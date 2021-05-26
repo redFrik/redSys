@@ -7,23 +7,23 @@
 //* someday maybe add support for compression and different header versions
 
 RedBMP {
-	var	<type,									//string "BM"
-		<>width,									//integer
-		<>height,									//integer
-		<>depth,									//integer
-		<fileSize,								//integer
-		<offset,									//integer
-		<headerSize,								//integer
-		<planes,									//integer
-		<compression,								//integer
-		<>imageSize,								//integer
-		<>horizontalResolution,						//integer
-		<>verticalResolution,						//integer
-		<>numColors,								//integer
-		<>numImportantColors,						//integer
-		<>topToBottom,							//flag
-		<>palette,								//array of color objects
-		<>data;									//array of color objects
+	var	<type,								//string "BM"
+	<>width,								//integer
+	<>height,								//integer
+	<>depth,								//integer
+	<fileSize,								//integer
+	<offset,								//integer
+	<headerSize,							//integer
+	<planes,								//integer
+	<compression,							//integer
+	<>imageSize,							//integer
+	<>horizontalResolution,					//integer
+	<>verticalResolution,					//integer
+	<>numColors,							//integer
+	<>numImportantColors,					//integer
+	<>topToBottom,							//flag
+	<>palette,								//array of color objects
+	<>data;									//array of color objects
 	*new {|width= 320, height= 240, depth= 32|
 		^super.new.initRedBMP(width, height, depth);
 	}
@@ -70,6 +70,27 @@ RedBMP {
 		path= path.standardizePath;
 		this.prWrite(path);
 	}
+	asInt32Array {
+		^Int32Array.fill(width*height, {|i|
+			Image.colorToPixel(data[i]);
+		});
+	}
+	asImage {
+		var img= Image(width, height).interpolation_(\fast);
+		img.pixels= this.asInt32Array;
+		^img;
+	}
+	plot {|bounds|
+		var b= bounds ?? {Rect(300, 300, width, height)};
+		var win= Window(this.class.name, b, false);
+		var img= this.asImage;
+		win.drawFunc= {
+			Pen.drawImage(Rect(0, 0, width, height), img);
+		};
+		win.onClose({img.free});
+		win.front;
+		^win;
+	}
 	makeWindow {|bounds|
 		var b= bounds ?? {Rect(300, 300, width, height)};
 		var win= Window(this.class.name, b, false);
@@ -89,7 +110,7 @@ RedBMP {
 		win.front;
 		^win;
 	}
-	
+
 	//--private
 	prRead {|path|
 		var file= File(path, "r");

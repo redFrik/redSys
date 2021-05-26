@@ -1,4 +1,4 @@
-a [Quark](http://supercollider-quarks.github.io/quarks/) for [SuperCollider](http://supercollider.github.io)
+a [Quark](https://supercollider-quarks.github.io/quarks/) for [SuperCollider](https://supercollider.github.io)
 
 install it from within supercollider with the command `Quarks.install("redSys")` and then recompile.
 
@@ -12,6 +12,7 @@ see redSysOverview in help
 
 ## changelog:
 
+* 210526 - RedBMP add support for Image
 * 180330 - RedIntelHex checksum bugfix
 * 180317 - redModule and redEffectsRack: added global lag
 * 180218 - replaced a few .interpret in hex-string to integer conversion

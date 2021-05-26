@@ -4,7 +4,7 @@ CATEGORIES:: Red>redTools
 RELATED:: Classes/RedGIF
 
 DESCRIPTION::
-Read and write .bmp files from disk. Handles 1, 4, 8, 16, 24 and 32bit depths. Includes a simple link::#-makeWindow:: method to display the pixels (but you should really write your own).
+Read and write .bmp files from disk. Handles 1, 4, 8, 16, 24 and 32bit depths. Includes simple link::#-makeWindow:: and link::#-plot:: methods to display the pixels (but you should really write your own).
 
 See http://en.wikipedia.org/wiki/BMP_file_format
 
@@ -23,8 +23,11 @@ PRIVATE:: prRead, prReadFileHeader, prWritePalette, prReadInfoHeader, prWrite, p
 METHOD:: write
 Write the bitmap image to disk.
 
+METHOD:: plot
+Generates an link::Classes/Image:: and display it.
+
 METHOD:: makeWindow
-As simple as possible.
+Display the pixels using link::Classes/Pen:: and code::fillRect::.
 
 METHOD:: type
 A string. "BM".
@@ -44,6 +47,12 @@ Colour table as a 1-dimensional array of link::Classes/Color:: objects. Size 256
 METHOD:: data
 The pixel data as a 1-dimensional array of link::Classes/Color:: objects. Reading from left to right, top to bottom. If you create your own make the size width*height.
 
+METHOD:: asImage
+Converts the data to an link::Classes/Image:: and return it. NOTE: remember to free the image.
+
+METHOD:: asInt32Array
+Converts the data to an link::Classes/Int32Array:: and return it.
+
 EXAMPLES::
 
 CODE::
@@ -56,6 +65,9 @@ a= RedBMP.read("/Developer/Extras/Java/JavaAdvancedImaging/JAIDemo/images/pond.b
 a.dump;
 a.makeWindow;
 
+a= RedBMP.read("~/Desktop/134px-Bmp_format.bmp");
+a.dump;
+a.plot;
 
 
 //--create an 32bit image from scratch
