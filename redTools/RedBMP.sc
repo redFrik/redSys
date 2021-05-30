@@ -71,8 +71,16 @@ RedBMP {
 		this.prWrite(path);
 	}
 	asInt32Array {
-		^Int32Array.fill(width*height, {|i|
-			Image.colorToPixel(data[i]);
+		if(topToBottom, {
+			^Int32Array.fill(width*height, {|i|
+				Image.colorToPixel(data[i]);
+			});
+		}, {
+			^Int32Array.fill(width*height, {|i|
+				var x= i%width;
+				var y= height-1-i.div(width);
+				Image.colorToPixel(data[y*width+x]);
+			});
 		});
 	}
 	asImage {
@@ -82,10 +90,10 @@ RedBMP {
 	}
 	plot {|bounds|
 		var b= bounds ?? {Rect(300, 300, width, height)};
-		var win= Window(this.class.name, b, false);
+		var win= Window(this.class.name, b);
 		var img= this.asImage;
 		win.drawFunc= {
-			Pen.drawImage(Rect(0, 0, width, height), img);
+			Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), img);
 		};
 		win.onClose= {img.free};
 		win.front;
@@ -101,7 +109,7 @@ RedBMP {
 				x= i%width;
 				y= i.div(width);
 				if(topToBottom.not, {
-					y= height-y;
+					y= height-1-y;
 				});
 				Pen.fillColor= c;
 				Pen.fillRect(Rect(x, y, 1, 1));
@@ -113,7 +121,7 @@ RedBMP {
 
 	//--private
 	prRead {|path|
-		var file= File(path, "r");
+		var file= File(path, "rb");
 		this.prReadFileHeader(file);
 		if(type=="BM", {							//possibly add "BA", "CI", "CP", "IC", "PT"
 			this.prReadInfoHeader(file);
@@ -176,7 +184,7 @@ RedBMP {
 			var g= file.getInt8.bitAnd(0xFF);
 			var r= file.getInt8.bitAnd(0xFF);
 			var a= file.getInt8.bitAnd(0xFF);
-			Color.new255(r, g, b);
+			Color(r/255, g/255, b/255);
 		}.dup(numColors);
 	}
 	prReadData {|file|
@@ -261,7 +269,7 @@ RedBMP {
 						var b= file.getInt8.bitAnd(0xFF);
 						var g= file.getInt8.bitAnd(0xFF);
 						var r= file.getInt8.bitAnd(0xFF);
-						data[y*width+x]= Color.new255(r, g, b);
+						data[y*width+x]= Color(r/255, g/255, b/255);
 					};
 					while({cnt%4>0}, {				//read padding bytes
 						file.getInt8;
@@ -277,7 +285,7 @@ RedBMP {
 						var g= file.getInt8.bitAnd(0xFF);
 						var r= file.getInt8.bitAnd(0xFF);
 						var a= file.getInt8.bitAnd(0xFF);
-						data[y*width+x]= Color.new255(r, g, b, a);
+						data[y*width+x]= Color(r/255, g/255, b/255, a/255);
 						if(a==0, {cnt= cnt+1});
 					};
 				};
@@ -293,7 +301,7 @@ RedBMP {
 		});
 	}
 	prWrite {|path|
-		var file= File(path, "w");
+		var file= File(path, "wb");
 		this.prWriteFileHeader(file);
 		this.prWriteInfoHeader(file);
 		if(palette.notNil, {

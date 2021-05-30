@@ -74,7 +74,7 @@ a.plot;
 b= RedBMP(320, 240, 32);
 b.dump;
 b.data= {Color.rand}.dup(b.width*b.height);	//creating our own noise pixel data
-b.makeWindow;
+b.plot;
 b.write("~/Desktop/testredbmp32a.bmp");		//save it to desktop
 
 
@@ -85,7 +85,7 @@ b.data= {|i|
 	var x= i%b.width;
 	Color.grey(sin(x/b.width*2pi+sin(x*0.11)), sin(i*0.01+sin(x*0.1)).abs);
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 
 
@@ -98,12 +98,12 @@ b.data= {|i|
 	var y= i.div(b.width);
 	b.palette[(Point(sin(x/6), cos(y/5)).rho>(x/b.width)).binaryValue];
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp1.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp1.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--creating a 4bit image from scratch
@@ -115,12 +115,12 @@ b.data= {|i|
 	var y= i.div(b.width);
 	b.palette[(sin(x/17)*cos(y/48)).linlin(-1, 1, 0, 15).round.asInteger];
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp4.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp4.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--creating an 8bit image from scratch
@@ -132,12 +132,12 @@ b.data= {|i|
 	var y= i.div(b.width);
 	b.palette[(sin(x/17)+cos(y/18)).linlin(-2, 2, 0, 255).round.asInteger];
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp8.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp8.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--creating a 16bit image from scratch
@@ -148,12 +148,12 @@ b.data= {|i|
 	var y= i.div(b.width);
 	Color(x*y%1234/1233, x*y%2345/2344, x*y%3456/3455);
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp16.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp16.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--creating a 24bit image from scratch
@@ -164,12 +164,12 @@ b.data= {|i|
 	var y= i.div(b.width);
 	Color.rand;
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp24.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp24.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--another 32bit image from scratch
@@ -180,28 +180,44 @@ b.data= {|i|
 	var y= i.div(b.width);
 	Color(sin(x/b.width*4pi).abs, sin(i*0.01).abs, sin(y/b.height*2pi).abs);
 }.dup(b.width*b.height);
-b.makeWindow;
+b.plot;
 )
 b.write("~/Desktop/testredbmp32.bmp");		//save it to desktop
 b= RedBMP.read("~/Desktop/testredbmp32.bmp");	//read it back
 b.dump
-b.makeWindow;
+b.plot;
 
 
 //--template for custom code to read, manipulate and display
 (
-	var scale= 3;
-	var a= RedBMP.read("/Developer/Extras/Java/JavaAdvancedImaging/JAIDemo/images/pond.bmp");	//edit to point at a bmp file
-	var win= Window("bmp", Rect(300, 300, a.width*scale, a.height*scale), false);
-	win.view.background= Color.red;
-	a.data= a.data.reverse;		//mess with the image pixel data
-	win.drawFunc= {
-		Pen.smoothing= true;
-		a.data.do{|c, i|
-			Pen.fillColor= Color(c.blue, c.green, c.red, c.alpha);
-			Pen.fillOval(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
-		};
+var scale= 3;
+var a= RedBMP.read("/Developer/Extras/Java/JavaAdvancedImaging/JAIDemo/images/pond.bmp");	//edit to point at a bmp file
+var win= Window("bmp", Rect(300, 300, a.width*scale, a.height*scale), false);
+win.view.background= Color.red;
+a.data= a.data.reverse;		//mess with the image pixel data
+win.drawFunc= {
+	Pen.smoothing= true;
+	a.data.do{|c, i|
+		Pen.fillColor= Color(c.blue, c.green, c.red, c.alpha);
+		Pen.fillOval(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
 	};
-	win.front;
+};
+win.front;
+)
+
+//--another template using the Image class
+(
+var scale= 1.5;
+var a= RedBMP.read("/Developer/Extras/Java/JavaAdvancedImaging/JAIDemo/images/pond.bmp");	//edit to point at a bmp file
+var win= Window("bmp", Rect(300, 300, a.width*scale, a.height*scale));
+var image;
+win.view.background= Color.red;
+a.data= a.data.round(0.5);        //mess with the image pixel data
+image= a.asImage;
+win.drawFunc= {
+	Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image);
+};
+win.onClose= {image.free};
+win.front;
 )
 ::
