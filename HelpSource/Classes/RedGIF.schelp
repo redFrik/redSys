@@ -62,14 +62,14 @@ Array of link::Classes/RedGIFImage:: objects.
 EXAMPLES::
 
 CODE::
-a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedDog.gif");
+a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedDog.gif", {|gif| gif.dump});
 a.dump;
 a.makeWindow;
 
 //--template for custom code to manipulate and display
 (
-var scale= 10;
-var a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedDog.gif");
+var scale= 2;
+var a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedDog.gif", {win.front});
 var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale), false);
 a.background= Color.blue;					//overwrite background colour
 a.images[0].data= a.images[0].data.reverse;	//mess with the image pixel data
@@ -83,7 +83,6 @@ win.drawFunc= {
 		});
 	};
 };
-win.front;
 )
 
 //--download example animated gif to desktop
@@ -92,26 +91,85 @@ win.front;
 //--template for animation (load an animated gif)
 (
 var scale= 2;
-var a= RedGIF.read("~/Desktop/dog.gif");
+var action;
+var a= RedGIF.read("~/Desktop/dog.gif", {action.value});
 var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale), false);
 var index= 0, img;
+win.background= Color.green;
 win.drawFunc= {
+	var diff;
 	Pen.smoothing= false;
 	img= a.images.wrapAt(index);
-	img.data.do{|col, i|
-		if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
-			Pen.fillColor= col;
-			Pen.fillRect(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
+	diff= a.width*a.height-img.data.size;
+	(a.width*a.height).do{|i|
+		var col;
+		if(i>=diff, {
+			col= img.data[i-diff];
+			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
+				Pen.fillColor= col;
+				Pen.fillRect(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
+			});
 		});
 	};
 };
-win.front;
-Routine({
-	while({win.isClosed.not}, {
-		win.refresh;
-		(img.control.duration*0.01).max(0.01).wait;
-		index= index+1;
-	});
-}).play(AppClock);
+action= {
+	Routine({
+		win.front;
+		while({win.isClosed.not}, {
+			win.refresh;
+			if(img.notNil, {
+				(img.control.duration*0.01).max(0.01).wait;
+			}, {
+				0.1.wait;
+			});
+			index= index+1;
+		});
+	}).play(AppClock);
+};
+)
+
+//or another template using the Image class
+(
+var scale= 2;
+var action;
+var a= RedGIF.read("~/Desktop/dog.gif", {action.value});
+var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale));
+var image= Image.color(a.width, a.height);
+var index= 0, img;
+win.background= Color.green;
+win.drawFunc= {
+	var diff;
+	img= a.images.wrapAt(index);
+	diff= a.width*a.height-img.data.size;
+	(a.width*a.height).do{|i|
+		var col;
+		if(i>=diff, {
+			col= img.data[i-diff];
+			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
+				image.setColor(col, i%a.width, i.div(a.width));
+			}, {
+				image.setColor(Color.clear, i%a.width, i.div(a.width));
+			});
+		}, {
+			image.setColor(Color.clear, i%a.width, i.div(a.width));
+		});
+	};
+	Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image)
+};
+win.onClose= {image.free};
+action= {
+	Routine({
+		win.front;
+		while({win.isClosed.not}, {
+			win.refresh;
+			if(img.notNil, {
+				(img.control.duration*0.01).max(0.01).wait;
+			}, {
+				0.1.wait;
+			});
+			index= index+1;
+		});
+	}).play(AppClock);
+};
 )
 ::
