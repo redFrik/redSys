@@ -87,7 +87,7 @@ RedBMP {
 		win.drawFunc= {
 			Pen.drawImage(Rect(0, 0, width, height), img);
 		};
-		win.onClose({img.free});
+		win.onClose= {img.free};
 		win.front;
 		^win;
 	}
