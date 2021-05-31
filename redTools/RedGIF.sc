@@ -45,7 +45,7 @@ RedGIF {
 			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
 				image.setColor(col, x, y);
 			}, {
-				image.setColor(clear, x, y);
+				image.setColor(background, x, y);
 			});
 		};
 		var interlace= {|passes, step, offset|
@@ -58,7 +58,8 @@ RedGIF {
 		};
 		win.view.background= background?clear;
 		win.drawFunc= {
-			var i= 0, size= image.width*image.height;
+			var i, j, size, x, y;
+			var left, right, top, bottom;
 			img= images.wrapAt(index);
 			if(img.interlaced, {
 				row= 0;
@@ -67,16 +68,27 @@ RedGIF {
 				interlace.value((height+1).div(4), 4, 2);
 				interlace.value(height.div(2), 2, 1);
 			}, {
+				i= 0;
+				j= 0;
+				left= img.bounds.left;
+				right= img.bounds.width+left;
+				top= img.bounds.top;
+				bottom= img.bounds.height+top;
+				size= width*height;
 				while({i<size}, {
-					var diff= size-img.data.size;
-					if(i<diff, {
-						image.setColor(clear, i%width, i.div(width));
-					}, {
-						drawPixel.value(i%width, i.div(width), img.data[i-diff]);
+					x= i%width;
+					y= i.div(width);
+					if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
+						drawPixel.value(x, y, img.data[j]);
+						j= j+1;
 					});
 					i= i+1;
 				});
 				Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image);
+				if(img.control.disposalMethod==2, {
+					image.fill(background);
+				});
+				//TODO ==3 restore previous
 			});
 		};
 		if(images.size>1, {						//if animated gif
@@ -116,32 +128,35 @@ RedGIF {
 					{(this.class.name++": unknown separator"+separator).warn}
 				);
 			});
-			"".postln;
-			images.do{|x, i|						//copy over control objects to image objects
+			file.close;
+			"\nuncompressing".post;
+			images.do{|image, i|						//copy over control objects to image objects
+				image.data= this.prDecode(image.data).collect{|x| image.colorMap[x]};
+				".".post;
 				if(i<controls.size, {				//set corresponding control object
-					x.control= controls[i];
+					image.control= controls[i];
 				}, {
 					if(controls.size>0, {			//use last found control object
-						x.control= controls.last;
+						image.control= controls.last;
 					}, {							//use default control
-						x.control= RedGIFControl.new;
-						x.control.duration= 0;
-						x.control.transparent= clear;
-						x.control.disposalMethod= 0;
-						x.control.userInputFlag= false;
-						x.control.transparentFlag= true;
+						image.control= RedGIFControl.new;
+						image.control.duration= 0;
+						image.control.transparent= clear;
+						image.control.disposalMethod= 0;
+						image.control.userInputFlag= false;
+						image.control.transparentFlag= true;
 					});
 				});
 			};
 		}, {
 			(this.class.name++": type"+type+"not recognized").error;
+			file.close;
 		});
-		file.close;
 	}
 	prReadHeader {|file|							//header with signature and version (6bytes)
 		type= {file.getChar}.dup(6).join;
 	}
-	prReadLogicalScreenDescriptor {|file|				//logical screen descriptor (7bytes)
+	prReadLogicalScreenDescriptor {|file|	//logical screen descriptor (7bytes)
 		var flags;
 		width= file.getInt16LE;						//logical screen width
 		height= file.getInt16LE;					//logical screen height
@@ -151,17 +166,19 @@ RedGIF {
 		if(aspectRatio!=0, {"aspectRatio not zero".warn});//debug
 		depth= flags.bitAnd(0x07)+1;				//size of global colour table
 		//resolution= flags.rightShift(4).bitAnd(0x07);//colour resolution (unused)
+
 		globalColorMap= [];
 		if(flags.bitTest(7), {						//global colour map (3bytes*numColors)
 			globalColorMap= {
-				Color.new255(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff));
-			}.dup(2.pow(depth));
+				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
+			}.dup(2.leftShift(depth-1));
 			background= globalColorMap[background];
 		}, {
 			background= nil;
 			//(this.class.name++": no global color map").postln;//debug
 		});
 	}
+
 	prReadExtensionBlock {|file|					//extension block (?bytes)
 		var flags, blockSize, ctrl;
 		switch(file.getInt8.bitAnd(0xff),
@@ -188,7 +205,7 @@ RedGIF {
 				flags= file.getInt8.bitAnd(0xff);	//packed field
 				ctrl.duration= file.getInt16LE;		//delay time (1/100ths of a second)
 				ctrl.transparent= globalColorMap[file.getInt8.bitAnd(0xff)];//transparent colour
-				ctrl.disposalMethod= flags.bitAnd(2r00111000).rightShift(3);//undraw
+				ctrl.disposalMethod= flags.bitAnd(2r00011100).rightShift(2);//undraw
 				ctrl.userInputFlag= flags.bitTest(1);	//wait for user input flag
 				ctrl.transparentFlag= flags.bitTest(0);//transparency flag
 				controls= controls.add(ctrl);
@@ -212,14 +229,15 @@ RedGIF {
 		);
 	}
 	prReadImageDescriptor {|file|					//local descriptor (10bytes)
-		var flags, bounds, image, data= [];
+		var flags, bounds, image;
 		bounds= {file.getInt16LE}.dup(4).asRect;
 		flags= file.getInt8.bitAnd(0xff);
 		image= RedGIFImage(bounds, flags);
+
 		if(image.hasColorMap, {
 			image.colorMap= {
-				Color.new255(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff));
-			}.dup(2.pow(image.depth));
+				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
+			}.dup(2.leftShift(image.depth-1));
 		}, {
 			//(this.class.name++": no local color map - using global").postln;//debug
 			image.colorMap= globalColorMap;
@@ -227,37 +245,34 @@ RedGIF {
 
 		//--read table based image data
 		codeSize= file.getInt8.bitAnd(0xff);
-		this.prInitDict;
-		image.data= this.prReadData(file).collect{|x|
-			image.colorMap[x];
-		};
+		image.data= this.prReadData(file);
 		images= images.add(image);
 	}
 	prReadData {|file|
-		var blockSize, data= Int8Array[];
+		var blockSize, data= List.new;
 		while({blockSize= file.getInt8.bitAnd(0xff); blockSize!=0}, {
-			data= data++file.read(Int8Array.newClear(blockSize)).bitAnd(0xff);
+			data.addAll(file.read(Int8Array.newClear(blockSize)).bitAnd(0xff));
 		});
-		^this.prDecode(data);
+		^data
 	}
+
 	prInitDict {
-		var size= 2.pow(codeSize).asInteger;
+		var size= 2.leftShift(codeSize-1);
 		dict= Array.newClear(4096);
 		size.do{|i| dict.put(i, [i])};
-		clearCode= size;
-		endCode= clearCode+1;
 		dict.put(clearCode, [clearCode]);
 		dict.put(endCode, [endCode]);
 	}
 	prDecode {|arr|								//lzw decompression
 		var str= Int8Array.fill(arr.size*8, {|i| arr[i.div(8)].rightShift(i%8).bitAnd(1)});
-		var old, out= [], val, sub, more= true;
+		var old, val, out= List.new, sub, more= true, cnt;
 		var k, tempCodeSize= codeSize+1, index= 0;
-		var cnt= endCode+1;
+		clearCode= 2.leftShift(codeSize-1);
+		endCode= clearCode+1;
 		while({more}, {
 			k= 0;
 			tempCodeSize.do{|i|
-				k= k+(str[index]*2.pow(i));
+				k= k+(str[index]*2.leftShift(i-1));
 				index= index+1;
 			};
 			if(k==clearCode, {
@@ -276,14 +291,14 @@ RedGIF {
 					}, {
 						sub= dict[old]++val;
 					});
-					out= out++sub;
+					out.addAll(sub);
 					val= sub[0];
 					if(old.notNil, {
 						dict.put(cnt, dict[old]++val);
 						cnt= cnt+1;
 					});
 					old= k;
-					if(cnt==2.pow(tempCodeSize), {
+					if(cnt==2.leftShift(tempCodeSize-1), {
 						tempCodeSize= tempCodeSize+1;
 						if(tempCodeSize==13, {
 							tempCodeSize= codeSize+1;
@@ -296,15 +311,17 @@ RedGIF {
 		});
 		^out;
 	}
-
 }
+
 RedGIFImage {
 	var <bounds, <flags, <>colorMap, <>data, <>control;
 	*new {|bounds, flags| ^super.newCopyArgs(bounds, flags)}
 	depth {^flags.bitAnd(0x07)+1}
 	hasColorMap {^flags.bitTest(7)}
 	interlaced {^flags.bitTest(6)}
+	sorted {^flags.bitTest(5)}
 }
+
 RedGIFControl {
 	var	<>duration,							//integer
 	<>transparent,							//color
