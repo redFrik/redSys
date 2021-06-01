@@ -35,7 +35,7 @@ RedGIF {
 		}, {(this.class.name++": file"+path+"not found").error});
 	}
 
-	makeWindow {|bounds|
+	makeWindow {|bounds, rate= 1.0|
 		var b= bounds ?? {Rect(300, 300, width, height)};
 		var win= Window(this.class.name, b);
 		var image= Image(width, height).interpolation_(\fast);
@@ -48,11 +48,12 @@ RedGIF {
 				row= row+1;
 			};
 		};
-		win.view.background= background??{Color.clear};
 		win.drawFunc= {
 			var i, j, size, x, y, col;
 			var left, right, top, bottom;
+			var clear= Color.clear;
 			img= images.wrapAt(index);
+			win.view.background= background?clear;
 			if(img.interlaced, {
 				row= 0;
 				interlace.value((height+7).div(8), 8, 0);
@@ -73,7 +74,7 @@ RedGIF {
 					if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
 						col= img.data[j];
 						if(img.control.transparentFlag and:{col==img.control.transparent}, {
-							col= background;
+							col= clear;
 						});
 						image.setColor(col, x, y);
 						j= j+1;
@@ -81,19 +82,20 @@ RedGIF {
 					i= i+1;
 				});
 				Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image);
-				if(img.control.disposalMethod==2, {
-					image.fill(background);
-				});
-				//TODO ==3 restore previous
+				switch(img.control.disposalMethod,
+					1, nil,  //leave image for overwrite
+					2, {image.fill(background)},  //restore background
+					3, {"TODO disposalMethod==3 restore previous".postln}
+				);
 			});
 		};
 		if(images.size>1, {						//if animated gif
 			Routine({
 				while({win.isClosed.not}, {
-					win.refresh;
 					//check userinputflag here
 					if(img.notNil, {
-						(img.control.duration*0.01).max(0.01).wait;
+						(img.control.duration*0.01/rate).max(0.01).wait;
+						win.refresh;
 						index= index+1;
 					}, {
 						0.01.wait;

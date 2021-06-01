@@ -17,7 +17,7 @@ LIST::
 CLASSMETHODS::
 
 METHOD:: read
-Create a RedGIF by reading and decoding a .gif file from disk. Might take a long time to decode.
+Create a RedGIF by reading and decoding a .gif file from disk. Might take some time to decode.
 
 INSTANCEMETHODS::
 
@@ -25,6 +25,12 @@ PRIVATE:: prReadHeader, prReadLogicalScreenDescriptor, prDecode, prReadExtension
 
 METHOD:: makeWindow
 As simple as possible.
+
+ARGUMENT:: bounds
+A link::Classes/Rect:: that defines the position and size of the window.
+
+ARGUMENT:: rate
+A link::Classes/Float:: for changing playback rate of animated GIFs. E.g. 0.5 will play at half speed.
 
 METHOD:: type
 A string. Either "GIF87a" or "GIF89a".
