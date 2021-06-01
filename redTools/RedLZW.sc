@@ -5,39 +5,39 @@
 
 RedLZW {
 	*compress {|input|
-		var tab= {|i| [i]}.dup(256);
-		var out= [];
+		var tab= List.fill(256, {|i| [i]});
+		var out= List.new;
 		var sub= [];
 		input.do{|val|
 			var tmp= sub++val;
-			if(tab.find([tmp]).notNil, {
+			if(tab.includesEqual(tmp), {
 				sub= tmp;
 			}, {
-				tab= tab++[tmp];
-				out= out++tab.find([sub]);
+				tab.add(tmp);
+				out.add(tab.indexOfEqual(sub));
 				sub= [val];
 			});
 		};
-		^out++tab.find([sub]);
+		^out.add(tab.indexOfEqual(sub)).array;
 	}
 	*decompress {|input|
-		var tab= (0..255);
+		var tab= List.fill(256, {|i| [i]});
 		var old= input[0];
-		var out= [old];
+		var out= List[old];
 		var val= old;
 		input.drop(1).do{|k|
 			var sub;
 			if(tab[k].notNil, {
 				sub= tab[k];
 			}, {
-				sub= tab[old].asCollection++val;
+				sub= tab[old]++val;
 			});
-			out= out++sub;
-			val= sub.asCollection[0];
-			tab= tab++[tab[old].asCollection++val];
+			out.addAll(sub);
+			val= sub[0];
+			tab.addAll([tab[old]++val]);
 			old= k;
 		};
-		^out;
+		^out.array;
 	}
 }
 
@@ -81,7 +81,7 @@ RedLZW {
 		};
 		^out										//string
 	}
-	
+
 	//--variant.  no difference in speed though
 	*compress2 {|input|							//string
 		var dict= {|i| i.asAscii.asSymbol}.dup(256);
