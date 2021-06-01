@@ -39,26 +39,18 @@ RedGIF {
 		var b= bounds ?? {Rect(300, 300, width, height)};
 		var win= Window(this.class.name, b);
 		var image= Image(width, height).interpolation_(\fast);
-		var clear= Color.clear;
 		var index= 0, img, row;
-		var drawPixel= {|x, y, col|
-			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
-				image.setColor(col, x, y);
-			}, {
-				image.setColor(background, x, y);
-			});
-		};
 		var interlace= {|passes, step, offset|
 			passes.do{|j|
 				img.data.copyRange(row*width, row+1*width-1).do{|col, i|
-					drawPixel.value(i, j*step+offset, col);
+					image.setColor(col, i, j*step+offset);//TODO test and check transparent
 				};
 				row= row+1;
 			};
 		};
-		win.view.background= background?clear;
+		win.view.background= background??{Color.clear};
 		win.drawFunc= {
-			var i, j, size, x, y;
+			var i, j, size, x, y, col;
 			var left, right, top, bottom;
 			img= images.wrapAt(index);
 			if(img.interlaced, {
@@ -76,10 +68,14 @@ RedGIF {
 				bottom= img.bounds.height+top;
 				size= width*height;
 				while({i<size}, {
-					x= i%width;
+					x= i.mod(width);
 					y= i.div(width);
 					if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
-						drawPixel.value(x, y, img.data[j]);
+						col= img.data[j];
+						if(img.control.transparentFlag and:{col==img.control.transparent}, {
+							col= background;
+						});
+						image.setColor(col, x, y);
 						j= j+1;
 					});
 					i= i+1;
@@ -114,7 +110,6 @@ RedGIF {
 	prRead {|path|
 		var file= File(path, "rb");
 		var separator;
-		var clear= Color.clear;
 		this.prReadHeader(file);
 		if(type=="GIF87a" or:{type=="GIF89a"}, {
 			this.prReadLogicalScreenDescriptor(file);
@@ -141,13 +136,14 @@ RedGIF {
 					}, {							//use default control
 						image.control= RedGIFControl.new;
 						image.control.duration= 0;
-						image.control.transparent= clear;
+						image.control.transparent= Color.clear;
 						image.control.disposalMethod= 0;
 						image.control.userInputFlag= false;
 						image.control.transparentFlag= true;
 					});
 				});
 			};
+			"".postln;
 		}, {
 			(this.class.name++": type"+type+"not recognized").error;
 			file.close;
@@ -264,7 +260,7 @@ RedGIF {
 		dict.put(endCode, [endCode]);
 	}
 	prDecode {|arr|								//lzw decompression
-		var str= Int8Array.fill(arr.size*8, {|i| arr[i.div(8)].rightShift(i%8).bitAnd(1)});
+		var str= Int8Array.fill(arr.size*8, {|i| arr[i.div(8)].rightShift(i.mod(8)).bitAnd(1)});
 		var old, val, out= List.new, sub, more= true, cnt;
 		var k, tempCodeSize= codeSize+1, index= 0;
 		clearCode= 2.leftShift(codeSize-1);
