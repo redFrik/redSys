@@ -77,7 +77,7 @@ RedBMP {
 			});
 		}, {
 			^Int32Array.fill(width*height, {|i|
-				var x= i%width;
+				var x= i.mod(width);
 				var y= height-1-i.div(width);
 				Image.colorToPixel(data[y*width+x]);
 			});
@@ -106,7 +106,7 @@ RedBMP {
 			Pen.smoothing= false;
 			data.do{|c, i|
 				var x, y;
-				x= i%width;
+				x= i.mod(width);
 				y= i.div(width);
 				if(topToBottom.not, {
 					y= height-1-y;
@@ -197,13 +197,13 @@ RedBMP {
 					cnt= 0;
 					width.do{|x|
 						var index;
-						if(x%8==0, {
+						if(x.mod(8)==0, {
 							i= file.getInt8.bitAnd(0xFF);
 						});
-						index= i.bitTest(7-(x%8)).binaryValue;
+						index= i.bitTest(7-(x.mod(8))).binaryValue;
 						data[y*width+x]= palette[index];
 					};
-					while({cnt%4>0}, {				//read padding bytes
+					while({cnt.mod(4)>0}, {				//read padding bytes
 						file.getInt8;
 						cnt= cnt+1;
 					});
@@ -215,18 +215,18 @@ RedBMP {
 					cnt= 0;
 					width.do{|x|
 						var index;
-						if(x%2==0, {
+						if(x.mod(2)==0, {
 							i= file.getInt8.bitAnd(0xFF);
 							cnt= cnt+1;
 						});
-						if(x%2==0, {
+						if(x.mod(2)==0, {
 							index= i.bitAnd(2r11110000).rightShift(4);
 						}, {
 							index= i.bitAnd(2r00001111);
 						});
 						data[y*width+x]= palette[index];
 					};
-					while({cnt%4>0}, {				//read padding bytes
+					while({cnt.mod(4)>0}, {				//read padding bytes
 						file.getInt8;
 						cnt= cnt+1;
 					});
@@ -239,7 +239,7 @@ RedBMP {
 						var index= file.getInt8.bitAnd(0xFF);
 						data[y*width+x]= palette[index];
 					};
-					while({cnt%4>0}, {				//read padding bytes
+					while({cnt.mod(4)>0}, {				//read padding bytes
 						file.getInt8;
 						cnt= cnt+1;
 					});
@@ -256,7 +256,7 @@ RedBMP {
 						var b= i.bitAnd(2r0000000000011111);
 						data[y*width+x]= Color(r/31, g/31, b/31, 1-a);
 					};
-					while({cnt%4>0}, {				//read padding bytes
+					while({cnt.mod(4)>0}, {				//read padding bytes
 						file.getInt16LE;
 						cnt= cnt+1;
 					});
@@ -271,7 +271,7 @@ RedBMP {
 						var r= file.getInt8.bitAnd(0xFF);
 						data[y*width+x]= Color(r/255, g/255, b/255);
 					};
-					while({cnt%4>0}, {				//read padding bytes
+					while({cnt.mod(4)>0}, {				//read padding bytes
 						file.getInt8;
 						cnt= cnt+1;
 					});
@@ -362,8 +362,8 @@ RedBMP {
 							(this.class.name++": color"+c+"at data index"+(y*width*x)+"not found in palette. replacing with 1st color").warn;
 							i= 0;
 						});
-						ii= ii+(2.pow(7-(x%8))*i);
-						if(x%8==7, {
+						ii= ii+(2.pow(7-(x.mod(8)))*i);
+						if(x.mod(8)==7, {
 							file.putInt8(ii);
 							cnt= cnt+1;
 							ii= 0;
@@ -374,7 +374,7 @@ RedBMP {
 						file.putInt8(ii);
 						cnt= cnt+1;
 					});
-					while({cnt%4>0}, {				//write padding bytes
+					while({cnt.mod(4)>0}, {				//write padding bytes
 						file.putInt8(0);
 						cnt= cnt+1;
 					});
@@ -392,7 +392,7 @@ RedBMP {
 							(this.class.name++": color"+c+"at data index"+(y*width*x)+"not found in palette. replacing with 1st color").warn;
 							i= 0;
 						});
-						if(x%2==0, {
+						if(x.mod(2)==0, {
 							ii= i;
 						}, {
 							file.putInt8(ii.leftShift(4)+i);
@@ -405,7 +405,7 @@ RedBMP {
 						file.putInt8(ii.leftShift(4));
 						cnt= cnt+1;
 					});
-					while({cnt%4>0}, {				//write padding bytes
+					while({cnt.mod(4)>0}, {				//write padding bytes
 						file.putInt8(0);
 						cnt= cnt+1;
 					});
@@ -423,7 +423,7 @@ RedBMP {
 						});
 						file.putInt8(i);
 					};
-					while({cnt%4>0}, {				//write padding bytes
+					while({cnt.mod(4)>0}, {				//write padding bytes
 						file.putInt8(0);
 						cnt= cnt+1;
 					});
@@ -440,7 +440,7 @@ RedBMP {
 						var b= (c.blue*31).round.asInteger;
 						file.putInt16LE(a+r+g+b);
 					};
-					while({cnt%4>0}, {				//write padding bytes
+					while({cnt.mod(4)>0}, {				//write padding bytes
 						file.putInt16LE(0);
 						cnt= cnt+1;
 					});
@@ -455,7 +455,7 @@ RedBMP {
 						file.putInt8((c.green*255).round.asInteger);
 						file.putInt8((c.red*255).round.asInteger);
 					};
-					while({cnt%4>0}, {				//write padding bytes
+					while({cnt.mod(4)>0}, {				//write padding bytes
 						file.putInt8(0);
 						cnt= cnt+1;
 					});
