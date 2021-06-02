@@ -8,10 +8,10 @@ Read and decodes a .gif file from disk. Includes a simple link::#-makeWindow:: m
 
 See
 LIST::
-## http://www.onicos.com/staff/iz/formats/gif.html
-## http://local.wasp.uwa.edu.au/~pbourke/dataformats/gif/
+## http://www33146ue.sakura.ne.jp/staff/iz/formats/gif.html
+## http://paulbourke.net/dataformats/gif/
 ## http://www.daubnet.com/formats/GIF.html
-## http://www.cis.udel.edu/%7Eamer/CISC651/lzw.and.gif.explained.html
+## https://www.eecis.udel.edu/~amer/CISC651/lzw.and.gif.explained.html
 ::
 
 CLASSMETHODS::
@@ -21,7 +21,7 @@ Create a RedGIF by reading and decoding a .gif file from disk. Might take some t
 
 INSTANCEMETHODS::
 
-PRIVATE:: prReadHeader, prReadLogicalScreenDescriptor, prDecode, prReadExtensionBlock, prReadImageDescriptor, prReadData, prInitDict, prRead
+PRIVATE:: prReadHeader, prReadLogicalScreenDescriptor, prDecode, prReadExtensionBlock, prReadImageDescriptor, prReadData, prRead
 
 METHOD:: makeWindow
 As simple as possible.
