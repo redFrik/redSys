@@ -2,7 +2,7 @@
 
 RedRLE {
 	*encode {|input|
-		var out= [], cnt, val, i= 0;
+		var out= List[], cnt, val, i= 0;
 		while({i<input.size}, {
 			cnt= 1;
 			val= input[i];
@@ -10,19 +10,20 @@ RedRLE {
 				cnt= cnt+1;
 				i= i+1;
 			});
-			out= out++cnt++val;
+			out.add(cnt);
+			out.add(val);
 			i= i+1;
 		});
-		^out;
+		^out.array;
 	}
 	*decode {|input|
-		var out= [], cnt, val, i= 0;
+		var out= List[], cnt, val, i= 0;
 		while({i<input.size}, {
 			cnt= input[i];
 			val= input[i+1];
-			out= out++val.dup(cnt);
+			out.addAll(val.dup(cnt));
 			i= i+2;
 		});
-		^out;
+		^out.array;
 	}
 }
