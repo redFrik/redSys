@@ -13,7 +13,7 @@ RedBitStream : Stream {
 		pos= argPos.clip(0, collection.size*byte);
 	}
 	peek {
-		^this.peekByte.rightShift(pos%byte)&1;
+		^this.peekByte.rightShift(pos.mod(byte)).bitAnd(1);
 	}
 	next {
 		var bit;
@@ -36,10 +36,10 @@ RedBitStream : Stream {
 		this.poke(item);
 		pos= pos+1;
 	}
-	
+
 	//--
 	poke {|bit|
-		collection.put(this.bytePos, this.peekByte.setBit(pos%byte, bit!=0));
+		collection.put(this.bytePos, this.peekByte.setBit(pos.mod(byte), bit!=0));
 	}
 	bytePos {
 		^pos.div(byte);
@@ -65,9 +65,9 @@ RedBitStream : Stream {
 }
 RedBitStream2 : RedBitStream {
 	peek {
-		^this.peekByte.rightShift(byte-1-(pos%byte))&1;
+		^this.peekByte.rightShift(byte-1-pos.mod(byte)).bitAnd(1);
 	}
 	poke {|bit|
-		collection.put(this.bytePos, this.peekByte.setBit(byte-1-(pos%byte), bit!=0));
+		collection.put(this.bytePos, this.peekByte.setBit(byte-1-pos.mod(byte), bit!=0));
 	}
 }
