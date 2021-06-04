@@ -2,30 +2,30 @@
 
 RedBencode {
 	*encode {|array|
-		var res= "";
+		var res= List.new;
 		array.do{|val, i|
 			case
-			{val.isInteger} {//integer
-				res= res++$i++val++$e;
+			{val.isInteger} {  //integer
+				res.add($i).add(val).add($e);
 			}
-			{val.isString} {//string
-				res= res++val.size++$:++val;
+			{val.isString} {  //string
+				res.add(val.size).add($:).add(val);
 			}
-			{val.isKindOf(Set)} {//dictionary
-				res= res++$d;
-				val.asSortedArray.do{|a| res= res++this.encode([a[0].asString, a[1]])};
-				res= res++$e;
+			{val.isKindOf(Set)} {  //dictionary
+				res.add($d);
+				val.asSortedArray.do{|a| res.add(this.encode([a[0].asString, a[1]]))};
+				res.add($e);
 			}
-			{val.isSequenceableCollection} {//list
-				res= res++$l++this.encode(val)++$e;
+			{val.isSequenceableCollection} {  //list
+				res.add($l).add(this.encode(val)).add($e);
 			}
-			{(this.class.name++": error encoding"+val+"at index"+i).error}
+			{("%: error encoding % at index %").format(this.class.name, val, i).error}
 		};
-		^res;
+		^res.join;
 	}
 	*encodeBytes {|array|
 		var str= this.encode(array);
-		^Int8Array.fill(str.size, {|i| str[i].ascii});
+		^str.collectAs({|x| x.ascii}, Int8Array);
 	}
 	*decodeBytes {|array|
 		^this.decodeString(String.fill(array.size, {|i| array[i].asAscii}));
@@ -34,63 +34,63 @@ RedBencode {
 		^this.decode(CollStream(string));
 	}
 	*decode {|stream|
-		var running= true, state= 0, res= [];
+		var running= true, state= 0, res= List.new;
 		var str, chr, tmp, dict;
 		while({running}, {
 			chr= stream.next;
 			running= chr.notNil;
 			switch(state,
-				0, {//new item
+				0, {  //new item
 					case
 					{chr.isNil} {
 						running= false;
 					}
-					{chr==$i} {//integer
+					{chr==$i} {  //integer
 						state= 1;
 						str= "";
 					}
-					{chr.isDecDigit} {//string length
+					{chr.isDecDigit} {  //string length
 						state= 2;
 						str= ""++chr;
 					}
-					{chr==$l} {//list recursion call
-						res= res.add(this.decode(stream));
+					{chr==$l} {  //list recursion call
+						res.add(this.decode(stream));
 					}
-					{chr==$d} {//dictionary recursion call
+					{chr==$d} {  //dictionary recursion call
 						tmp= this.decode(stream);
 						dict= Dictionary(tmp.size);
 						tmp.pairsDo{|k, v| dict.put(k.asSymbol, v)};
-						res= res.add(dict);
+						res.add(dict);
 					}
-					{chr==$e} {//end of list or dictionary
+					{chr==$e} {  //end of list or dictionary
 						running= false;
 					}
-					{(this.class.name++": error decoding"+chr+"at index"+stream.pos).error}
+					{("%: error decoding % at index %").format(this.class.name, chr, stream.pos).error}
 				},
-				1, {//integer
+				1, {  //integer
 					case
-					{chr.isDecDigit or:{chr==$-}} {//integer digits or sign
+					{chr.isDecDigit or:{chr==$-}} {  //integer digits or sign
 						str= str++chr;
 					}
-					{chr==$e} {//end of integer
-						res= res.add(str.asInteger);
+					{chr==$e} {  //end of integer
+						res.add(str.asInteger);
 						state= 0;
 					}
-					{(this.class.name++": error decoding integer"+chr+"at index"+stream.pos).error}
+					{("%: error decoding integer % at index %").format(this.class.name, chr, stream.pos).error}
 				},
-				2, {//string
+				2, {  //string
 					case
-					{chr.isDecDigit} {//string length
+					{chr.isDecDigit} {  //string length
 						str= str++chr;
 					}
-					{chr==$:} {//string delimiter and content
-						res= res.add(stream.nextN(str.asInteger));
+					{chr==$:} {  //string delimiter and content
+						res.add(stream.nextN(str.asInteger));
 						state= 0;
 					}
-					{(this.class.name++": error decoding string"+chr+"at index"+stream.pos).error}
+					{("%: error decoding string % at index %").format(this.class.name, chr, stream.pos).error}
 				}
 			);
 		});
-		^res;
+		^res.array;
 	}
 }
