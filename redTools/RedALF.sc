@@ -2,30 +2,30 @@
 
 RedALF {
 	*atolf {|str|
-		var res= [1/2**5];
-		var tre= [2**12, 2**20, 2**28];
+		var res= List[1/(1<<5)];
+		var tre= [1<<12, 1<<20, 1<<28];
 		str.do{|chr, i|
 			var j= i.div(3);
-			if(i%3==2, {
-				res= res++(1/2**5);
+			if(i.mod(3)==2, {
+				res.add(1/(1<<5));
 			});
-			res.put(j, res[j]+(chr.ascii/tre[i%3]));
+			res.put(j, res[j]+(chr.ascii/tre[i.mod(3)]));
 		};
-		^res;
+		^res.array;
 	}
 	*lftoa {|arr|
-		var res= "";
+		var res= List[];
 		arr.do{|val|
 			var a, b, c;
-			val= val-(1/2**5)*(2**12);
+			val= val-(1/(1<<5))*4096;
 			a= val.asInteger;
-			val= val-a*(2**8);
+			val= val-a*256;
 			b= val.asInteger;
-			val= val-b*(2**8);
+			val= val-b*256;
 			c= val.asInteger;
-			res= res++a.asAscii++b.asAscii++c.asAscii;
+			res.add(a).add(b).add(c);
 		};
-		^res;
+		^res.select{|x| x>0}.collectAs({|x| x.asAscii}, String);
 	}
 }
 
