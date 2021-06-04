@@ -115,7 +115,7 @@ RedGIF {
 		if(type=="GIF87a" or:{type=="GIF89a"}, {
 			this.prReadLogicalScreenDescriptor(file);
 			images= [];
-			"reading".post;
+			"reading ".post;
 			while({separator= file.getInt8.bitAnd(0xff); separator!=0x3b}, {
 				switch(separator,
 					0x21, {this.prReadExtensionBlock(file)},
@@ -125,7 +125,7 @@ RedGIF {
 				);
 			});
 			file.close;
-			"\nuncompressing".post;
+			"\ndecoding".post;
 			images.do{|image, i|  //copy over control objects to image objects
 				image.data= this.prDecode(image.data).collect{|x| image.colorMap[x]};
 				".".post;
@@ -171,7 +171,7 @@ RedGIF {
 		if(flags.bitTest(7), {  //global color map (3bytes*numColors)
 			globalColorMap= {
 				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
-			}.dup(2.leftShift(depth-1));
+			}.dup(1.leftShift(depth));
 			background= globalColorMap[background];
 		}, {
 			globalColorMap= [];
@@ -236,7 +236,7 @@ RedGIF {
 		if(image.hasColorMap, {
 			image.colorMap= {
 				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
-			}.dup(2.leftShift(image.depth-1));
+			}.dup(1.leftShift(image.depth));
 		}, {
 			image.colorMap= globalColorMap;
 		});
@@ -257,57 +257,51 @@ RedGIF {
 
 	//--lzw decompression
 	prDecode {|arr|
-		var clearCode= 2.leftShift(codeSize-1);
+		var clearCode= 1.leftShift(codeSize);
 		var endCode= clearCode+1;
-		var cnt, dict, tempCodeSize;
-		var clear= {
-			cnt= endCode+1;
-			dict= Array.newClear(4096).overWrite({|i| [i]}.dup(cnt));
-			tempCodeSize= codeSize+1;
-		};
+		var dict, initArr= {|i| [i]}.dup(endCode+1);
 		var str= Int8Array.fill(arr.size*8, {|i| arr[i.div(8)].rightShift(i.mod(8)).bitAnd(1)});
-		var old, val, out= List[], sub, more= true;
-		var k, index= 0;
-		clear.value;
+		var code, index= 0, tempCodeSize= codeSize+1;
+		var c, old, out= List[], val;
+		var more= true;
+
 		while({more}, {
-			k= 0;
+			code= 0;
 			tempCodeSize.do{|i|
-				k= k+(str[index]*2.leftShift(i-1));
+				code= code+(str[index]*1.leftShift(i));
 				index= index+1;
 			};
-			if(k==clearCode, {
-				clear.value;
-				if(index>tempCodeSize, {
-					index= index+3;
-				});
+			if(code==clearCode, {
+				dict= Array(4096).overWrite(initArr);
+				tempCodeSize= codeSize+1;
+				code= 0;
+				tempCodeSize.do{|i|
+					code= code+(str[index]*1.leftShift(i));
+					index= index+1;
+				};
+				out.add(code);
+				val= [code];
 			}, {
-				if(k==endCode, {
+				if(code==endCode, {
 					more= false;
 				}, {
-					if(dict[k].notNil, {
-						sub= dict[k];
+					c= dict[code];
+					if(c.notNil, {
+						dict.add(val++c[0]);
 					}, {
-						sub= dict[old]++val;
+						c= dict[old]++val[0];
+						dict.add(c);
 					});
-					out.addAll(sub);
-					val= sub[0];
-					if(old.notNil, {
-						dict[cnt]= dict[old]++val;
-						cnt= cnt+1;
-					});
-					old= k;
-					if(cnt==2.leftShift(tempCodeSize-1), {
+					val= c.asCollection;
+					out.addAll(c);
+					if(tempCodeSize<12 and:{dict.size==1.leftShift(tempCodeSize)}, {
 						tempCodeSize= tempCodeSize+1;
-						if(tempCodeSize==13, {
-							tempCodeSize= codeSize+1;
-							old= nil;
-							val= nil;
-						});
 					});
 				});
 			});
+			old= code;
 		});
-		^out;
+		^out.array;
 	}
 }
 
