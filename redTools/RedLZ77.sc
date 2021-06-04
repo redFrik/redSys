@@ -2,9 +2,9 @@
 
 RedLZ77 {
 	classvar <>window= 4096, <>length= 32;
-	
+
 	*compress {|input|
-		var out= [], i= 0, len, off, sub, j;
+		var out= List[], i= 0, len, off, sub, j;
 		while({i<input.size}, {
 			len= length;
 			while({
@@ -16,7 +16,7 @@ RedLZ77 {
 				len= len-1;
 			});
 			if(off.isNil, {
-				out= out++[0, 0, sub[0]];
+				out.addAll([0, 0, sub[0]]);
 				i= i+1;
 			}, {
 				if(off+len==i, {
@@ -28,34 +28,34 @@ RedLZ77 {
 					});
 					len= len+j;
 				});
-				out= out++[len, i.min(window-1)-off];
+				out.addAll([len, i.min(window-1)-off]);
 				i= i+len;
 				if(i<input.size, {
-					out= out++input[i];
+					out.add(input[i]);
 					i= i+1;
 				});
 			});
 		});
-		^out;
+		^out.array;
 	}
 	*decompress {|input|
-		var out= [], i= 0, len, off;
+		var out= List[], i= 0, len, off;
 		while({i<input.size}, {
 			len= input[i];
 			if(len==0, {
-				out= out++input[i+2];
+				out.add(input[i+2]);
 			}, {
 				off= input[i+1];
 				while({len>0}, {
-					out= out++out[out.size-off];
+					out.add(out[out.size-off]);
 					len= len-1;
 				});
 				if(i+2<input.size, {
-					out= out++input[i+2];
+					out.add(input[i+2]);
 				});
 			});
 			i= i+3;
 		});
-		^out;
+		^out.array;
 	}
 }
