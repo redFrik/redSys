@@ -7,11 +7,11 @@ RedHuffman {
 		var out, n0, n1;
 
 		//--build a forest of small trees
-		tree= [];
+		tree= List[];
 		arr.do{|val|
 			var n= tree.detect{|x| x.key==val};
 			if(n.isNil, {
-				tree= tree.add((val -> 1));			//value and counter association
+				tree.add((val -> 1));			//value and counter association
 			}, {
 				n.value= n.value+1;				//increase counter
 			});
@@ -21,11 +21,11 @@ RedHuffman {
 		while({tree.size>2}, {
 			n0= this.prTakeMinimum;
 			n1= this.prTakeMinimum;
-			tree= tree.add(([n0, n1] -> (n0.value+n1.value)));
+			tree.add((List[n0, n1] -> (n0.value+n1.value)));
 		});
 
 		//--remove counters from tree
-		tree= this.prRebuildTree(tree);
+		tree= this.prRebuildTree(tree, List.new);
 
 		//--build dictionary
 		dict= ();
@@ -39,15 +39,15 @@ RedHuffman {
 		^out;
 	}
 	*decompress {|str|
-		var out= [], tmp= tree;
+		var out= List[], tmp= tree;
 		str.do{|x|
 			tmp= tmp[x.digit];
-			if(tmp.isArray.not, {
-				out= out++tmp;
+			if(tmp.isCollection.not, {
+				out.add(tmp);
 				tmp= tree;
 			});
 		};
-		^out;
+		^out.array;
 	}
 	*binaryStringToBytes {|str|
 		pad= 0;
@@ -56,12 +56,12 @@ RedHuffman {
 				x= x++0;
 				pad= pad+1;
 			});
-			x.sum{|bit, i| 2**(x.size-1-i)*bit.digit}.asInteger;
+			x.sum{|bit, i| 1<<(x.size-1-i)*bit.digit};
 		};
 	}
 	*bytesToBinaryString {|arr|
 		var str= arr.collect{|x|
-			x.asBinaryString(8);
+			x.asStringToBase(2, 8);
 		}.join;
 		^str.copyRange(0, str.size-1-pad);
 	}
@@ -80,18 +80,23 @@ RedHuffman {
 		tree.removeAt(ii);
 		^nn;
 	}
-	*prRebuildTree {|arr|
-		^arr.collect{|x|
-			if(x.key.isArray, {
-				this.prRebuildTree(x.key);
-			}, {
-				x.key;
-			});
+
+	*prRebuildTree {|list, res|
+		list.do{|x|
+			res.add(
+				if(x.key.isCollection, {
+					this.prRebuildTree(x.key, List.new);
+				}, {
+					x.key;
+				})
+			);
 		};
+		^res;
 	}
-	*prBuildDict {|arr, str|
-		arr.do{|x, i|
-			if(x.isArray, {
+
+	*prBuildDict {|list, str|
+		list.do{|x, i|
+			if(x.isCollection, {
 				this.prBuildDict(x, str++i);
 			}, {
 				dict.put(x, str++i);

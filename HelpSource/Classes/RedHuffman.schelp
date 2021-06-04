@@ -32,7 +32,7 @@ METHOD:: pad
 Semi-private counter for number of padded zeros. Set by link::#*binaryStringToBytes:: and read by link::#*bytesToBinaryString::.
 
 METHOD:: tree
-Multi-level array with values as leaves.
+Multi-level link::Classes/List:: with values as leaves.
 
 METHOD:: dict
 Look-up dictionary with values and binary strings.
