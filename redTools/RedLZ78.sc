@@ -5,30 +5,32 @@
 
 RedLZ78 {
 	*compress {|input|
-		var tab= [], out= [], i= 0, j, match, sub, last;
+		var tab= [], out= List[], i= 0, j, match, sub, last;
 		while({i<input.size}, {
 			j= 0;
 			last= 0;
 			while({
 				sub= input.copyRange(i, i+j);
-				match= tab.find([sub]);
+				match= tab.indexOfEqual(sub);
 				match.notNil and:{i+j<(input.size-1)};
 			}, {
 				last= match;
 				j= j+1;
 			});
-			tab= tab++[sub];
+			tab= tab.add(sub);
 			if(j==0, {
-				out= out++0++input[i+j];
+				out.add(0);
+				out.add(input[i+j]);
 			}, {
-				out= out++(last+1)++input[i+j];
+				out.add(last+1);
+				out.add(input[i+j]);
 			});
 			i= i+1+j;
 		});
-		^out;
+		^out.array;
 	}
 	*decompress {|input|
-		var tab= [], out= [], i= 0, j, match, sub, val;
+		var tab= List[], out= List[], i= 0, match, sub, val;
 		while({i<input.size}, {
 			match= input[i];
 			val= input[i+1];
@@ -37,10 +39,10 @@ RedLZ78 {
 			}, {
 				sub= tab[match-1]++val;
 			});
-			tab= tab.add(sub);
-			out= out++sub;
+			tab.add(sub);
+			out.addAll(sub);
 			i= i+2;
 		});
-		^out;
+		^out.array;
 	}
 }
