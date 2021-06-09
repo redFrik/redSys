@@ -32,6 +32,9 @@ A link::Classes/Rect:: that defines the position and size of the window.
 ARGUMENT:: rate
 A link::Classes/Float:: for changing playback rate of animated GIFs. E.g. 0.5 will play at half speed.
 
+ARGUMENT:: interpolation
+A link::Classes/Symbol:: that can be either code::\fast:: or code::\smooth::.
+
 METHOD:: type
 A string. Either "GIF87a" or "GIF89a".
 
