@@ -21,7 +21,11 @@ RedGIF {
 
 	<>images,  //array of images
 
-	codeSize;  //integer used for lzw decompression
+	//used for lzw decompression
+	dict,  //array of arrays
+	val,  //array
+	old,  //integer
+	codeSize;  //integer
 
 	*read {|path, action|
 		^super.new.read(path, action);
@@ -37,23 +41,25 @@ RedGIF {
 	makeWindow {|bounds, rate= 1.0|
 		var b= bounds ?? {Rect(300, 300, width, height)};
 		var win= Window(this.class.name, b);
-		var image= Image(width, height).interpolation_(\fast);
-		var index= 0, img, row;
+		var img= Image(width, height).interpolation_(\fast);
+		var index= 0, image, row;
 		var interlace= {|passes, step, offset|
 			passes.do{|j|
-				img.data.copyRange(row*width, row+1*width-1).do{|col, i|
-					image.setColor(col, i, j*step+offset);//TODO test and check transparent
+				image.data.copyRange(row*width, row+1*width-1).do{|col, i|
+					img.setColor(col, i, j*step+offset);//TODO test and check transparent
 				};
 				row= row+1;
 			};
 		};
 		win.drawFunc= {
-			var i, j, size, x, y, col;
+			var i, j, x, y, size;
 			var left, right, top, bottom;
-			var clear= Color.clear;
-			img= images.wrapAt(index);
-			win.view.background= background?clear;
-			if(img.interlaced, {
+			image= images.wrapAt(index);
+			if(background.notNil and:{index%images.size==0}, {
+				img.fill(background);
+			});
+			if(image.interlaced, {
+				"image.interlaced".postln;
 				row= 0;
 				interlace.value((height+7).div(8), 8, 0);
 				interlace.value((height+3).div(8), 8, 4);
@@ -62,28 +68,28 @@ RedGIF {
 			}, {
 				i= 0;
 				j= 0;
-				left= img.bounds.left;
-				right= img.bounds.width+left;
-				top= img.bounds.top;
-				bottom= img.bounds.height+top;
+				left= image.bounds.left;
+				right= image.bounds.width+left;
+				top= image.bounds.top;
+				bottom= image.bounds.height+top;
 				size= width*height;
 				while({i<size}, {
 					x= i.mod(width);
 					y= i.div(width);
 					if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
-						col= img.data[j];
-						if(img.control.transparentFlag and:{col==img.control.transparent}, {
-							col= clear;
+						if(image.control.transparentFlag.not or:{
+							image.indices[j]!=image.control.transparent
+						}, {
+							img.setColor(image.data[j], x, y);
 						});
-						image.setColor(col, x, y);
 						j= j+1;
 					});
 					i= i+1;
 				});
-				Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image);
-				switch(img.control.disposalMethod,
+				Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), img);
+				switch(image.control.disposalMethod,
 					1, nil,  //leave image for overwrite
-					2, {image.fill(background)},  //restore background
+					2, {img.fill(background)},  //restore background
 					3, {"TODO disposalMethod==3 restore previous".postln}
 				);
 			});
@@ -92,17 +98,13 @@ RedGIF {
 			Routine({
 				while({win.isClosed.not}, {
 					//TODO check userinputflag here
-					if(img.notNil, {
-						(img.control.duration*0.01/rate).max(0.01).wait;
-						win.refresh;
-						index= index+1;
-					}, {
-						0.01.wait;
-					});
+					(images.wrapAt(index).control.duration*0.01/rate).max(0.01).wait;
+					index= index+1;
+					win.refresh;
 				});
 			}).play(AppClock);
 		});
-		win.onClose= {image.free};
+		win.onClose= {img.free};
 		win.front;
 		^win;
 	}
@@ -127,7 +129,12 @@ RedGIF {
 			file.close;
 			"\ndecoding".post;
 			images.do{|image, i|  //copy over control objects to image objects
-				image.data= this.prDecode(image.data).collect{|x| image.colorMap[x]};
+				image.data= this.prDecode(image.data);
+				image.indices= Array(image.data.size);
+				image.data= image.data.collect{|x|
+					image.indices.add(x);
+					image.colorMap[x];
+				};
 				".".post;
 				if(i<controls.size, {  //set corresponding control object
 					image.control= controls[i];
@@ -136,7 +143,7 @@ RedGIF {
 						image.control= controls.last;
 					}, {  //use default control
 						image.control= RedGIFControl.new;
-						image.control.duration= 0;
+						image.control.duration= 10;
 						image.control.transparent= Color.clear;
 						image.control.disposalMethod= 0;
 						image.control.userInputFlag= false;
@@ -165,13 +172,13 @@ RedGIF {
 		if(aspectRatio!=0, {
 			aspectRatio= aspectRatio+15/64;
 		});
-		depth= flags.bitAnd(0x07)+1;  //size of global color table
-		resolution= flags.rightShift(4).bitAnd(0x07)+1;
+		depth= 1.leftShift(flags.bitAnd(0x07)+1);  //size of global color table
 		sorted= flags.rightShift(3).bitAnd(0x01);
+		resolution= flags.rightShift(4).bitAnd(0x07);
 		if(flags.bitTest(7), {  //global color map (3bytes*numColors)
 			globalColorMap= {
 				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
-			}.dup(1.leftShift(depth));
+			}.dup(depth);
 			background= globalColorMap[background];
 		}, {
 			globalColorMap= [];
@@ -204,8 +211,8 @@ RedGIF {
 				blockSize= file.getInt8.bitAnd(0xff);
 				flags= file.getInt8.bitAnd(0xff);  //packed field
 				ctrl.duration= file.getInt16LE;  //delay time (1/100ths of a second)
-				ctrl.transparent= globalColorMap[file.getInt8.bitAnd(0xff)];
-				ctrl.disposalMethod= flags.bitAnd(2r00011100).rightShift(2);
+				ctrl.transparent= file.getInt8.bitAnd(0xff);
+				ctrl.disposalMethod= flags.rightShift(2).bitAnd(0x07);
 				ctrl.userInputFlag= flags.bitTest(1);  //wait for user input flag
 				ctrl.transparentFlag= flags.bitTest(0);  //transparency flag
 				controls= controls.add(ctrl);
@@ -236,7 +243,7 @@ RedGIF {
 		if(image.hasColorMap, {
 			image.colorMap= {
 				Color(*file.read(Int8Array[0, 0, 0]).bitAnd(0xff)/255);
-			}.dup(1.leftShift(image.depth));
+			}.dup(image.depth);
 		}, {
 			image.colorMap= globalColorMap;
 		});
@@ -252,33 +259,35 @@ RedGIF {
 		while({blockSize= file.getInt8.bitAnd(0xff); blockSize!=0}, {
 			data.addAll(file.read(Int8Array.newClear(blockSize)).bitAnd(0xff));
 		});
-		^data
+		^data;
 	}
 
 	//--lzw decompression
 	prDecode {|arr|
+		var extractCode= {
+			var i= 0;
+			{|size|
+				var sum= 0, j= 0;
+				while({j<size}, {
+					sum= sum+(arr[i.div(8)].rightShift(i.mod(8)).bitAnd(1)*1.leftShift(j));
+					i= i+1;
+					j= j+1;
+				});
+				sum;
+			};
+		}.value;
 		var clearCode= 1.leftShift(codeSize);
 		var endCode= clearCode+1;
-		var dict, initArr= {|i| [i]}.dup(endCode+1);
-		var str= Int8Array.fill(arr.size*8, {|i| arr[i.div(8)].rightShift(i.mod(8)).bitAnd(1)});
-		var code, index= 0, tempCodeSize= codeSize+1;
-		var c, old, out= List[], val;
+		var initArr= {|i| [i]}.dup(endCode+1);
+		var code, tempCodeSize= codeSize+1;
+		var c, out= List[];
 		var more= true;
-
 		while({more}, {
-			code= 0;
-			tempCodeSize.do{|i|
-				code= code+(str[index]*1.leftShift(i));
-				index= index+1;
-			};
+			code= extractCode.value(tempCodeSize);
 			if(code==clearCode, {
 				dict= Array(4096).overWrite(initArr);
 				tempCodeSize= codeSize+1;
-				code= 0;
-				tempCodeSize.do{|i|
-					code= code+(str[index]*1.leftShift(i));
-					index= index+1;
-				};
+				code= extractCode.value(tempCodeSize);
 				out.add(code);
 				val= [code];
 			}, {
@@ -306,17 +315,17 @@ RedGIF {
 }
 
 RedGIFImage {
-	var <bounds, <flags, <>colorMap, <>data, <>control;
+	var <bounds, <flags, <>colorMap, <>data, <>control, <>indices;
 	*new {|bounds, flags| ^super.newCopyArgs(bounds, flags)}
-	depth {^flags.bitAnd(0x07)+1}
 	hasColorMap {^flags.bitTest(7)}
 	interlaced {^flags.bitTest(6)}
 	sorted {^flags.bitTest(5)}
+	depth {^1.leftShift(flags.bitAnd(0x07)+1)}  //size of local color table
 }
 
 RedGIFControl {
 	var	<>duration,  //integer
-	<>transparent,  //color
+	<>transparent,  //integer
 	<>disposalMethod,  //integer
 	<>userInputFlag,  //boolean
 	<>transparentFlag;  //boolean

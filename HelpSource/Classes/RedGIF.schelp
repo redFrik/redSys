@@ -45,10 +45,10 @@ METHOD:: aspectRatio
 Usually 0.
 
 METHOD:: depth
-Colour depth.
+Number of colors in the globalColorMap array (the color lookup table).
 
 METHOD:: globalColorMap
-Array of colours.
+Array of link::Classes/Color:: objects.
 
 METHOD:: controls
 Array of link::Classes/RedGIFControl:: objects. Corresponding control also saved in each link::Classes/RedGIFImage::. See below.
@@ -72,18 +72,20 @@ a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedD
 a.dump;
 a.makeWindow;
 
-//--template for custom code to manipulate and display
+//--template for custom display code (non animating)
 (
 var scale= 2;
 var a= RedGIF.read("/Library/Application Support/Apple/iChat Icons/Funk Animals/RedDog.gif", {win.front});
 var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale), false);
-a.background= Color.blue;					//overwrite background colour
-a.images[0].data= a.images[0].data.reverse;	//mess with the image pixel data
-win.view.background= a.background;
+var image;
+win.background= Color.green;
 win.drawFunc= {
 	Pen.smoothing= false;
-	a.images[0].data.do{|col, i|
-		if(a.controls[0].transparentFlag.not or:{a.controls[0].transparent!=col}, {
+	image= a.images[0];
+	image.data.do{|col, i|
+		if(image.control.transparentFlag.not or:{
+			image.control.transparent!=image.indices[i]
+		}, {
 			Pen.fillColor= col;
 			Pen.fillOval(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
 		});
@@ -92,90 +94,108 @@ win.drawFunc= {
 )
 
 //--download example animated gif to desktop
-"cd ~/Desktop; curl -o dog.gif http://www.animatedimages.org/data/media/202/animated-dog-image-0022.gif".unixCmd;
+"cd ~/Desktop; curl -o dog.gif https://www.animatedimages.org/data/media/202/animated-dog-image-0022.gif".unixCmd;
 
 //--template for animation (load an animated gif)
 (
 var scale= 2;
 var action;
 var a= RedGIF.read("~/Desktop/dog.gif", {action.value});
-var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale), false);
-var index= 0, img;
+var win= Window("gif animation", Rect(300, 300, a.width*scale, a.height*scale), false);
+var image, index= 0;
+var i, j, x, y, size;
+var left, right, top, bottom;
 win.background= Color.green;
 win.drawFunc= {
-	var diff;
 	Pen.smoothing= false;
-	img= a.images.wrapAt(index);
-	diff= a.width*a.height-img.data.size;
-	(a.width*a.height).do{|i|
-		var col;
-		if(i>=diff, {
-			col= img.data[i-diff];
-			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
-				Pen.fillColor= col;
-				Pen.fillRect(Rect(i%a.width*scale, i.div(a.width)*scale, scale, scale));
+	image= a.images.wrapAt(index);
+	i= 0;
+	j= 0;
+	left= image.bounds.left;
+	right= image.bounds.width+left;
+	top= image.bounds.top;
+	bottom= image.bounds.height+top;
+	size= a.width*a.height;
+	while({i<size}, {
+		x= i.mod(a.width);
+		y= i.div(a.width);
+		if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
+			if(image.control.transparentFlag.not or:{
+				image.indices[j]!=image.control.transparent
+			}, {
+				Pen.fillColor= image.data[j];
+				Pen.fillRect(Rect(x*scale, y*scale, scale, scale));
 			});
+			j= j+1;
 		});
-	};
+		i= i+1;
+	});
 };
 action= {
-	Routine({
-		win.front;
-		while({win.isClosed.not}, {
-			win.refresh;
-			if(img.notNil, {
-				(img.control.duration*0.01).max(0.01).wait;
-			}, {
-				0.1.wait;
+	if(a.images.size>1, {  //if animated gif
+		Routine({
+			while({win.isClosed.not}, {
+				(a.images.wrapAt(index).control.duration*0.01).max(0.01).wait;
+				index= index+1;
+				win.refresh;
 			});
-			index= index+1;
-		});
-	}).play(AppClock);
+		}).play(AppClock);
+	});
+	win.front;
 };
 )
 
-//or another template using the Image class
+//or another animation template using the Image class (faster and can resize)
 (
 var scale= 2;
 var action;
 var a= RedGIF.read("~/Desktop/dog.gif", {action.value});
-var win= Window("gif", Rect(300, 300, a.width*scale, a.height*scale));
-var image= Image.color(a.width, a.height);
-var index= 0, img;
-win.background= Color.green;
+var win= Window("gif animation 2", Rect(300, 300, a.width*scale, a.height*scale));
+var img= Image.color(a.width, a.height);
+var image, index= 0;
+var i, j, x, y, size;
+var left, right, top, bottom;
 win.drawFunc= {
-	var diff;
-	img= a.images.wrapAt(index);
-	diff= a.width*a.height-img.data.size;
-	(a.width*a.height).do{|i|
-		var col;
-		if(i>=diff, {
-			col= img.data[i-diff];
-			if(img.control.transparentFlag.not or:{img.control.transparent!=col}, {
-				image.setColor(col, i%a.width, i.div(a.width));
+	image= a.images.wrapAt(index);
+	i= 0;
+	j= 0;
+	left= image.bounds.left;
+	right= image.bounds.width+left;
+	top= image.bounds.top;
+	bottom= image.bounds.height+top;
+	size= a.width*a.height;
+	while({i<size}, {
+		x= i.mod(a.width);
+		y= i.div(a.width);
+		if(x>=left and:{x<right and:{y>=top and:{y<bottom}}}, {
+			if(image.control.transparentFlag.not or:{
+				image.indices[j]!=image.control.transparent
 			}, {
-				image.setColor(Color.clear, i%a.width, i.div(a.width));
+				img.setColor(image.data[j], x, y);
 			});
-		}, {
-			image.setColor(Color.clear, i%a.width, i.div(a.width));
+			j= j+1;
 		});
-	};
-	Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), image)
+		i= i+1;
+	});
+	Pen.drawImage(Rect(0, 0, win.bounds.width, win.bounds.height), img);
+	img.fill(a.background);
 };
-win.onClose= {image.free};
+win.onClose= {img.free};
 action= {
-	Routine({
-		win.front;
-		while({win.isClosed.not}, {
-			win.refresh;
-			if(img.notNil, {
-				(img.control.duration*0.01).max(0.01).wait;
-			}, {
-				0.1.wait;
+	if(a.images.size>1, {  //if animated gif
+		Routine({
+			while({win.isClosed.not}, {
+				(a.images.wrapAt(index).control.duration*0.01).max(0.01).wait;
+				index= index+1;
+				win.refresh;
 			});
-			index= index+1;
-		});
-	}).play(AppClock);
+		}).play(AppClock);
+	});
+	win.front;
 };
 )
+
+//NOTE: these templates are slightly simplified and will not
+//display all .gif files. Look at the .makeWindow method for
+//a more elaborate version.
 ::

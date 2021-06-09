@@ -19,19 +19,25 @@ METHOD:: flags
 Semi-private image settings. Use the methods link::#-depth::, link::#-hasColorMap::, link::#-interlaced:: below instead.
 
 METHOD:: colorMap
-Image specific (a.k.a. local) array of colours.
+Image specific (a.k.a. local) array of link::Classes/Color:: objects.
 
 METHOD:: data
 The pixel data as a 1-dimensional array of link::Classes/Color:: objects. Reading from left to right, top to bottom.
+
+METHOD:: indices
+The pixel data as an array of integer indices for looking up colors in the colorMap.
 
 METHOD:: control
 A link::Classes/RedGIFControl:: object.
 
 METHOD:: depth
-Colour depth.
+Number of colors in the colorMap array (the color lookup table).
 
 METHOD:: hasColorMap
-A boolean. true if local link::#-colorMap::.
+A boolean. true if local link::#-colorMap:: should be used. if false then globalColorMap.
 
 METHOD:: interlaced
 A boolean. Indicates that this image needs to be drawn in separate passes.
+
+METHOD:: sorted
+A boolean.
