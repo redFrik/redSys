@@ -12,6 +12,7 @@ see redSysOverview in help
 
 ## changelog:
 
+* 210610 - huge speed improvements to most data compression classes, RedGIF massive speed improvements and important fixes
 * 210526 - RedBMP add support for Image
 * 180330 - RedIntelHex checksum bugfix
 * 180317 - redModule and redEffectsRack: added global lag
@@ -61,4 +62,3 @@ see redSysOverview in help
 * 091025 - some changes to RedToolsMenu. added Redraw
 * 091009 - new effects: RedEfxDely, RedEfxWave, RedEfxDelp, RedEfxTanh. added a limiter to RedEfxTank. argument name changes for RedEfxOcta and RedEfxGuit. added template to RedEffectModule.sc file
 * 090916 - added RedEfxTanh, RedEfxWave and a template in the RedEffectModule.sc file
-::

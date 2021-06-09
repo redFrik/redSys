@@ -6,6 +6,6 @@
 	\helpdoc:		"RedSys.html",
 	\url:			"http://www.fredrikolofsson.com/",
 	\dependencies:	["TabbedView"],
-	\version:		0.52,
+	\version:		0.54,
 	\isCompatible:	{Main.versionAtLeast(3, 6)}
 )
