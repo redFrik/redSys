@@ -31,7 +31,7 @@ ARGUMENT:: lag
 For equalizer settings, balance and volume. In seconds.
 
 METHOD::restoreFile
-Reads back a redMixer with all settings from an archived instance. Also see LINK::#-store::.
+Reads back a redMixer with all settings from an archived instance. Also see link::#-store::.
 
 NOTE::
 Call code::.init:: after this to initialize server side objects.
@@ -39,6 +39,16 @@ Call code::.init:: after this to initialize server side objects.
 
 ARGUMENT::path
 A file path as a string.
+
+METHOD:: restoreArchive
+Similar to link::#*restoreFile:: but directly takes an link::Classes/Archive:: as argument.
+
+NOTE::
+Call code::.init:: after this to initialize server side objects.
+::
+
+ARGUMENT:: archive
+An link::Classes/Archive::.
 
 INSTANCEMETHODS::
 
@@ -92,8 +102,11 @@ Index of input channel. Can also be an array of indices.
 METHOD:: def
 Should probably be private.
 
+METHOD:: isReady
+code::true:: after the server is booted and the internal mixer is added and created.
+
 METHOD::store
-Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see LINK::#*restoreFile::.
+Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see link::#*restoreFile::.
 
 ARGUMENT::path
 A file path as a string.
@@ -141,6 +154,8 @@ a.channels[1].vol= 12	//turn up second input
 a.channels[1].bal= 1	//balance hard right on second mixer channel
 a.channels[1].bal= -1	//balance hard left
 a.mixer.bal= 0.9	//main out balance right
+c= a.gui;
+c.close;
 b.stop
 a.free
 
@@ -225,9 +240,9 @@ a.channels[1].eqLo= 1	//turn on channel specific eq
 a.channels[1].loGain= 9
 a.channels[1].loFreq= 1000	//frequency sweep from 70 (defalut) up to 1000hz
 a.channels[0].insertClass(RedEfxRing, \addToHead);
-a.channels[0].inserts[0].cvs.ringMix.input= 0.5;
-a.channels[0].inserts[0].cvs.ringMul.input= 0.4;
-a.channels[0].inserts[0].cvs.ringRate.input= 0.3;
+a.channels[0].inserts[0].ringMix= 0.75;
+a.channels[0].inserts[0].ringMul= 400;
+a.channels[0].inserts[0].ringRate= 0.3;
 a.store("~/Desktop/redMixer-test.txt".standardizePath)	//same as .writeArchive
 //recompile
 a= RedMixer.restoreFile("~/Desktop/redMixer-test.txt".standardizePath);	//same as readArchive
@@ -237,9 +252,9 @@ a.mixer.bal	//should be 0.75
 a.mixer.vol	//should be -6
 a.mixer.miFreq	//should be 300
 a.channels[1].loFreq	//should be 1000
-a.channels[0].inserts[0].cvs.ringMix.input	//should be 0.5
-a.channels[0].inserts[0].cvs.ringMul.input	//should be 0.4
-a.channels[0].inserts[0].cvs.ringRate.input	//should be 0.3
+a.channels[0].inserts[0].ringMix	//should be 0.75
+a.channels[0].inserts[0].ringMul	//should be 400
+a.channels[0].inserts[0].ringRate	//should be 0.3
 b= {SinOsc.ar([400, 404], 0, 0.5)}.play(outbus: 20);
 c= {PinkNoise.ar(0.5!2)}.play(outbus: 30);
 d= {WhiteNoise.ar(0.1!2)}.play(outbus: 40);

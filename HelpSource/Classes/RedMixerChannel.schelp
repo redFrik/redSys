@@ -19,15 +19,25 @@ If code::nil:: then code::Server.default.defaultGroup:: will be used.
 ARGUMENT:: lag
 For eq settings, balance and volume. In seconds.
 
-METHOD::restoreFile
-Reads back a redMixerChannel with all settings from an archived instance. Also see LINK::#-store::.
+METHOD:: restoreFile
+Reads back a redMixerChannel with all settings from an archived instance. Also see link::#-store::.
 
 NOTE::
 Call code::.init:: after this to initialize server side objects.
 ::
 
-ARGUMENT::path
+ARGUMENT:: path
 A file path as a string.
+
+METHOD:: restoreArchive
+Similar to link::#*restoreFile:: but directly takes an link::Classes/Archive:: as argument.
+
+NOTE::
+Call code::.init:: after this to initialize server side objects.
+::
+
+ARGUMENT:: archive
+An link::Classes/Archive::.
 
 INSTANCEMETHODS::
 
@@ -110,10 +120,10 @@ Returns the mixer channel link::Classes/SynthDef::.
 METHOD:: defEq
 Returns the equalizer link::Classes/SynthDef::.
 
-METHOD::store
-Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see LINK::#*restoreFile::.
+METHOD:: store
+Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see link::#*restoreFile::.
 
-ARGUMENT::path
+ARGUMENT:: path
 A file path as a string.
 
 METHOD:: peaks

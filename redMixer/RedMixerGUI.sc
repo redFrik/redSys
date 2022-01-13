@@ -11,54 +11,24 @@
 //preview/monitor synth and connect to numbox
 
 RedMixerGUI {
+
 	classvar <>numMixerChannelsBeforeScroll= 11;	//todo!!!
+
 	var <win, <redMixer, <time, lastTime= 0, controllers,
 	mainGUIchannels, mainGUImixers, mainGUIviews, mirrorGUIviews;
+
 	*new {|redMixer, position|
 		^super.new.initRedMixerGUI(redMixer, position);
 	}
+
 	initRedMixerGUI {|argRedMixer, position|
 		Routine({
 			var tab, winWidth, winHeight, tabWidth, tabHeight, topHeight,
-			macroMenu, macroFunctions, makeMirror, defaults,
-			margin= Point(4, 4), gap= Point(4, 4), lagBox;
+			macroMenu, macroFunctions, macroItems, makeMirror, defaults,
+			lagBox, bw= 44, lh= 14;
+
 			while({argRedMixer.isReady.not}, {0.02.wait});
 			controllers= List.new;
-
-			redMixer= argRedMixer;
-			position= position ?? {Point(300, 200)};
-
-			tabWidth= RedMixerChannelGUI.width+gap.x;
-			tabWidth= tabWidth*(redMixer.mixers.size+redMixer.channels.size);
-			topHeight= 10;
-			tabHeight= RedMixerChannelGUI.height+2+topHeight;
-
-			winWidth= (tabWidth+(margin.x*2)).max(260);
-			winHeight= tabHeight+topHeight+gap.y+(margin.y*2)+16;
-			win= Window(
-				redMixer.class.name.asString.put(0, $r),
-				Rect(position.x, position.y, winWidth, winHeight),
-				false
-			);
-			win.front;
-			win.view.background= GUI.skins.redFrik.background;
-			win.view.decorator= FlowLayout(win.view.bounds, margin, gap);
-
-			lagBox= RedNumberBox(win)
-			.value_(redMixer.lag)
-			.action_({|v|
-				redMixer.lag= v.value.max(0);
-			});
-			controllers.add(
-				SimpleController(redMixer.cvs.lag).put(\value, {|ref|
-					lagBox.value= ref.value;
-				})
-			);
-			win.view.decorator.shift(-2, 2);
-			RedStaticText(win, nil, "lag");
-			win.view.decorator.shift(2, -2);
-			RedButton(win, nil, "monitor", "monitor").action_{|view| "todo".postln};  //TODO
-			RedNumberBox(win).value_(7).action_{|view| "todo".postln};
 
 			macroFunctions= {|index|
 				var gui;
@@ -91,8 +61,7 @@ RedMixerGUI {
 					}}
 				][index].value;
 			};
-			macroMenu= RedPopUpMenu(win)
-			.items_([
+			macroItems= #[
 				"_macros_",
 				"defaults",
 				"randomize all",
@@ -108,43 +77,90 @@ RedMixerGUI {
 				"copy >",
 				"save preset",
 				"load preset"
-			])
-			.action_{|view|
-				macroFunctions.value(view.value);
-			};
-			RedButton(win, Point(14, 14), "<").action= {
-				macroFunctions.value(macroMenu.value);
-			};
-			win.view.decorator.nextLine;
+			];
 
-			win.view.decorator.shift(100, 0);
-			time= RedSlider(win)
-			.action_{|view|
-				if(tab.activeTab==0, {
-					if(lastTime==0 and:{view.value>0}, {
-						mainGUIviews.do{|x| x.do{|y| y.save}};
-					});
-					mainGUIviews.do{|x, i|
-						x.do{|y, j|
-							y.interp(mirrorGUIviews[i][j].value, view.value);
-						};
-					};
-					tab.backgrounds_([
-						GUI.skins.redFrik.foreground.copy.alpha_(1-view.value),
-						GUI.skins.redFrik.background
-					]);
-				});
-				lastTime= view.value;
-			};
-			win.view.decorator.shift(-100, -4);
+			redMixer= argRedMixer;
+			position= position ?? {Point(300, 200)};
 
-			tab= TabbedView(
-				win,
-				Point(tabWidth, tabHeight),
-				#[\now, \later],
-				[Color.grey(0.2, 0.2), GUI.skins.redFrik.background],
-				scroll: true
+			tabWidth= RedMixerChannelGUI.width+4;
+			tabWidth= tabWidth*(redMixer.mixers.size+redMixer.channels.size);
+			topHeight= 10;
+			tabHeight= RedMixerChannelGUI.height+2+topHeight;
+
+			winWidth= (tabWidth+8).max(260);
+			winHeight= tabHeight+topHeight+32;
+			win= Window(
+				redMixer.class.name.asString.put(0, $r),
+				Rect(position.x, position.y, winWidth, winHeight),
+				false
 			);
+			win.front;
+			win.view.background= GUI.skins.redFrik.background;
+
+			win.view.layout= VLayout(
+				HLayout(
+					lagBox= RedNumberBox(win).maxHeight_(lh).maxWidth_(bw)
+					.value_(redMixer.lag)
+					.action_({|v| redMixer.lag= v.value.max(0)});
+					controllers.add(
+						SimpleController(redMixer.cvs.lag).put(\value, {|ref|
+							lagBox.value= ref.value;
+						})
+					);
+					lagBox,
+					RedStaticText(win, nil, "lag").maxHeight_(lh).maxWidth_(20),
+
+					RedButton(win, nil, "monitor", "monitor").maxHeight_(lh).maxWidth_(52)
+					.action_{|v| "todo".postln},  //TODO
+					RedNumberBox(win).maxHeight_(lh).maxWidth_(bw)
+					.value_(7).action_{|v| "todo".postln},
+
+					macroMenu= RedPopUpMenu(win).maxHeight_(lh)
+					.items_(macroItems)
+					.action_{|v| macroFunctions.value(v.value)},
+					RedButton(win, nil, "<").maxHeight_(lh).maxWidth_(lh)
+					.action_{
+						macroFunctions.value(macroMenu.value);
+					},
+
+					View()  //spacer
+				),
+
+				HLayout(
+					100,  //spacer
+
+					time= RedSlider(win).maxHeight_(lh).maxWidth_(100)
+					.action_{|v|
+						if(tab.activeTab==0, {
+							if(lastTime==0 and:{v.value>0}, {
+								mainGUIviews.do{|x| x.do{|y| y.save}};
+							});
+							mainGUIviews.do{|x, i|
+								x.do{|y, j|
+									y.interp(mirrorGUIviews[i][j].value, v.value);
+								};
+							};
+							tab.backgrounds_([
+								GUI.skins.redFrik.foreground.copy.alpha_(1-v.value),
+								GUI.skins.redFrik.background
+							]);
+						});
+						lastTime= v.value;
+					},
+
+					View()  //spacer
+				),
+
+				tab= TabbedView(
+					win,
+					nil,
+					#[\now, \later],
+					[Color.grey(0.2, 0.2), GUI.skins.redFrik.background],
+					scroll: true
+				);
+				tab.view.minHeight_(tabHeight)
+			).margins_(4).spacing_(4);
+
 			tab.views.do{|x| x.hasHorizontalScroller= false};
 			tab.font= RedFont.new;
 			tab.stringFocusedColor= GUI.skins.redFrik.foreground;
@@ -176,25 +192,30 @@ RedMixerGUI {
 			defaults= mainGUIviews.collect{|x| x.collect{|y| y.view.value}};
 			makeMirror= {|v, x|
 				var views= List.new;
-				var cmp= CompositeView(v, x.cmp.bounds);
+				var view= View(v, x.view.bounds);
 				var ampRef= x.redMixerChannel.cvs.amp;	//special case to keep this link
 				var ampRefCopy= ampRef.copy;
 				x.views.do{|y|
-					var r;
+					var r, nv;
 					if(y.ref==ampRef, {
 						r= ampRefCopy;
 					}, {
 						r= y.ref.copy;
 					});
-					views.add(y.class.new(cmp, y.view.bounds, r, y.map, y.unmap, y.args));
+					nv= y.class.new(view, y.view.bounds, r, y.map, y.unmap, y.args);
+					if(y.isKindOf(RedGUICVSlider), {
+						nv.view.orientation= y.view.orientation;
+					});
+					views.add(nv);
 				};
 				views;
 			};
-			tab.views[1].flow{|v|
+			tab.view.toFrontAction_{
 				mirrorGUIviews= (mainGUIchannels++mainGUImixers).collect{|x|
-					makeMirror.value(v, x);
+					makeMirror.value(tab.views[1], x);
 				};
 			};
+
 			redMixer.channels.do{|x, i|
 				controllers.add(
 					SimpleController(x.cvs.out).put(\value, {|ref|
@@ -214,6 +235,7 @@ RedMixerGUI {
 			CmdPeriod.doOnce({this.close});
 		}).play(AppClock);
 	}
+
 	close {
 		if(win.isClosed.not, {win.close});
 		controllers.do{|x| x.remove};

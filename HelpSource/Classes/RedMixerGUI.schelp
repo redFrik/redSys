@@ -1,7 +1,7 @@
 CLASS:: RedMixerGUI
 SUMMARY:: gui for RedMixer
 CATEGORIES:: Red>redMixer
-RELATED:: Classes/RedMixer, Classes/RedEffectsRackGUI
+RELATED:: Classes/RedMixerChannelGUI, Classes/RedMixer, Classes/RedEffectsRackGUI
 
 DESCRIPTION::
 NOTE::
@@ -18,6 +18,9 @@ A link::Classes/RedMixer::.
 ARGUMENT:: position
 A link::Classes/Point::.
 
+METHOD:: numMixerChannelsBeforeScroll
+Get or set the number of link::Classes/RedMixerChannelGUI:: that will be visible in the window before adding horizontal scrollbars. The default is 11.
+
 INSTANCEMETHODS::
 
 PRIVATE:: initRedMixerGUI
@@ -25,8 +28,14 @@ PRIVATE:: initRedMixerGUI
 METHOD:: close
 Close the window if open.
 
+METHOD:: redMixer
+The current link::Classes/RedMixer:: instance.
+
 METHOD:: time
 Slider to go from now to later.
+
+METHOD:: win
+Returns the link::Classes/Window::
 
 EXAMPLES::
 

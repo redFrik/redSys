@@ -12,6 +12,7 @@ RedGUICV {
 		view.value= unmap.value(ref.value);
 		this.prConnect;
 	}
+	asView {^view}
 	interp {|target, val| this.value_(savedValue.blend(target, val))}
 	value_ {|val| ref.value_(val).changed(\value)}
 	value {^map.value(view.value)}

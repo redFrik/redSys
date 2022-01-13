@@ -1,9 +1,11 @@
 CLASS:: RedMixerChannelGUI
 SUMMARY:: gui for RedMixerChannel
 CATEGORIES:: Red>redMixer
-RELATED:: Classes/RedMixerChannel, Classes/RedMixerGUI, Classes/RedMixer, Classes/RedEffectsRackGUI
+RELATED:: Classes/RedMixerGUI, Classes/RedMixerChannel, Classes/RedEffectsRackGUI
 
 DESCRIPTION::
+
+An embeddable GUI for link::Classes/RedMixerChannel::. If no parent given then a new Window will be created.
 
 CLASSMETHODS::
 
@@ -15,7 +17,7 @@ ARGUMENT:: redMixerChannel
 A link::Classes/RedMixerChannel::.
 
 ARGUMENT:: parent
-A link::Classes/Window::, link::Classes/CompositeView:: or code::nil::.
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
 
 ARGUMENT:: position
 A link::Classes/Point::.
@@ -23,12 +25,42 @@ A link::Classes/Point::.
 ARGUMENT:: name
 A link::Classes/String:: displayed below the volume slider.
 
+METHOD:: height
+Set and get the default height.
+
+METHOD:: numInserts
+Set and get the default number of inserts (effect slots).
+
+METHOD:: width
+Set and get the default width.
+
 INSTANCEMETHODS::
 
 PRIVATE:: prContainer, initRedMixerChannelGUI
 
 METHOD:: close
 Close the window if open.
+
+METHOD:: cmp
+Deprecated. Use link::#-view:: instead.
+
+METHOD:: parent
+A link::Classes/Window:: or, if embedded, a link::Classes/View::.
+
+METHOD:: redMixerChannel
+The current link::Classes/RedMixerChannel:: instance.
+
+METHOD:: text
+Set the label for the channel. Visible near the bottom.
+
+ARGUMENT:: str
+A link::Classes/String::.
+
+METHOD:: view
+Return the top view.
+
+METHOD:: views
+Return a link::Classes/List:: of all relevant view items (not text or peak buttons).
 
 EXAMPLES::
 
@@ -63,4 +95,17 @@ a.init
 a.out
 c= RedMixerChannelGUI(a, name: "testing");
 a.out= 0
+b.free
+a.free
+c.close
+
+a= RedMixerChannel(0);
+b= a.gui;  //shortcut
+//changes are synced using SimpleController
+c= a.gui(position: Point(10, 100));  //another gui from the same channel instance
+RedMixerChannelGUI.height= 300;
+RedMixerChannelGUI.width= 300;
+RedMixerChannelGUI.numInserts= 4;
+d= a.gui(position: Point(100, 200));
+a.free; b.close; c.close; d.close;
 ::
