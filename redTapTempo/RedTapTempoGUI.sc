@@ -12,12 +12,12 @@ RedTapTempoGUI {
 		^super.new.initRedTapTempoGUI(clock, n, timeout, server, parent, position);
 	}
 	initRedTapTempoGUI {|argClock, n, timeout, server, argParent, argPosition|
-		var cmp, times= 0.dup(n), counter, lastTime= 0;
+		var view, times= 0.dup(n), counter, lastTime= 0;
 		clock= argClock ?? TempoClock.default;
 		server= server ?? Server.default;
 		parent= argParent;
 		position= argPosition;
-		cmp= this.prContainer;
+		view= this.prContainer;
 
 		forkIfNeeded{
 			server.bootSync;
@@ -28,55 +28,57 @@ RedTapTempoGUI {
 
 			//--gui
 			{
-				tapView= RedButton(cmp, Point(122, 60), "tap tempo", "tap tempo").action_{|view|
-					var newTempo, nowTime= SystemClock.seconds;
-					if(nowTime-timeout>lastTime, {
-						(this.class.name++": timeout").postln;
-						counter= 0;
-					});
-					if(counter<(n-1), {
-						times= times.put(counter, SystemClock.seconds);
-						counter= counter+1;
-					}, {
-						times= times.put(counter, SystemClock.seconds);
-						newTempo= times.differentiate.drop(1).mean;
-						bpmView.valueAction_(60/newTempo);
-						times= times.rotate(-1);
-					});
-					lastTime= nowTime;
-					view.value= 0;
-				}.focus;
+				var bw= 36, lh= 14;
+				view.layout= VLayout(
+					tapView= RedButton(view, nil, "tap tempo", "tap tempo").action_{|view|
+						var newTempo, nowTime= SystemClock.seconds;
+						if(nowTime-timeout>lastTime, {
+							(this.class.name++": timeout").postln;
+							counter= 0;
+						});
+						if(counter<(n-1), {
+							times= times.put(counter, SystemClock.seconds);
+							counter= counter+1;
+						}, {
+							times= times.put(counter, SystemClock.seconds);
+							newTempo= times.differentiate.drop(1).mean;
+							bpmView.valueAction_(60/newTempo);
+							times= times.rotate(-1);
+						});
+						lastTime= nowTime;
+						view.value= 0;
+					}.maxHeight_(60).focus,
 
-				cmp.decorator.nextLine;
-				RedButton(cmp, Point(122, 14), "sync").action_{|view|
-					task.stop;
-					task= this.prRoutine.play(clock);
-				};
+					RedButton(view, nil, "sync").action_{|view|
+						task.stop;
+						task= this.prRoutine.play(clock);
+					}.maxHeight_(lh),
 
-				cmp.decorator.nextLine;
-				bpmView= RedNumberBox(cmp).value_(clock.tempo*60).action_{|view|
-					var bps= (view.value/60).round(0.0001);
-					clock.tempo= bps;
-					bpsView.value= bps;
-					(this.class.name++": new tempo... bps:"+bps+" bpm:"+(bps*60)).postln;
-				};
-				RedStaticText(cmp, nil, "bpm");
-				bpsView= RedNumberBox(cmp).value_(clock.tempo).action_{|view|
-					this.tempo= view.value.max(0);
-				};
-				RedStaticText(cmp, nil, "bps");
-				
-				cmp.decorator.nextLine;
-				monOnView= RedButton(cmp, nil, "monitor", "monitor").action_{|view|
-					monOn= view.value.booleanValue;
-				};
-				monBusView= RedNumberBox(cmp).value_(monBus).action_{|view|
-					monBus= view.value.asInteger.max(0);
-					view= monBus;
-				};
+					HLayout(
+						bpmView= RedNumberBox(view).value_(clock.tempo*60).action_{|view|
+							var bps= (view.value/60).round(0.0001);
+							clock.tempo= bps;
+							bpsView.value= bps;
+							(this.class.name++": new tempo... bps:"+bps+" bpm:"+(bps*60)).postln;
+						}.maxWidth_(bw).maxHeight_(lh),
+						RedStaticText(view, nil, "bpm").maxHeight_(lh),
+						bpsView= RedNumberBox(view).value_(clock.tempo).action_{|view|
+							this.tempo= view.value.max(0);
+						}.maxWidth_(bw).maxHeight_(lh),
+						RedStaticText(view, nil, "bps").maxHeight_(lh)
+					),
 
-				cmp.decorator.nextLine;
-				cmp.bounds= cmp.bounds.resizeTo(cmp.bounds.width, cmp.decorator.top);
+					HLayout(
+						monOnView= RedButton(view, nil, "monitor", "monitor").action_{|view|
+							monOn= view.value.booleanValue;
+						}.maxWidth_(53).maxHeight_(lh),
+						monBusView= RedNumberBox(view).value_(monBus).action_{|view|
+							monBus= view.value.asInteger.max(0);
+							view= monBus;
+						}.maxWidth_(bw).maxHeight_(lh),
+						View().maxHeight_(lh)
+					)
+				).margins_(4).spacing_(4);
 
 				task= this.prRoutine.play(clock, quant:1);
 				parent.onClose= {task.stop};
@@ -111,7 +113,7 @@ RedTapTempoGUI {
 
 	//--private
 	prContainer {
-		var cmp, width, height, margin= Point(4, 4), gap= Point(4, 4);
+		var width, height;
 		position= position ?? {Point(400, 600)};
 		width= 130;
 		height= 122;
@@ -122,10 +124,9 @@ RedTapTempoGUI {
 			win.front;
 			CmdPeriod.doOnce({if(win.isClosed.not, {win.close})});
 		});
-		cmp= CompositeView(parent, Point(width, height))
+		^View(parent, Point(width, height))
+		.layout_(VLayout())
 		.background_(GUI.skins.redFrik.background);
-		cmp.decorator= FlowLayout(cmp.bounds, margin, gap);
-		^cmp;
 	}
 	prRoutine {
 		^Routine({

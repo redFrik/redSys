@@ -20,7 +20,7 @@ ARGUMENT:: server
 For monitor synth. The default is code::Server.default::.
 
 ARGUMENT:: parent
-A link::Classes/Window::, link::Classes/CompositeView:: or code::nil::.
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
 
 ARGUMENT:: position
 A link::Classes/Point:: or code::nil::.
@@ -47,11 +47,17 @@ Which bus to play the click sound on.
 DISCUSSION::
 As the default monitor bus is 7 we need to code::s.options.numOutputBusChannels= 8;:: and then code::s.reboot:: and code::s.meter:: to see the signal.
 
+METHOD:: clock
+The link::Classes/TempoClock:: in use.
+
 METHOD:: close
 Closes the window if open and stop internal task.
 
 METHOD:: def
-Return the link::Classes/SynthDef::.
+Calls link::#*def::
+
+METHOD:: parent
+Return the current parent (link::Classes/Window:: or link::Classes/View::).
 
 EXAMPLES::
 
@@ -69,7 +75,7 @@ a.close;
 (
 w= Window("hgf", Rect(100, 200, 500, 500));
 w.front;
-v= CompositeView(w, Rect(100, 100, 200, 200)).background_(Color.blue);
+v= View(w, Rect(100, 100, 200, 200)).background_(Color.blue);
 c= TempoClock(1.4);
 a= RedTapTempoGUI(c, parent:v);
 )

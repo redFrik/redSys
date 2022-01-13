@@ -15,12 +15,15 @@ INSTANCEMETHODS::
 PRIVATE:: initRedTempoClockGUI
 
 METHOD:: close
-Closes the window if open. Also automatically with LINK::Classes/CmdPeriod::.
+Closes the window if open. Also automatically with link::Classes/CmdPeriod::.
+
+METHOD:: win
+The link::Classes/Window::.
 
 EXAMPLES::
 
 CODE::
 a= RedTempoClockGUI();
-c= TempoClock(2.4);
+c= TempoClock(2.4);  //create another clock and then look in the popup menu again
 a.close;
 ::

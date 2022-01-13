@@ -88,6 +88,7 @@ RedMixGUI {
 		if(parent.isNil, {
 			parent= Window(redMix.class.name, Rect(position.x, position.y, width, height), false);
 			win= parent;
+			win.alpha= GUI.skins.redFrik.unfocus;
 			win.front;
 			CmdPeriod.doOnce({this.close});
 		});

@@ -3,26 +3,30 @@
 //--related:
 //RedTapTempoGUI
 
+//TODO: make embeddable with parent
+
 RedTempoClockGUI {
-	var <>win;
+	var <win;
 	*new {|position|
 		^super.new.initRedTempoClockGUI(position);
 	}
 	initRedTempoClockGUI {|position|
-		var cmp, pop, num, bpm, sld;
+		var view, pop, num, bpm, sld;
 		var spec= #[0.5, 5].asSpec, index= 0, clocks= [];
+		var bw= 36, lh= 14;
 		position= position ?? {Point(100, 200)};
 		win= Window("TempoClock.all", Rect(position.x, position.y, 214, 60), false);
-		cmp= CompositeView(win, Rect(0, 0, win.bounds.width, win.bounds.height));
-		cmp.background= GUI.skins.redFrik.background;
-		cmp.decorator= FlowLayout(cmp.bounds);
-		pop= RedPopUpMenu(cmp, Point(200, 14));
-		cmp.decorator.nextLine;
-		RedStaticText(cmp, Point(30, 14), "bps:");
-		num= RedNumberBox(cmp, Point(40, 14));
-		bpm= RedStaticText(cmp, Point(128, 14), "(bpm:)");
-		cmp.decorator.nextLine;
-		sld= RedSlider(cmp, Point(200, 14));
+		view= View(win, Rect(0, 0, win.bounds.width, win.bounds.height));
+		view.background= GUI.skins.redFrik.background;
+		view.layout= VLayout(
+			pop= RedPopUpMenu(view).maxHeight_(lh),
+			HLayout(
+				RedStaticText(view, nil, "bps:").maxWidth_(30).maxHeight_(lh),
+				num= RedNumberBox(view).maxWidth_(bw).maxHeight_(lh),
+				bpm= RedStaticText(view, nil, "(bpm:)").maxHeight_(lh)
+			),
+			sld= RedSlider(view).maxHeight_(lh)
+		).margins_(4).spacing_(4);
 		Routine({
 			inf.do{
 				if(clocks!=TempoClock.all.collect{|x| x.hash}, {
@@ -48,6 +52,7 @@ RedTempoClockGUI {
 		if(TempoClock.all.notEmpty, {
 			num.valueAction_(TempoClock.all[0].tempo);
 		});
+		win.alpha= GUI.skins.redFrik.unfocus;
 		win.front;
 		CmdPeriod.doOnce({win.close});
 	}
