@@ -10,23 +10,6 @@ Do not instantiate. Use its subclasses.
 
 CLASSMETHODS::
 
-METHOD:: new
-
-ARGUMENT:: inA
-First mono input.
-
-ARGUMENT:: inB
-Second mono input.
-
-ARGUMENT:: out
-Stereo output.
-
-ARGUMENT:: group
-code::nil:: boots the default server and uses the code::defaultGroup::. Adds to tail.
-
-ARGUMENT:: lag
-Ramp for mix controllers in seconds.
-
 SUBSECTION:: subclass responsibility
 
 METHOD:: def
@@ -34,27 +17,6 @@ METHOD:: def
 INSTANCEMETHODS::
 
 PRIVATE:: initRedAbstractMix
-
-METHOD:: free
-Free the mixer synth.
-
-METHOD:: gui
-create a link::Classes/RedMixGUI::.
-
-METHOD:: group
-The link::Classes/Group:: in use.
-
-METHOD:: cvs
-Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
-
-TABLE::
-## inA || input bus offset
-## inB || second bus offset
-## out || output bus offset
-## mix || mix control -1 to 1
-## amp || volume 0 to 1
-## lag || ramp time in seconds for mix and amp
-::
 
 EXAMPLES::
 

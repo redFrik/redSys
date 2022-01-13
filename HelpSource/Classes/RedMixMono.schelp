@@ -4,20 +4,22 @@ CATEGORIES:: Red>redMix
 RELATED:: Overviews/redMixOverview, Classes/RedMixStereo, Classes/RedMixStereoMono, Classes/RedMatrixMixer, Classes/RedMixer
 
 DESCRIPTION::
-simple mixer that take two mono sources, combines them and output to one stereo
+Simple mixer that take emphasis::two mono:: sources, combines them and output to emphasis::one stereo::.
+
+Can be used with or without link::Classes/RedMixGUI::.
 
 CLASSMETHODS::
 
 METHOD:: new
 
 ARGUMENT:: inA
-First emphasis::mono:: input.
+First emphasis::mono:: audio input bus number.
 
 ARGUMENT:: inB
-Second emphasis::mono:: input.
+Second emphasis::mono:: audio input bus number.
 
 ARGUMENT:: out
-Stereo output.
+Stereo output bus number.
 
 ARGUMENT:: group
 code::nil:: boots the default server and uses the code::defaultGroup::. Adds to tail.
@@ -27,6 +29,59 @@ Ramp for mix controllers in seconds.
 
 METHOD:: def
 Returns the link::Classes/SynthDef::.
+
+INSTANCEMETHODS::
+
+METHOD:: amp
+Get or set volume 0.0 to 1.0
+
+METHOD:: cvs
+Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
+
+TABLE::
+## inA || input audio bus number
+## inB || second audio bus number
+## out || output audio bus number
+## mix || mix control (balance) -1.0 to 1.0
+## amp || volume 0.0 to 1.0
+## lag || ramp time in seconds for mix and amp
+::
+
+METHOD:: def
+Calls link::#*def::
+
+METHOD:: free
+Free the mixer synth.
+
+METHOD:: group
+The link::Classes/Group:: in use.
+
+METHOD:: gui
+create a link::Classes/RedMixGUI::.
+
+ARGUMENT:: parent
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
+
+ARGUMENT:: position
+A link::Classes/Point:: or code::nil::.
+
+METHOD:: inA
+Get or set first input audio bus number.
+
+METHOD:: inB
+Get or set second input audio bus number.
+
+METHOD:: isReady
+code::true:: after the server is booted and the internal mixer is added and created.
+
+METHOD:: lag
+Get or set the ramp time in seconds for mix and amp.
+
+METHOD:: mix
+Get or set the mix control (balance) -1.0 to 1.0
+
+METHOD:: out
+Get or set the audio output bus number.
 
 EXAMPLES::
 

@@ -4,20 +4,22 @@ CATEGORIES:: Red>redMix
 RELATED:: Overviews/redMixOverview, Classes/RedMixMono, Classes/RedMixStereo, Classes/RedMatrixMixer, Classes/RedMixer
 
 DESCRIPTION::
-simple mixer that take one stereo source and one mono source, combines them and output to one stereo
+Simple mixer that take emphasis::one stereo:: source and emphasis::one mono:: source, combines them and output to emphasis::one stereo::.
+
+Can be used with or without link::Classes/RedMixGUI::.
 
 CLASSMETHODS::
 
 METHOD:: new
 
 ARGUMENT:: inA
-First emphasis::stereo:: input.
+First emphasis::stereo:: audio input bus number.
 
 ARGUMENT:: inB
-Second emphasis::mono:: input.
+Second emphasis::mono:: audio input bus number.
 
 ARGUMENT:: out
-Stereo output.
+Stereo output bus number.
 
 ARGUMENT:: group
 code::nil:: boots the default server and uses the code::defaultGroup::. Adds to tail.
@@ -25,8 +27,22 @@ code::nil:: boots the default server and uses the code::defaultGroup::. Adds to 
 ARGUMENT:: lag
 Ramp for mix controllers in seconds.
 
-METHOD:: def
-Returns the link::Classes/SynthDef::.
+COPYMETHOD:: RedMixMono *def
+
+INSTANCEMETHODS::
+
+COPYMETHOD:: RedMixMono -amp
+COPYMETHOD:: RedMixMono -cvs
+COPYMETHOD:: RedMixMono -def
+COPYMETHOD:: RedMixMono -free
+COPYMETHOD:: RedMixMono -group
+COPYMETHOD:: RedMixMono -gui
+COPYMETHOD:: RedMixMono -inA
+COPYMETHOD:: RedMixMono -inB
+COPYMETHOD:: RedMixMono -isReady
+COPYMETHOD:: RedMixMono -lag
+COPYMETHOD:: RedMixMono -mix
+COPYMETHOD:: RedMixMono -out
 
 EXAMPLES::
 

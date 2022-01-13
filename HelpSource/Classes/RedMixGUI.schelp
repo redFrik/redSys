@@ -16,10 +16,10 @@ CLASSMETHODS::
 METHOD:: new
 
 ARGUMENT:: redMix
-A red mix object ( link::Classes/RedMixMono::, link::Classes/RedMixStereo::, link::Classes/RedMixStereoMono:: )
+A red mix object (link::Classes/RedMixMono::, link::Classes/RedMixStereo::, link::Classes/RedMixStereoMono::)
 
 ARGUMENT:: parent
-A link::Classes/Window::, link::Classes/CompositeView:: or code::nil::.
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
 
 ARGUMENT:: position
 A link::Classes/Point:: or code::nil::.
@@ -30,6 +30,12 @@ PRIVATE:: initRedMixGUI, prContainer
 
 METHOD:: close
 Close the window if open.
+
+METHOD:: parent
+Return the current parent (link::Classes/Window:: or link::Classes/View::).
+
+METHOD:: redMix
+Return the current mixer (link::Classes/RedMixMono::, link::Classes/RedMixStereo::, link::Classes/RedMixStereoMono::).
 
 EXAMPLES::
 
@@ -51,29 +57,29 @@ a.free;
 b.stop;
 c.stop;
 
+//multiple RedMixGUIs are linked with SimpleController
 (
-var w= Window("lkj", Rect(100, 200, 500, 500));
+var w= Window("lkj", Rect(100, 200, 300, 300));
 w.front;
-w.view.decorator= FlowLayout(w.view.bounds, Point(10, 10), Point(10, 10));
+w.layout= VLayout();
 a= RedMixStereo(20, 40, 0);
 b= Pbind(\degree, 0, \out, 20).play;
 c= Pbind(\degree, 4, \out, 40).play;
 a.gui(w);
-w.view.decorator.nextLine;
 a.gui(w);
 w.onClose= {a.free; b.stop; c.stop};
 )
 
+//a RedMixGUI can be embedded into another View
 (
 w= Window("hgf", Rect(100, 200, 500, 500));
 w.front;
-v= CompositeView(w, Rect(10, 10, 400, 400)).background_(Color.blue).decorator= FlowLayout(Rect(0, 0, 300, 300));
+w.layout= VLayout();
+v= View(w).background_(Color.blue);
 a= RedMixStereo(20, 40, 0);
 b= Pbind(\degree, 0, \out, 20).play;
 c= Pbind(\degree, 4, \out, 40).play;
-a.gui(v);
-v.decorator.nextLine;
-a.gui(v);
+a.gui(v);  //note parent v
 w.onClose= {a.free; b.stop; c.stop};
 )
 ::
