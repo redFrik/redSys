@@ -5,7 +5,7 @@ RELATED:: Classes/RedMixerChannelGUI, Classes/RedMixer, Classes/RedEffectsRackGU
 
 DESCRIPTION::
 NOTE::
-Requires the link::Classes/TabbedView:: quark.
+Requires the link::Classes/TabbedView2:: quark.
 ::
 
 CLASSMETHODS::

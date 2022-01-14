@@ -25,7 +25,7 @@ GUI.skins.redFrik		//also includes a skin
 RedFont.new.dump
 (
 var w= Window("RedGUI test", Rect(100, 200, 400, 400)).front;
-w.view.decorator= FlowLayout(w.view.bounds);
+w.view.layout= VLayout();
 Red2DSlider(w);
 RedButton(w);
 RedButton(w, nil, "aaa", "bbb");

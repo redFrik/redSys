@@ -12,6 +12,7 @@ RedEffectsRackGUI {
 
 	var <win, <redEffectsRack, <time, lastTime= 0, controllers,
 	mainGUI, mainGUIviews, mirrorGUIviews,
+	efxs,  //active effects (ignore modules without controllers e.g. thru)
 	width1= 264, height1;
 
 	*new {|redEffectsRack, position|
@@ -28,7 +29,7 @@ RedEffectsRackGUI {
 
 			macroFunctions= {|index|
 				var gui;
-				if(tab.activeTab==0, {
+				if(tab.activeTab.index==0, {
 					gui= mainGUIviews;
 				}, {
 					gui= mirrorGUIviews;
@@ -76,7 +77,8 @@ RedEffectsRackGUI {
 			redEffectsRack= argRedEffectsRack;
 			position= position ?? {Point(300, 360)};
 
-			redEffectsRack.efxs.do{|x|
+			efxs= redEffectsRack.efxs.reject{|x| x.cvs.size<=1};
+			efxs.do{|x|
 				var cols= x.def.metadata[\order].count{|x| x.key!=\out}-1;
 				var tmp= 4*2.5+RedGUICVSlider.defaultWidth+4;
 				tmp= tmp+(RedGUICVKnob.defaultWidth+4*cols);
@@ -84,7 +86,7 @@ RedEffectsRackGUI {
 			};
 			height1= 4+RedGUICVSlider.defaultHeight+4;
 
-			rows= redEffectsRack.efxs.size.min(numEffectsBeforeScroll);
+			rows= efxs.size.min(numEffectsBeforeScroll);
 
 			win= Window(
 				redEffectsRack.class.name.asString.put(0, $r),
@@ -133,19 +135,16 @@ RedEffectsRackGUI {
 
 					time= RedSlider().maxHeight_(lh).maxWidth_(100)
 					.action_({|v|
-						if(tab.activeTab==0, {
+						var bg;
+						if(tab.activeTab.index==0, {
 							if(lastTime==0 and:{v.value>0}, {
 								mainGUIviews.do{|x| x.do{|y| y.save}};
 							});
 							mainGUIviews.do{|x, i|
-								x.do{|y, j|
-									y.interp(mirrorGUIviews[i][j].value, v.value);
-								};
+								x.do{|y, j| y.interp(mirrorGUIviews[i][j].value, v.value)};
 							};
-							tab.backgrounds_([
-								GUI.skins.redFrik.foreground.copy.alpha_(1-v.value),
-								GUI.skins.redFrik.background
-							]);
+							bg= GUI.skins.redFrik.foreground.blend(GUI.skins.redFrik.background, v.value);
+							tab.activeTab.background= bg;
 						}, {
 							v.value= 1;
 						});
@@ -155,41 +154,37 @@ RedEffectsRackGUI {
 					View()  //spacer
 				),
 
-				tab= TabbedView(
-					win,
-					nil,
-					#[\now, \later],
-					[Color.grey(0.2, 0.2), GUI.skins.redFrik.background],
-					scroll: true
-				);
+				tab= TabbedView2(win);
+				tab.backgrounds= [
+					GUI.skins.redFrik.foreground,
+					Color.red
+				];
+				tab.labelColors= [GUI.skins.redFrik.background];
+				tab.unfocusedColors= [Color.grey(0.2, 0.2)];
+				tab.stringFocusedColors= [GUI.skins.redFrik.foreground];
+				tab.stringColors= [GUI.skins.redFrik.foreground];
+				tab.font= RedFont.new;
+				tab.tabHeight= 12;
+				tab.add("now", scroll:true);
+				tab.add("later", scroll:true);
 				tab.view.minHeight_(height1+4*rows+14);
 				tab.view
 			).margins_(4).spacing_(4);
 
-			if(redEffectsRack.efxs.size<=numEffectsBeforeScroll, {
-				tab.views.do{|x| x.hasVerticalScroller= false};
-			});
-			tab.views.do{|x| x.hasHorizontalScroller= false};
-			tab.font= RedFont.new;
-			tab.stringFocusedColor= GUI.skins.redFrik.foreground;
-			tab.stringColor= GUI.skins.redFrik.foreground;
-			tab.backgrounds= [GUI.skins.redFrik.foreground, GUI.skins.redFrik.background];
-			tab.unfocusedColors= [Color.grey(0.2, 0.2), GUI.skins.redFrik.background];
-			tab.focusActions= [
-				{
+			tab.changeAction= {|v|
+				if(v.activeTab.index==0, {
 					time.valueAction= lastTime;
 					time.enabled= true;
 					time.canFocus= true;
-				},
-				{
+				}, {
 					mainGUIviews.do{|x| x.do{|y| y.save}};
 					time.value= 1;
 					time.enabled= false;
 					time.canFocus= false;
-				}
-			];
+				});
+			};
 			tab.views[0].flow{|v|
-				mainGUI= redEffectsRack.efxs.collect{|x|
+				mainGUI= efxs.collect{|x|
 					var gui= RedEffectModuleGUI(x, v);
 					v.decorator.nextLine;
 					gui;

@@ -10,6 +10,8 @@
 //knobs+numberbox eller annat sätt att visa exakta värden?
 //preset med mus xy gui där cirklar visar hur mycket varje kanal. slider att styra omfång, max. jmf processing exempel
 
+//TODO: make embeddable
+
 RedMatrixMixerGUI {
 	var <win, <redMatrixMixer, <time, lastTime= 0,
 	mainGUI, mirrorGUI;
@@ -23,14 +25,14 @@ RedMatrixMixerGUI {
 			var tab,
 			macroMenu, macroFunctions, macroItems, makeMirror,
 			inNumbers, outNumbers,
-			inBox, outBox, lagBox, bw= 44, lh= 14, controllers= List.new,
+			inBox, outBox, lagBox, bw= 44, lh= 14, sw, controllers= List.new,
 			nIn= argRedMatrixMixer.nIn,
 			nOut= argRedMatrixMixer.nOut;
 			while({argRedMatrixMixer.isReady.not}, {0.02.wait});
 
 			macroFunctions= {|index|
 				var gui;
-				if(tab.activeTab==0, {
+				if(tab.activeTab.index==0, {
 					gui= mainGUI;
 				}, {
 					gui= mirrorGUI;
@@ -109,12 +111,13 @@ RedMatrixMixerGUI {
 			redMatrixMixer= argRedMatrixMixer;
 			position= position ?? {Point(700, 400)};
 
+			sw= "o99".bounds(RedFont.new).width;
 			win= Window(
 				"redMatrixMixer nIn"++nIn+"nOut"++nOut,
 				Rect(
 					position.x,
 					position.y,
-					(RedGUICVMultiSliderView.defaultWidth+4*nOut+8+"o99".bounds(RedFont.new).width).max(280),
+					(RedGUICVMultiSliderView.defaultWidth+4*nOut+8+sw).max(280),
 					RedGUICVMultiSliderView.defaultHeight*nIn+14+14+46
 				),
 				false
@@ -186,20 +189,19 @@ RedMatrixMixerGUI {
 					100,  //spacer
 
 					time= RedSlider().maxHeight_(lh).maxWidth_(100)
-					.action_({|view|
-						if(tab.activeTab==0, {
-							if(lastTime==0 and:{view.value>0}, {
+					.action_({|v|
+						var bg;
+						if(tab.activeTab.index==0, {
+							if(lastTime==0 and:{v.value>0}, {
 								mainGUI.do{|x| x.save};
 							});
 							mainGUI.do{|x, i|
-								x.interp(mirrorGUI[i].value, view.value);
+								x.interp(mirrorGUI[i].value, v.value);
 							};
-							tab.backgrounds_([
-								GUI.skins.redFrik.foreground.copy.alpha_(1-view.value),
-								GUI.skins.redFrik.background
-							]);
+							bg= GUI.skins.redFrik.foreground.copy.alpha_(1-v.value);
+							tab.activeTab.background= bg;
 						});
-						lastTime= view.value;
+						lastTime= v.value;
 					}),
 
 					View().maxHeight_(lh)  //spacer
@@ -213,30 +215,31 @@ RedMatrixMixerGUI {
 						}.dup(nIn)
 					].flat),
 
-					tab= TabbedView(
-						win,
-						nil,
-						#[\now, \later],
-						[Color.grey(0.2, 0.2), GUI.skins.redFrik.background]
-					);
+					tab= TabbedView2(win);
+					tab.backgrounds= [
+						GUI.skins.redFrik.foreground.copy.alpha_(1),
+						GUI.skins.redFrik.background
+					];
+					tab.labelColors= [GUI.skins.redFrik.background];
+					tab.unfocusedColors= [Color.grey(0.2, 0.2)];
+					tab.stringFocusedColors= [GUI.skins.redFrik.foreground];
+					tab.stringColors= [GUI.skins.redFrik.foreground];
 					tab.font= RedFont.new;
-					tab.stringFocusedColor= GUI.skins.redFrik.foreground;
-					tab.stringColor= GUI.skins.redFrik.foreground;
-					tab.backgrounds= [GUI.skins.redFrik.foreground, GUI.skins.redFrik.background];
-					tab.unfocusedColors= [Color.grey(0.2, 0.2), GUI.skins.redFrik.background];
-					tab.focusActions= [
-						{
+					tab.tabHeight= 12;
+					tab.add("now");
+					tab.add("later");
+					tab.changeAction= {|v|
+						if(v.activeTab.index==0, {
 							time.valueAction= lastTime;
 							time.enabled= true;
 							time.canFocus= true;
-						},
-						{
+						}, {
 							mainGUI.do{|x| x.save};
 							time.value= 1;
 							time.enabled= false;
 							time.canFocus= false;
-						}
-					];
+						});
+					};
 					tab.views[0].flow{|v|
 						mainGUI= {|i|
 							var ref= redMatrixMixer.cvs[("o"++i).asSymbol];

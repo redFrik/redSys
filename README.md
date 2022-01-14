@@ -12,6 +12,7 @@ see redSysOverview in help
 
 ## changelog:
 
+* 220115 - rewrite to use TabbedView2 instead of TabbedView (about time)
 * 220114 - redMix, redTapTempo, redMixer, redMatrixMixer, redEffectsRack, redModule - rework gui and helpfiles
 * 210610 - huge speed improvements to most data compression classes, RedGIF massive speed improvements and important fixes
 * 210526 - RedBMP add support for Image

@@ -4,8 +4,8 @@
 	\summary:		"red system including mixers, effects, instruments, presets, tools, gui",
 	\author:		"redFrik",
 	\helpdoc:		"RedSys.html",
-	\url:			"http://www.fredrikolofsson.com/",
-	\dependencies:	["TabbedView"],
+	\url:			"https://www.fredrikolofsson.com/",
+	\dependencies:	["TabbedView2_QT", "TabbedView2"],
 	\version:		0.55,
 	\since:			"2009",
 	\isCompatible:	{Main.versionAtLeast(3, 6)}

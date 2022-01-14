@@ -12,7 +12,7 @@
 
 RedMixerGUI {
 
-	classvar <>numMixerChannelsBeforeScroll= 11;	//todo!!!
+	classvar <>numMixerChannelsBeforeScroll= 11;  //max window width
 
 	var <win, <redMixer, <time, lastTime= 0, controllers,
 	mainGUIchannels, mainGUImixers, mainGUIviews, mirrorGUIviews;
@@ -23,7 +23,7 @@ RedMixerGUI {
 
 	initRedMixerGUI {|argRedMixer, position|
 		Routine({
-			var tab,
+			var tab, channelWidth,
 			macroMenu, macroFunctions, macroItems, makeMirror, defaults,
 			lagBox, bw= 44, lh= 14;
 
@@ -32,7 +32,7 @@ RedMixerGUI {
 
 			macroFunctions= {|index|
 				var gui;
-				if(tab.activeTab==0, {
+				if(tab.activeTab.index==0, {
 					gui= mainGUIviews;
 				}, {
 					gui= mirrorGUIviews;
@@ -81,14 +81,17 @@ RedMixerGUI {
 
 			redMixer= argRedMixer;
 			position= position ?? {Point(300, 200)};
+			channelWidth= {|n| RedMixerChannelGUI.width+4*n+10};
 
 			win= Window(
 				redMixer.class.name.asString.put(0, $r),
 				Rect(
 					position.x,
 					position.y,
-					(RedMixerChannelGUI.width+4*(redMixer.mixers.size+redMixer.channels.size)+8).max(260),
-					RedMixerChannelGUI.height+12+42
+					channelWidth.value(redMixer.mixers.size+redMixer.channels.size)
+					.max(260)
+					.min(channelWidth.value(RedMixerGUI.numMixerChannelsBeforeScroll)),
+					RedMixerChannelGUI.height+58
 				),
 				false
 			);
@@ -127,19 +130,16 @@ RedMixerGUI {
 
 					time= RedSlider().maxHeight_(lh).maxWidth_(100)
 					.action_({|v|
-						if(tab.activeTab==0, {
+						var bg;
+						if(tab.activeTab.index==0, {
 							if(lastTime==0 and:{v.value>0}, {
 								mainGUIviews.do{|x| x.do{|y| y.save}};
 							});
 							mainGUIviews.do{|x, i|
-								x.do{|y, j|
-									y.interp(mirrorGUIviews[i][j].value, v.value);
-								};
+								x.do{|y, j| y.interp(mirrorGUIviews[i][j].value, v.value)};
 							};
-							tab.backgrounds_([
-								GUI.skins.redFrik.foreground.copy.alpha_(1-v.value),
-								GUI.skins.redFrik.background
-							]);
+							bg= GUI.skins.redFrik.foreground.blend(GUI.skins.redFrik.background, v.value);
+							tab.activeTab.background= bg;
 						});
 						lastTime= v.value;
 					}),
@@ -147,36 +147,35 @@ RedMixerGUI {
 					View()  //spacer
 				),
 
-				tab= TabbedView(
-					win,
-					nil,
-					#[\now, \later],
-					[Color.grey(0.2, 0.2), GUI.skins.redFrik.background],
-					scroll: true
-				);
-				tab.view.minHeight_(RedMixerChannelGUI.height+12);
+				tab= TabbedView2(win);
+				tab.backgrounds= [
+					GUI.skins.redFrik.foreground,
+					Color.red
+				];
+				tab.labelColors= [GUI.skins.redFrik.background];
+				tab.unfocusedColors= [Color.grey(0.2, 0.2)];
+				tab.stringFocusedColors= [GUI.skins.redFrik.foreground];
+				tab.stringColors= [GUI.skins.redFrik.foreground];
+				tab.font= RedFont.new;
+				tab.tabHeight= 12;
+				tab.add("now", scroll:true);
+				tab.add("later", scroll:true);
+				tab.view.minHeight_(RedMixerChannelGUI.height+14);
 				tab.view
 			).margins_(4).spacing_(4);
 
-			tab.views.do{|x| x.hasHorizontalScroller= false};
-			tab.font= RedFont.new;
-			tab.stringFocusedColor= GUI.skins.redFrik.foreground;
-			tab.stringColor= GUI.skins.redFrik.foreground;
-			tab.backgrounds= [GUI.skins.redFrik.foreground, GUI.skins.redFrik.background];
-			tab.unfocusedColors= [Color.grey(0.2, 0.2), GUI.skins.redFrik.background];
-			tab.focusActions= [
-				{
+			tab.changeAction= {|v|
+				if(v.activeTab.index==0, {
 					time.valueAction= lastTime;
 					time.enabled= true;
 					time.canFocus= true;
-				},
-				{
+				}, {
 					mainGUIviews.do{|x| x.do{|y| y.save}};
 					time.value= 1;
 					time.enabled= false;
 					time.canFocus= false;
-				}
-			];
+				});
+			};
 			tab.views[0].flow{|v|
 				mainGUIchannels= redMixer.channels.collect{|x, i|
 					RedMixerChannelGUI(x, v, nil, "in[%,%]".format(x.out, x.out+1));
