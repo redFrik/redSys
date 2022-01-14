@@ -13,9 +13,11 @@
 RedMatrixMixerGUI {
 	var <win, <redMatrixMixer, <time, lastTime= 0,
 	mainGUI, mirrorGUI;
+
 	*new {|redMatrixMixer, position|
 		^super.new.initRedMatrixMixerGUI(redMatrixMixer, position);
 	}
+
 	initRedMatrixMixerGUI {|argRedMatrixMixer, position|
 		Routine({
 			var tab,
@@ -83,7 +85,7 @@ RedMatrixMixerGUI {
 					}}}
 				][index].value;
 			};
-			macroItems= [
+			macroItems= #[
 				"_macros_",
 				"default",
 				"backwards",
@@ -169,22 +171,22 @@ RedMatrixMixerGUI {
 
 					macroMenu= RedPopUpMenu().maxHeight_(lh)
 					.items_(macroItems)
-					.action_{|view|
+					.action_({|view|
 						macroFunctions.value(view.value);
 						mainGUI.do{|x| x.save};
-					},
+					}),
 					RedButton(nil, Point(14, 14), "<").maxHeight_(lh).maxWidth_(lh)
-					.action= {
+					.action_({
 						macroFunctions.value(macroMenu.value);
 						mainGUI.do{|x| x.save};
-					}
+					})
 				),
 
 				HLayout(
 					100,  //spacer
 
 					time= RedSlider().maxHeight_(lh).maxWidth_(100)
-					.action_{|view|
+					.action_({|view|
 						if(tab.activeTab==0, {
 							if(lastTime==0 and:{view.value>0}, {
 								mainGUI.do{|x| x.save};
@@ -198,7 +200,7 @@ RedMatrixMixerGUI {
 							]);
 						});
 						lastTime= view.value;
-					},
+					}),
 
 					View().maxHeight_(lh)  //spacer
 				),
@@ -239,8 +241,7 @@ RedMatrixMixerGUI {
 						mainGUI= {|i|
 							var ref= redMatrixMixer.cvs[("o"++i).asSymbol];
 							var vi= RedGUICVMultiSliderView(v, nil, ref, nil, nil, (num: ref.value.size));
-							vi.view.bounds.postln;
-							vi.view.action= vi.view.action+{vi.save};
+							vi.view.action_({vi.view.action+{vi.save}});
 							vi;
 						}.dup(nOut);
 					};
@@ -263,14 +264,14 @@ RedMatrixMixerGUI {
 				var ref= redMatrixMixer.cvs[("o"++i).asSymbol].copy;
 				var rect= mainGUI[i].view.bounds.copy;
 				var vi= RedGUICVMultiSliderView(v, rect, ref, nil, nil, (num: ref.value.size));
-				vi.view.action= vi.view.action+{vi.save};
+				vi.view.action_({vi.view.action+{vi.save}});
 				vi;
 			};
-			tab.view.toFrontAction_{
+			tab.view.toFrontAction_({
 				mirrorGUI= {|i|
 					makeMirror.value(tab.views[1], i);
 				}.dup(nOut);
-			};
+			});
 
 			win.onClose_({controllers.do{|x| x.remove}});
 			CmdPeriod.doOnce({this.close});

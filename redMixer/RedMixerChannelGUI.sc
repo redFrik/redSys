@@ -38,10 +38,10 @@ RedMixerChannelGUI {
 			numInserts.collect{|i|
 				var popup, button;
 				HLayout(
-					popup= RedPopUpMenu(view)
+					popup= RedPopUpMenu()
 					.items_(["_inserts_"]++RedEffectModule.subclasses.collect{|x| x.name}),
-					button= RedButton(view, nil, "o", "o").maxWidth_(bw)
-					.action_{|v|
+					button= RedButton(nil, nil, "o", "o").maxWidth_(bw)
+					.action_({|v|
 						var efx, win;
 						if(v.value==1, {
 							if(popup.value>0, {
@@ -53,11 +53,11 @@ RedMixerChannelGUI {
 									win= efx.gui(nil, pos);
 									insertEfxs[i]= efx;
 									insertWins[i]= win;
-									win.onClose= {
+									win.onClose_({
 										redMixerChannel.remove(insertEfxs[i]);
 										insertEfxs[i]= nil;
 										v.value= 0;
-									};
+									});
 								}).play(AppClock);
 							});
 						}, {
@@ -66,60 +66,60 @@ RedMixerChannelGUI {
 								insertWins[i]= nil;
 							});
 						});
-					}
+					})
 				)
 			},
 
 			//--equaliser
 			HLayout(
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.hiFreq,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.hiFreq,
 						{|x| freqSpec.map(x)}, {|x| freqSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.hiBand,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.hiBand,
 						{|x| bandSpec.map(x)}, {|x| bandSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.hiGain,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.hiGain,
 						{|x| gainSpec.map(x)}, {|x| gainSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVButton(view, nil, redMixerChannel.cvs.eqHi, nil, nil, (str: "hi"))
+					RedGUICVButton(nil, nil, redMixerChannel.cvs.eqHi, nil, nil, (str: "hi"))
 				).last
 			),
 			HLayout(
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.miFreq,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.miFreq,
 						{|x| freqSpec.map(x)}, {|x| freqSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.miBand,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.miBand,
 						{|x| bandSpec.map(x)}, {|x| bandSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.miGain,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.miGain,
 						{|x| gainSpec.map(x)}, {|x| gainSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVButton(view, nil, redMixerChannel.cvs.eqMi, nil, nil, (str: "mi"))
+					RedGUICVButton(nil, nil, redMixerChannel.cvs.eqMi, nil, nil, (str: "mi"))
 				).last
 			),
 			HLayout(
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.loFreq,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.loFreq,
 						{|x| freqSpec.map(x)}, {|x| freqSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.loBand,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.loBand,
 						{|x| bandSpec.map(x)}, {|x| bandSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVKnob(view, nil, redMixerChannel.cvs.loGain,
+					RedGUICVKnob(nil, nil, redMixerChannel.cvs.loGain,
 						{|x| gainSpec.map(x)}, {|x| gainSpec.unmap(x)})
 				).last,
 				views.add(
-					RedGUICVButton(view, nil, redMixerChannel.cvs.eqLo, nil, nil, (str: "lo"))
+					RedGUICVButton(nil, nil, redMixerChannel.cvs.eqLo, nil, nil, (str: "lo"))
 				).last
 			),
 
@@ -127,7 +127,7 @@ RedMixerChannelGUI {
 			HLayout(
 				views.add(
 					RedGUICVSlider(
-						view,
+						nil,
 						nil,
 						redMixerChannel.cvs.bal,
 						{|x| x*2-1},
@@ -146,7 +146,7 @@ RedMixerChannelGUI {
 				//--mute
 				views.add(
 					RedGUICVButton(
-						view,
+						nil,
 						nil,
 						redMixerChannel.cvs.mute,
 						nil,
@@ -174,8 +174,8 @@ RedMixerChannelGUI {
 				//--peaks
 				View().fixedSize_(Size(12, lh)),  //spacer
 				peakButtons= [
-					RedButton(view, nil, "", ""),
-					RedButton(view, nil, "", "")
+					RedButton(nil, nil, "", ""),
+					RedButton(nil, nil, "", "")
 				];
 				peakButtons.do{|b|
 					b.canFocus_(false);
@@ -203,7 +203,7 @@ RedMixerChannelGUI {
 			HLayout(*[
 				views.add(
 					RedGUICVSlider(
-						view,
+						nil,
 						nil,
 						redMixerChannel.cvs.amp,
 						{|x| volWarp.map(x).dbamp},
@@ -247,7 +247,7 @@ RedMixerChannelGUI {
 
 			//--name
 			if(name.notNil, {
-				textView= RedStaticText(view, nil, name);
+				textView= RedStaticText(nil, nil, name);
 				textView.maxHeight_(lh).align_(\center);
 			})
 
@@ -309,6 +309,6 @@ RedMixerChannelGUI {
 		});
 		^View(parent, Point(width, height))
 		.background_(GUI.skins.redFrik.background)
-		.onClose_({this.close})
+		.onClose_({this.close});
 	}
 }

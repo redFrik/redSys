@@ -4,9 +4,9 @@
 //gui class
 //make left/right speaking voice.  formant synthesis?
 
-
 RedTest {
 	classvar players;
+
 	var buf, syn, <sfGrp;
 
 	*initClass {
@@ -15,16 +15,18 @@ RedTest {
 
 	//--pseudo ugen
 	*ar {|amp= 1, pan= 0|
-		^Pan2.ar(Mix(SinOsc.ar([400, 404], 0, LFNoise0.kr(5).max(0)*amp*0.5)), pan)
+		^Pan2.ar(Mix(SinOsc.ar(#[400, 404], 0, LFNoise0.kr(5).max(0)*amp*0.5)), pan)
 	}
 
 	//--soundfile
 	*sf {|out= 0, group|
 		^super.new.initRedTestSF(out, group, 1);
 	}
+
 	*sf2 {|out= 0, group|
 		^super.new.initRedTestSF(out, group, 2);
 	}
+
 	initRedTestSF {|out, group, channels|
 		sfGrp= group ? Server.default.defaultGroup;
 		Routine.run{
@@ -54,9 +56,11 @@ RedTest {
 			});
 		}
 	}
+
 	sfBus_ {|out|
 		syn.set(\out, out);
 	}
+
 	sfFree {
 		syn.free;
 		buf.free;
@@ -66,7 +70,7 @@ RedTest {
 	*speaker {|channels, amp= 0.5, dur= 1|
 		Routine.run{
 			Server.default.bootSync;
-			channels= channels ? [0, 1];
+			channels= channels ? #[0, 1];
 			SynthDef(\redTestPink, {|out= 0, gate= 1, amp= 1|
 				var e= EnvGen.kr(Env.perc, gate, doneAction:2);
 				var z= PinkNoise.ar(e*amp);
@@ -83,10 +87,11 @@ RedTest {
 			);
 		};
 	}
+
 	*speaker2 {|channels, amp= 0.5, dur= 1|
 		Routine.run{
 			Server.default.bootSync;
-			channels= channels ? [0, 1];
+			channels= channels ? #[0, 1];
 			SynthDef(\redTestPing, {|out= 0, gate= 1, freq= 400, amp= 1|
 				var e= EnvGen.kr(Env.perc, gate, doneAction:2);
 				var z= SinOsc.ar(freq, 0, e*amp);
@@ -104,6 +109,7 @@ RedTest {
 			);
 		};
 	}
+
 	*stop {
 		players.do{|x| x.stop};
 		players= List.new;

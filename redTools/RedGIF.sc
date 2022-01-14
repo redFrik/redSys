@@ -101,7 +101,7 @@ RedGIF {
 				});
 			}).play(AppClock);
 		});
-		win.onClose= {img.free};
+		win.onClose_({img.free});
 		win.front;
 		^win;
 	}

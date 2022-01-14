@@ -7,9 +7,11 @@ RedMatrixMixer {
 	var <group,
 	<isReady= false, groupPassedIn,
 	<nIn, <nOut, <synth, <cvs, <defString, controllers;
+
 	*new {|nIn= 8, nOut= 8, in= 0, out= 0, group, lag= 0.05|
 		^super.new.initRedMatrixMixer(nIn, nOut, in, out, group, lag);
 	}
+
 	initRedMatrixMixer {|argNIn, argNOut, argIn, argOut, argGroup, argLag|
 		var server;
 		nIn= argNIn;
@@ -73,6 +75,7 @@ RedMatrixMixer {
 			isReady= true;
 		};
 	}
+
 	def {
 		defString= "SynthDef('redMatrixMixer', {|in= 0, out= 0, lag= 0.05";
 		nOut.do{|i|
@@ -86,12 +89,14 @@ RedMatrixMixer {
 		defString= defString++"\n});";
 		^defString.interpret;
 	}
+
 	in {^cvs.in.value}
 	in_ {|val| cvs.in.value_(val.max(0)).changed(\value)}
 	out {^cvs.out.value}
 	out_ {|val| cvs.out.value_(val.max(0)).changed(\value)}
 	lag {^cvs.lag.value}
 	lag_ {|val| cvs.lag.value_(val.max(0)).changed(\value)}
+
 	free {
 		if(groupPassedIn.not, {
 			group.free;
@@ -100,6 +105,7 @@ RedMatrixMixer {
 		});
 		controllers.do{|x| x.remove};
 	}
+
 	gui {|position|
 		^RedMatrixMixerGUI(this, position);
 	}

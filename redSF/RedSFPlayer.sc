@@ -7,12 +7,15 @@
 RedSFPlayer {
 	var	<>server, <buffer, <synth, <duration, <channels,
 	amp= 1, sendDefs= true;
+
 	*new {|server|
 		^super.new.server_(server ? Server.default);
 	}
+
 	*read {|path, server|
 		^this.new(server).read(path);
 	}
+
 	read {|path|
 		var file;
 		if(File.exists(path), {
@@ -29,31 +32,37 @@ RedSFPlayer {
 		}, {
 			(this.class.name++": file"+path+"not found").warn;
 		});
-
 	}
+
 	loop {|out= 0, rate= 1, fadeTime= 0|
 		this.prPlay(out, rate, fadeTime, true);
 	}
+
 	play {|out= 0, rate= 1, fadeTime= 0|
 		this.prPlay(out, rate, fadeTime, false);
 	}
+
 	stop {|fadeTime= 0|
 		if(this.isPlaying, {
 			this.prStop(fadeTime);
 		});
 	}
+
 	free {
 		this.prFree;
 	}
+
 	amp_ {|val|
 		amp= val;
 		if(this.isPlaying, {
 			synth.set(\amp, amp);
 		});
 	}
+
 	isPlaying {
 		^synth.isPlaying;
 	}
+
 	makeWindow {
 
 	}
@@ -62,6 +71,7 @@ RedSFPlayer {
 	prRead {|path|
 		buffer= Buffer.read(server, path);
 	}
+
 	prSendDefs {
 		8.do{|i|
 			SynthDef("redSFPlayer"++(i+1), {|out= 0, rate= 1, atk= 0, rel= 0, loop= 1, amp= 1, buf, gate= 1|
@@ -71,6 +81,7 @@ RedSFPlayer {
 			}).add;
 		};
 	}
+
 	prPlay {|out, rate, fadeTime, loop|
 		if(this.isPlaying, {
 			this.stop(fadeTime);
@@ -92,9 +103,11 @@ RedSFPlayer {
 			});
 		});
 	}
+
 	prStop {|fadeTime|
 		synth.set(\rel, fadeTime, \gate, 0);
 	}
+
 	prFree {
 		if(this.isPlaying, {
 			synth.free;

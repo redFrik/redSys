@@ -23,7 +23,7 @@ RedMixerGUI {
 
 	initRedMixerGUI {|argRedMixer, position|
 		Routine({
-			var tab, winWidth, winHeight, tabWidth, tabHeight, topHeight,
+			var tab,
 			macroMenu, macroFunctions, macroItems, makeMirror, defaults,
 			lagBox, bw= 44, lh= 14;
 
@@ -82,16 +82,14 @@ RedMixerGUI {
 			redMixer= argRedMixer;
 			position= position ?? {Point(300, 200)};
 
-			tabWidth= RedMixerChannelGUI.width+4;
-			tabWidth= tabWidth*(redMixer.mixers.size+redMixer.channels.size);
-			topHeight= 10;
-			tabHeight= RedMixerChannelGUI.height+2+topHeight;
-
-			winWidth= (tabWidth+8).max(260);
-			winHeight= tabHeight+topHeight+32;
 			win= Window(
 				redMixer.class.name.asString.put(0, $r),
-				Rect(position.x, position.y, winWidth, winHeight),
+				Rect(
+					position.x,
+					position.y,
+					(RedMixerChannelGUI.width+4*(redMixer.mixers.size+redMixer.channels.size)+8).max(260),
+					RedMixerChannelGUI.height+12+42
+				),
 				false
 			);
 			win.front;
@@ -99,7 +97,7 @@ RedMixerGUI {
 
 			win.view.layout= VLayout(
 				HLayout(
-					lagBox= RedNumberBox(win).maxHeight_(lh).maxWidth_(bw)
+					lagBox= RedNumberBox().maxHeight_(lh).maxWidth_(bw)
 					.value_(redMixer.lag)
 					.action_({|v| redMixer.lag= v.value.max(0)});
 					controllers.add(
@@ -108,20 +106,18 @@ RedMixerGUI {
 						})
 					);
 					lagBox,
-					RedStaticText(win, nil, "lag").maxHeight_(lh).maxWidth_(20),
+					RedStaticText(nil, nil, "lag").maxHeight_(lh).maxWidth_(20),
 
-					RedButton(win, nil, "monitor", "monitor").maxHeight_(lh).maxWidth_(52)
-					.action_{|v| "todo".postln},  //TODO
-					RedNumberBox(win).maxHeight_(lh).maxWidth_(bw)
-					.value_(7).action_{|v| "todo".postln},
+					RedButton(nil, nil, "monitor", "monitor").maxHeight_(lh).maxWidth_(52)
+					.action_({|v| "todo".postln}),  //TODO
+					RedNumberBox().maxHeight_(lh).maxWidth_(bw)
+					.value_(7).action_({|v| "todo".postln}),
 
-					macroMenu= RedPopUpMenu(win).maxHeight_(lh)
+					macroMenu= RedPopUpMenu().maxHeight_(lh)
 					.items_(macroItems)
-					.action_{|v| macroFunctions.value(v.value)},
-					RedButton(win, nil, "<").maxHeight_(lh).maxWidth_(lh)
-					.action_{
-						macroFunctions.value(macroMenu.value);
-					},
+					.action_({|v| macroFunctions.value(v.value)}),
+					RedButton(nil, nil, "<").maxHeight_(lh).maxWidth_(lh)
+					.action_({macroFunctions.value(macroMenu.value)}),
 
 					View()  //spacer
 				),
@@ -129,8 +125,8 @@ RedMixerGUI {
 				HLayout(
 					100,  //spacer
 
-					time= RedSlider(win).maxHeight_(lh).maxWidth_(100)
-					.action_{|v|
+					time= RedSlider().maxHeight_(lh).maxWidth_(100)
+					.action_({|v|
 						if(tab.activeTab==0, {
 							if(lastTime==0 and:{v.value>0}, {
 								mainGUIviews.do{|x| x.do{|y| y.save}};
@@ -146,7 +142,7 @@ RedMixerGUI {
 							]);
 						});
 						lastTime= v.value;
-					},
+					}),
 
 					View()  //spacer
 				),
@@ -158,7 +154,8 @@ RedMixerGUI {
 					[Color.grey(0.2, 0.2), GUI.skins.redFrik.background],
 					scroll: true
 				);
-				tab.view.minHeight_(tabHeight)
+				tab.view.minHeight_(RedMixerChannelGUI.height+12);
+				tab.view
 			).margins_(4).spacing_(4);
 
 			tab.views.do{|x| x.hasHorizontalScroller= false};
@@ -190,6 +187,7 @@ RedMixerGUI {
 			};
 			mainGUIviews= (mainGUIchannels++mainGUImixers).collect{|x| x.views};
 			defaults= mainGUIviews.collect{|x| x.collect{|y| y.view.value}};
+
 			makeMirror= {|v, x|
 				var views= List.new;
 				var view= View(v, x.view.bounds);
@@ -210,11 +208,11 @@ RedMixerGUI {
 				};
 				views;
 			};
-			tab.view.toFrontAction_{
+			tab.view.toFrontAction_({
 				mirrorGUIviews= (mainGUIchannels++mainGUImixers).collect{|x|
 					makeMirror.value(tab.views[1], x);
 				};
-			};
+			});
 
 			redMixer.channels.do{|x, i|
 				controllers.add(
@@ -238,6 +236,5 @@ RedMixerGUI {
 
 	close {
 		if(win.isClosed.not, {win.close});
-		controllers.do{|x| x.remove};
 	}
 }

@@ -6,9 +6,11 @@
 
 RedEffectModule : RedAbstractModule {	//abstract class
 	var <synth;
+
 	*new {|out= 0, group, addAction= \addToTail, lag= 0|
 		^super.new(group, addAction, lag).initRedEffectModule(out);
 	}
+
 	initModule {|group|
 		thisdef.add;
 		group.server.sync;
@@ -16,6 +18,7 @@ RedEffectModule : RedAbstractModule {	//abstract class
 		super.initMethods;
 		this.initRedEffectModule(cvs.out.value);
 	}
+
 	initRedEffectModule {|out|
 		var args= List.new;
 		forkIfNeeded{
@@ -29,10 +32,12 @@ RedEffectModule : RedAbstractModule {	//abstract class
 			this.prAddControllers;
 		};
 	}
+
 	free {
 		synth.free;
 		super.free;
 	}
+
 	gui {|parent, position|
 		^RedEffectModuleGUI(this, parent, position);
 	}

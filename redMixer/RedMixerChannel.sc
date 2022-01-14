@@ -11,9 +11,11 @@ RedMixerChannel {
 	<inserts,
 	synth, synthEq,
 	osc, controllers;
+
 	*new {|out= 0, group, lag= 0.05|
 		^super.new.initRedMixerChannel(out, lag).init(group);
 	}
+
 	initRedMixerChannel {|out, lag|
 		cvs= ();
 		cvs.levels= Ref(0.dup);
@@ -36,6 +38,7 @@ RedMixerChannel {
 		cvs.loBand= Ref(1);
 		cvs.loGain= Ref(0);
 	}
+
 	init {|argGroup|
 		var server;
 		synthEq= nil;
@@ -101,6 +104,7 @@ RedMixerChannel {
 			//isReady= true;
 		};
 	}
+
 	interp {|other, val= 0|
 		var exclude= #[\out, \mute, \peaks, \levels];
 		cvs.keysValuesDo{|k, v, i|
@@ -110,6 +114,7 @@ RedMixerChannel {
 			});
 		};
 	}
+
 	insertClass {|redEfxClass, addAction= \addToHead|
 		forkIfNeeded{
 			redEfxClass.asArray.do{|x|
@@ -134,6 +139,7 @@ RedMixerChannel {
 			};
 		};
 	}
+
 	insert {|redEfx, addAction= \addToHead|
 		forkIfNeeded{
 			group.server.sync;
@@ -162,22 +168,27 @@ RedMixerChannel {
 			};
 		};
 	}
+
 	removeClass {|redEfxClass|
 		redEfxClass.asArray.do{|x|
 			inserts= inserts.reject{|y| if(y.class==x, {y.free; true}, {false})};
 		};
 	}
+
 	remove {|redEfx|
 		redEfx.asArray.do{|x|
 			inserts= inserts.reject{|y| if(y==x, {y.free; true}, {false})};
 		};
 	}
+
 	removeAll {
 		inserts.do{|x| x.free};
 		inserts= List.new;
 	}
+
 	levels {^cvs.levels.value}
 	peaks {^cvs.peaks.value}
+
 	lag {^cvs.lag.value}
 	lag_ {|val| cvs.lag.value_(val.max(0)).changed(\value)}
 	mute {^cvs.mute.value}
@@ -212,9 +223,11 @@ RedMixerChannel {
 	loBand_ {|val| cvs.loBand.value_(val).changed(\value)}
 	loGain {^cvs.loGain.value}
 	loGain_ {|val| cvs.loGain.value_(val).changed(\value)}
+
 	gui {|parent, position|
 		^RedMixerChannelGUI(this, parent, position);
 	}
+
 	free {
 		this.removeAll;
 		controllers.do{|x| x.remove};
@@ -222,10 +235,12 @@ RedMixerChannel {
 		synth.free;
 		osc.free;
 	}
+
 	resetPeaks {
 		cvs.peaks.value= cvs.peaks.value*0;
 		cvs.peaks.changed(\value);
 	}
+
 	def {|channels= 2|
 		^switch(channels,
 			2, {
@@ -250,6 +265,7 @@ RedMixerChannel {
 			{(this.class.name++": different num channels todo"+channels).warn}
 		);
 	}
+
 	defEq {|channels= 2|
 		^SynthDef(\redMixerChannelEq, {|out= 0, lag= 0.05,
 			eqHi= 0, eqMi= 0, eqLo= 0,
@@ -280,6 +296,7 @@ RedMixerChannel {
 			)
 		));
 	}
+
 	archive {
 		^(
 			cvs: cvs,

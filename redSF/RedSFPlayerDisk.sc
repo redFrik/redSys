@@ -8,6 +8,7 @@ RedSFPlayerDisk : RedSFPlayer {
 	prRead {|path|
 		buffer= Buffer.cueSoundFile(server, path, 0, channels);
 	}
+
 	prSendDefs {
 		8.do{|i|
 			SynthDef("redSFPlayerDisk"++(i+1), {|out= 0, rate= 1, atk= 0, rel= 0, loop= 1, amp= 1, buf, gate= 1|
@@ -17,6 +18,7 @@ RedSFPlayerDisk : RedSFPlayer {
 			}).add;
 		};
 	}
+
 	prPlay {|out, rate, fadeTime, loop|
 		var attackTime, cond= Condition(true);
 		fork{
@@ -49,6 +51,7 @@ RedSFPlayerDisk : RedSFPlayer {
 			});});
 		};
 	}
+
 	prStop {|fadeTime, cond|
 		synth.set(\rel, fadeTime, \gate, 0);
 		SystemClock.sched(fadeTime, {
@@ -56,6 +59,7 @@ RedSFPlayerDisk : RedSFPlayer {
 			nil;
 		});
 	}
+
 	prFree {
 		if(this.isPlaying, {
 			synth.free;

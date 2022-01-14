@@ -5,15 +5,19 @@
 
 RedAbstractModule {	//abstract class
 	classvar <all;
+
 	var <group, addAction, <cvs, <specs;
 	var condition, controllers;
 	var thisdef;
+
 	*initClass {
 		all= List.new;
 	}
+
 	*new {|group, addAction, lag= 0|
 		^super.new.initRedAbstractModule(group, addAction, lag);
 	}
+
 	initRedAbstractModule {|argGroup, argAddAction, lag|
 		var server;
 		condition= Condition();
@@ -27,6 +31,7 @@ RedAbstractModule {	//abstract class
 		cvs= ();
 		specs= ();
 		controllers= List.new;
+
 		thisdef= this.def(lag);
 		thisdef.metadata[\order].do{|assoc|
 			var k= assoc.key;
@@ -37,6 +42,7 @@ RedAbstractModule {	//abstract class
 			specs.put(k, spec);
 		};
 		this.initMethods;
+
 		forkIfNeeded{
 			server.bootSync;
 			thisdef.add;
@@ -46,6 +52,7 @@ RedAbstractModule {	//abstract class
 			all.add(this);
 		};
 	}
+
 	initMethods {
 		cvs.keysValuesDo{|k, v|
 			this.addUniqueMethod((k++"_").asSymbol, {|obj, val|
@@ -57,6 +64,7 @@ RedAbstractModule {	//abstract class
 			});
 		};
 	}
+
 	cvsToParam {|name|
 		if(name==\out, {
 			^\out;
@@ -64,10 +72,12 @@ RedAbstractModule {	//abstract class
 			^thisdef.metadata[\order].detect{|x| x.value==name}.key;
 		});
 	}
+
 	free {
 		controllers.do{|x| x.remove};
 		all.remove(this);
 	}
+
 	def {|lag| ^this.class.def(lag)}
 
 	//--for subclasses

@@ -18,6 +18,7 @@ RedGUI {
 		});
 	}
 }
+
 Red2DSlider {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(100, 100)};
@@ -26,6 +27,7 @@ Red2DSlider {
 		.background_(GUI.skins.redFrik.background);
 	}
 }
+
 RedButton {
 	*new {|parent, bounds ...strings|
 		var fnt= RedFont.new;
@@ -41,11 +43,13 @@ RedButton {
 		.font_(fnt);
 	}
 }
+
 RedFont {
 	*new {
 		^Font(*GUI.skins.redFrik.fontSpecs);
 	}
 }
+
 RedKnob {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(48, 48)};
@@ -58,6 +62,7 @@ RedKnob {
 		]);
 	}
 }
+
 RedLevelIndicator {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(100, 14)};
@@ -65,6 +70,7 @@ RedLevelIndicator {
 		.background_(GUI.skins.redFrik.background)
 	}
 }
+
 RedMultiSliderView {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(100, 14)};
@@ -74,6 +80,7 @@ RedMultiSliderView {
 		.fillColor_(GUI.skins.redFrik.foreground);
 	}
 }
+
 RedNumberBox {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(36, 14)};
@@ -84,6 +91,7 @@ RedNumberBox {
 		.font_(RedFont.new);
 	}
 }
+
 RedPopUpMenu {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(74, 14)};
@@ -93,6 +101,7 @@ RedPopUpMenu {
 		.font_(RedFont.new);
 	}
 }
+
 RedPopUpTreeMenu {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(74, 14)};
@@ -102,6 +111,7 @@ RedPopUpTreeMenu {
 		.font_(RedFont.new);
 	}
 }
+
 RedSlider {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(100, 14)};
@@ -110,6 +120,7 @@ RedSlider {
 		.background_(GUI.skins.redFrik.background);
 	}
 }
+
 RedStaticText {
 	*new {|parent, bounds, string|
 		var fnt= RedFont.new;
@@ -122,6 +133,7 @@ RedStaticText {
 		.font_(fnt);
 	}
 }
+
 RedTextView {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(100, 14)};

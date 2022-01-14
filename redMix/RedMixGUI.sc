@@ -9,9 +9,11 @@
 RedMixGUI {
 	var <redMix, <parent, position,
 	win;
+
 	*new {|redMix, parent, position|
 		^super.newCopyArgs(redMix, parent, position).initRedMixGUI;
 	}
+
 	initRedMixGUI {
 		var view= this.prContainer;
 		var bw= 36, lh= 14;
@@ -21,51 +23,51 @@ RedMixGUI {
 
 		view.layout= VLayout(
 			HLayout(
-				inA= RedNumberBox(view).maxWidth_(bw).maxHeight_(lh),
-				RedStaticText(view, nil, "inA ("++redMix.def.metadata.info.inA++")").maxHeight_(lh)
+				inA= RedNumberBox().maxWidth_(bw).maxHeight_(lh),
+				RedStaticText(nil, nil, "inA ("++redMix.def.metadata.info.inA++")").maxHeight_(lh)
 			),
 			HLayout(
-				inB= RedNumberBox(view).maxWidth_(bw).maxHeight_(lh),
-				RedStaticText(view, nil, "inB ("++redMix.def.metadata.info.inB++")").maxHeight_(lh)
+				inB= RedNumberBox().maxWidth_(bw).maxHeight_(lh),
+				RedStaticText(nil, nil, "inB ("++redMix.def.metadata.info.inB++")").maxHeight_(lh)
 			),
 			HLayout(
-				out= RedNumberBox(view).maxWidth_(bw).maxHeight_(lh),
-				RedStaticText(view, nil, "out (stereo)").maxHeight_(lh)
+				out= RedNumberBox().maxWidth_(bw).maxHeight_(lh),
+				RedStaticText(nil, nil, "out (stereo)").maxHeight_(lh)
 			),
 			HLayout(
-				lag= RedNumberBox(view).maxWidth_(bw).maxHeight_(lh),
-				RedStaticText(view, nil, "lag").maxHeight_(lh)
+				lag= RedNumberBox().maxWidth_(bw).maxHeight_(lh),
+				RedStaticText(nil, nil, "lag").maxHeight_(lh)
 			),
-			mixamp= Red2DSlider(view)
+			mixamp= Red2DSlider()
 		).margins_(4).spacing_(4);
 
 		inA.value= redMix.inA;
-		inA.action= {|view| redMix.inA= view.value.round.max(0)};
+		inA.action_({|view| redMix.inA= view.value.round.max(0)});
 		controllers.add(
 			SimpleController(redMix.cvs.inA).put(\value, {|ref| inA.value= ref.value})
 		);
 
 		inB.value= redMix.inB;
-		inB.action= {|view| redMix.inB= view.value.round.max(0)};
+		inB.action_({|view| redMix.inB= view.value.round.max(0)});
 		controllers.add(
 			SimpleController(redMix.cvs.inB).put(\value, {|ref| inB.value= ref.value})
 		);
 
 		out.value= redMix.out;
-		out.action= {|view| redMix.out= view.value.round.max(0)};
+		out.action_({|view| redMix.out= view.value.round.max(0)});
 		controllers.add(
 			SimpleController(redMix.cvs.out).put(\value, {|ref| out.value= ref.value})
 		);
 
 		lag.value= redMix.lag;
-		lag.action= {|view| redMix.lag= view.value.max(0)};
+		lag.action_({|view| redMix.lag= view.value.max(0)});
 		controllers.add(
 			SimpleController(redMix.cvs.lag).put(\value, {|ref| lag.value= ref.value})
 		);
 
 		mixamp.x= mixSpec.unmap(redMix.mix);
 		mixamp.y= redMix.amp;
-		mixamp.action= {|view| redMix.mix= mixSpec.map(view.x); redMix.amp= view.y};
+		mixamp.action_({|view| redMix.mix= mixSpec.map(view.x); redMix.amp= view.y});
 		controllers.add(
 			SimpleController(redMix.cvs.mix).put(\value, {|ref| mixamp.x= mixSpec.unmap(ref.value)})
 		);
@@ -75,6 +77,7 @@ RedMixGUI {
 		mixamp.mouseUpAction= {|view, x, y, mod| if(mod.isCtrl, {{redMix.mix= 0}.defer(0.1)})};
 		mixamp.onClose_({controllers.do{|x| x.remove}});
 	}
+
 	close {
 		if(win.notNil and:{win.isClosed.not}, {win.close});
 	}

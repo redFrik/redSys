@@ -5,11 +5,14 @@
 
 RedEffectsRack {
 	classvar <>defaultClasses;
+
 	var <group, <cvs, <specs, <isReady= false, groupPassedIn,
 	<efxs, controllers;
+
 	*new {|efxClasses, out= 0, group, lag= 0|
 		^super.new.initRedEffectsRack(efxClasses, out, group, lag);
 	}
+
 	*initClass {
 		defaultClasses= [	//just some favourites
 			RedEfxRing,
@@ -20,6 +23,7 @@ RedEffectsRack {
 			RedEfxComp
 		];
 	}
+
 	initRedEffectsRack {|efxClasses, argOut, argGroup, lag|
 		var server;
 		if(efxClasses.isNil or:{efxClasses.isEmpty}, {
@@ -90,17 +94,20 @@ RedEffectsRack {
 			isReady= true;
 		};
 	}
+
 	free {
 		controllers.do{|x| x.remove};
 		efxs.do{|x| x.free};
 		if(groupPassedIn.not, {group.free});
 	}
+
 	out_ {|val|
 		cvs.out.value_(specs.out.constrain(val)).changed(\value);
 	}
 	out {
 		^cvs.out.value;
 	}
+
 	gui {|position|	//parent here???
 		^RedEffectsRackGUI(this, position);
 	}

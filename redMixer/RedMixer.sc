@@ -12,11 +12,13 @@ RedMixer {
 	var <group, <cvs, <isReady, groupPassedIn,
 	<channels, <mixers, controllers,
 	internalSynths, internalInputChannels, internalOutputChannels;
+
 	*new {|inputChannels= #[2, 4, 6, 8], outputChannels= #[0], group, lag= 0.05|
 		^super.new
 		.initRedMixer(inputChannels.asArray, outputChannels.asArray, lag)
 		.init(group);
 	}
+
 	initRedMixer {|argInputChannels, argOutputChannels, lag|
 		cvs= ();
 		cvs.lag= Ref(lag);
@@ -25,6 +27,7 @@ RedMixer {
 		internalInputChannels= argInputChannels;
 		internalOutputChannels= argOutputChannels;
 	}
+
 	init {|argGroup|
 		var server;
 		isReady= false;
@@ -90,9 +93,11 @@ RedMixer {
 			isReady= true;
 		};
 	}
+
 	mixer {
 		^mixers[0];
 	}
+
 	inputChannels {
 		^channels.collect{|x| x.cvs.out.value};
 	}
@@ -109,6 +114,7 @@ RedMixer {
 			};
 		});
 	}
+
 	outputChannels {
 		^mixers.collect{|x| x.cvs.out.value};
 	}
@@ -123,6 +129,7 @@ RedMixer {
 			};
 		});
 	}
+
 	free {
 		if(groupPassedIn.not, {
 			group.free;
@@ -133,17 +140,21 @@ RedMixer {
 		});
 		controllers.do{|x| x.remove};
 	}
+
 	gui {|position|
 		^RedMixerGUI(this, position);
 	}
+
 	lag {^cvs.lag.value}
 	lag_ {|val| cvs.lag.value_(val.max(0)).changed(\value)}
+
 	mute_ {|val|
 		channels.do{|x| x.mute= val.binaryValue};
 	}
 	solo_ {|channel|
 		channels.do{|x, i| x.mute= channel.asArray.includes(i).not.binaryValue};
 	}
+
 	def {|inputChannels= #[2, 4, 6, 8]|
 		^SynthDef(\redMixerInternalRouting, {|out= 0|
 			var c= Control.names(\inputs).kr(inputChannels);
@@ -151,6 +162,7 @@ RedMixer {
 			Out.ar(out, Mix(z));
 		});
 	}
+
 	archive {
 		^(
 			internalInputChannels: this.inputChannels,

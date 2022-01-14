@@ -8,9 +8,11 @@ RedTapTempoGUI {
 	var <clock, task, monOn= false, monAmp= 0.5, monBus= 7;
 	var win;
 	var bpmView, bpsView, tapView, monOnView, monBusView;
+
 	*new {|clock, n= 4, timeout= 3, server, parent, position|
 		^super.new.initRedTapTempoGUI(clock, n, timeout, server, parent, position);
 	}
+
 	initRedTapTempoGUI {|argClock, n, timeout, server, argParent, argPosition|
 		var view, times= 0.dup(n), counter, lastTime= 0;
 		clock= argClock ?? TempoClock.default;
@@ -30,7 +32,7 @@ RedTapTempoGUI {
 			{
 				var bw= 36, lh= 14;
 				view.layout= VLayout(
-					tapView= RedButton(view, nil, "tap tempo", "tap tempo").action_{|view|
+					tapView= RedButton(nil, nil, "tap tempo", "tap tempo").action_{|view|
 						var newTempo, nowTime= SystemClock.seconds;
 						if(nowTime-timeout>lastTime, {
 							(this.class.name++": timeout").postln;
@@ -49,30 +51,30 @@ RedTapTempoGUI {
 						view.value= 0;
 					}.maxHeight_(60).focus,
 
-					RedButton(view, nil, "sync").action_{|view|
+					RedButton(nil, nil, "sync").action_{|view|
 						task.stop;
 						task= this.prRoutine.play(clock);
 					}.maxHeight_(lh),
 
 					HLayout(
-						bpmView= RedNumberBox(view).value_(clock.tempo*60).action_{|view|
+						bpmView= RedNumberBox().value_(clock.tempo*60).action_{|view|
 							var bps= (view.value/60).round(0.0001);
 							clock.tempo= bps;
 							bpsView.value= bps;
 							(this.class.name++": new tempo... bps:"+bps+" bpm:"+(bps*60)).postln;
 						}.maxWidth_(bw).maxHeight_(lh),
-						RedStaticText(view, nil, "bpm").maxHeight_(lh),
-						bpsView= RedNumberBox(view).value_(clock.tempo).action_{|view|
+						RedStaticText(nil, nil, "bpm").maxHeight_(lh),
+						bpsView= RedNumberBox().value_(clock.tempo).action_{|view|
 							this.tempo= view.value.max(0);
 						}.maxWidth_(bw).maxHeight_(lh),
-						RedStaticText(view, nil, "bps").maxHeight_(lh)
+						RedStaticText(nil, nil, "bps").maxHeight_(lh)
 					),
 
 					HLayout(
-						monOnView= RedButton(view, nil, "monitor", "monitor").action_{|view|
+						monOnView= RedButton(nil, nil, "monitor", "monitor").action_{|view|
 							monOn= view.value.booleanValue;
 						}.maxWidth_(53).maxHeight_(lh),
-						monBusView= RedNumberBox(view).value_(monBus).action_{|view|
+						monBusView= RedNumberBox().value_(monBus).action_{|view|
 							monBus= view.value.asInteger.max(0);
 							view= monBus;
 						}.maxWidth_(bw).maxHeight_(lh),
@@ -81,22 +83,26 @@ RedTapTempoGUI {
 				).margins_(4).spacing_(4);
 
 				task= this.prRoutine.play(clock, quant:1);
-				parent.onClose= {task.stop};
+				view.onClose_({task.stop});
 			}.defer;
 		};
 	}
+
 	tempo {^clock.tempo}
 	tempo_ {|bps| bpmView.valueAction= bps*60}
+
 	monitor_ {|bool| monOnView.valueAction= bool.binaryValue}
 	monitorAmp_ {|val| monAmp= val}
 	monitorBus_ {|index|
 		monBus= index;
 		monBusView.value= index;
 	}
+
 	close {
 		task.stop;
 		if(win.notNil and:{win.isClosed.not}, {win.close});
 	}
+
 	def {^this.class.def}
 	*def {
 		^SynthDef(\redTapTempo, {|out= 0, amp= 0.5| //mono only
@@ -128,6 +134,7 @@ RedTapTempoGUI {
 		.layout_(VLayout())
 		.background_(GUI.skins.redFrik.background);
 	}
+
 	prRoutine {
 		^Routine({
 			inf.do{

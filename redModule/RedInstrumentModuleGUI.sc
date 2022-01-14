@@ -4,17 +4,21 @@
 
 RedInstrumentModuleGUI {
 	var <win;
+
 	*new {
 		^super.new.initRedInstrumentGUI;
 	}
+
 	initRedInstrumentGUI {
 
 	}
+
 	defaults {
 		RedInstrumentModule.all.do{|x|
 			x.cvs.do{|cv| cv.value= cv.spec.default};
 		};
 	}
+
 	randomize {
 		RedInstrumentModule.all.do{|x|
 			x.cvs.do{|cv| cv.input= 1.0.rand};
