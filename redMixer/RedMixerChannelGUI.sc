@@ -49,7 +49,10 @@ RedMixerChannelGUI {
 									var pos;
 									efx= RedEffectModule.subclasses[popup.value-1].new;
 									redMixerChannel.insert(efx, #[\addToHead, \addToTail].clipAt(i));
-									pos= Point(parent.bounds.right, parent.bounds.bottom-80-(i*110));
+									pos= Point(
+										view.absoluteBounds.right,
+										Window.screenBounds.height-view.absoluteBounds.top-80-(i*110)
+									);
 									win= efx.gui(nil, pos);
 									insertEfxs[i]= efx;
 									insertWins[i]= win;
