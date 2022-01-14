@@ -28,8 +28,14 @@ PRIVATE:: initRedEffectsRackGUI
 METHOD:: close
 Closes the window if open.
 
+METHOD:: redEffectsRack
+The current link::Classes/RedEffectsRack:: instance.
+
 METHOD:: time
 Slider to go from now to later.
+
+METHOD:: win
+Returns the link::Classes/Window::
 
 EXAMPLES::
 
@@ -52,7 +58,7 @@ a.free;
 b.stop;
 c.close;
 
-s.options.memSize= 8192*2;
+s.options.memSize= 8192*8;
 s.reboot;
 a= RedEffectsRack(RedEffectModule.subclasses);
 b= Pbind(\degree, Pseq([0, 1, 5, 4, 3, 4], inf), \dur, 0.25).play;

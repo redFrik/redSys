@@ -24,6 +24,9 @@ code::nil:: creates a group after the code::defaultGroup::.
 ARGUMENT:: lag
 a non-modulatable lag time for all parameters in all modules.
 
+METHOD:: defaultClasses
+An link::Classes/Array:: of default redEffects classes.
+
 INSTANCEMETHODS::
 
 PRIVATE:: initRedEffectsRack
@@ -59,6 +62,12 @@ etc. See individual classes for complete list. If two or more of the same class,
 METHOD:: efxs
 Array of effects.
 
+METHOD:: isReady
+code::true:: after the server is booted and the internal group is added and created.
+
+METHOD:: specs
+A dictionary with link::Classes/ContolSpec::.
+
 EXAMPLES::
 
 CODE::
@@ -93,6 +102,7 @@ a.ringMix_1= 0.5;
 a.ringFreq
 a.ringFreq_1
 a.tankMix= 0.5;
+a.gui;  //optional
 c.stop;
 a.free;
 ::
