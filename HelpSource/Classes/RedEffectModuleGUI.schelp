@@ -14,7 +14,7 @@ ARGUMENT:: redEffectModule
 A link::Classes/RedEffectModule::.
 
 ARGUMENT:: parent
-A link::Classes/Window::, link::Classes/CompositeView:: or code::nil::.
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
 
 ARGUMENT:: position
 A link::Classes/Point:: or code::nil::.
@@ -25,6 +25,29 @@ PRIVATE:: prContainer, initRedEffectModuleGUI
 
 METHOD:: close
 Check if a window was created as parent and then closes it.
+
+METHOD:: cmp
+Deprecated. Use link::#-view:: instead.
+
+METHOD:: onClose
+
+ARGUMENT:: func
+A link::Classes/Function:: that will be evaluated when this gui module is closed.
+
+METHOD:: params
+An link::Classes/Array:: of link::Classes/Association::s from module metadata (argument names).
+
+METHOD:: parent
+Return the current parent (link::Classes/Window:: or link::Classes/View::).
+
+METHOD:: redEffectModule
+The current link::Classes/RedEffectModule:: instance.
+
+METHOD:: view
+Return the top view.
+
+METHOD:: views
+Return a link::Classes/List:: of all relevant view items (not text).
 
 EXAMPLES::
 
@@ -55,7 +78,7 @@ c.close;
 var efx= [RedEfxRing.new, RedEfxDist.new, RedEfxTank.new, RedEfxGuit.new];
 var win= Window("test", Rect(100, 200, 300, 400));
 win.front;
-win.view.decorator= FlowLayout(win.view.bounds);
+win.layout= VLayout();
 Pbind(\degree, 0).play;
 efx.do{|x|
 	RedEffectModuleGUI(x, win);
@@ -68,12 +91,11 @@ CmdPeriod.doOnce({win.close});
 var efx= RedEfxTank.new;
 var win= Window("hgf", Rect(100, 200, 500, 500));
 win.front;
-v= CompositeView(win, Rect(10, 10, 400, 400));
+v= View(win, Rect(10, 10, 400, 400));
+v.layout= VLayout();
 v.background_(Color.blue);
-v.decorator= FlowLayout(Rect(0, 0, 300, 300));
 Pbind(\degree, 0).play;
 efx.gui(v);
-v.decorator.nextLine;
 efx.gui(v);
 CmdPeriod.doOnce({win.close});
 )

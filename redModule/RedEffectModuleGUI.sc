@@ -5,82 +5,99 @@
 
 RedEffectModuleGUI {
 	var <redEffectModule, <parent, position,
-	win, <views, <cmp, <params;
+	win, <views, <view, <params;
+
 	*new {|redEffectModule, parent, position|
 		^super.newCopyArgs(redEffectModule, parent, position).initRedEffectModuleGUI;
 	}
+
 	initRedEffectModuleGUI {
-		var savedLeft= 0;
+		var bw= 16, lh= 14;
 		params= redEffectModule.def.metadata[\order].reject{|x| x.key==\out};
-		cmp= this.prContainer(params.size-1);
+		view= this.prContainer(params.size-1);
 		views= List.new;
-		params.do{|assoc|
-			var k= assoc.key;
-			var v= assoc.value;
-			if(k==\mix, {
-				views.add(
-					RedGUICVSlider(
-						cmp,
-						nil,
-						redEffectModule.cvs[v],
-						{|x| redEffectModule.specs[k].map(x)},
-						{|x| redEffectModule.specs[k].unmap(x)}
-					)
-				);
-				views.last.view.mouseUpAction_{|view, x, y, mod|
-					if(mod.isCtrl, {	//ctrl to center dry/wet mix
-						redEffectModule.cvs[v].value_(0).changed(\value);
-					});
-				};
-				savedLeft= cmp.decorator.left;
-			}, {
-				cmp.decorator.left= savedLeft;
-				cmp.decorator.top= cmp.decorator.gap.y;
-				views.add(
-					RedGUICVKnob(
-						cmp,
-						nil,
-						redEffectModule.cvs[v],
-						{|x| redEffectModule.specs[k].map(x)},
-						{|x| redEffectModule.specs[k].unmap(x)}
-					)
-				);
-				savedLeft= cmp.decorator.left;
-				cmp.decorator.shift(
-					0-RedGUICVKnob.defaultWidth,
-					RedGUICVKnob.defaultHeight
-				);
-				views.add(
-					RedGUICVNumberBox(
-						cmp,
-						nil,
-						redEffectModule.cvs[v],
-						{|x| redEffectModule.specs[k].constrain(x)},
-						{|x| redEffectModule.specs[k].constrain(x)}
-					)
-				);
-				v= v.asString;
-				cmp.decorator.shift(
-					2-RedGUICVNumberBox.defaultWidth-(v.bounds(RedFont.new).width/5)*1.1,
-					RedGUICVNumberBox.defaultHeight
-				);
-				RedStaticText(cmp, nil, v);
-			});
-		};
+
+		view.layout= HLayout(
+
+			*params.collect{|assoc|
+				var k= assoc.key;
+				var v= assoc.value;
+				if(k==\mix, {
+
+					views.add(
+						RedGUICVSlider(
+							nil,
+							nil,
+							redEffectModule.cvs[v],
+							{|x| redEffectModule.specs[k].map(x)},
+							{|x| redEffectModule.specs[k].unmap(x)}
+						)
+					);
+					views.last.view.mouseUpAction_{|view, x, y, mod|
+						if(mod.isCtrl, {	//ctrl to center dry/wet mix
+							redEffectModule.cvs[v].value_(0).changed(\value);
+						});
+					};
+					views.last.view.maxWidth_(bw);
+					views.last
+
+				}, {
+					VLayout(
+
+						views.add(
+							RedGUICVKnob(
+								nil,
+								nil,
+								redEffectModule.cvs[v],
+								{|x| redEffectModule.specs[k].map(x)},
+								{|x| redEffectModule.specs[k].unmap(x)}
+							)
+						);
+						views.last.view.minWidth_(RedGUICVKnob.defaultWidth);
+						views.last.view.minHeight_(RedGUICVKnob.defaultHeight);
+						views.last,
+
+						views.add(
+							RedGUICVNumberBox(
+								nil,
+								nil,
+								redEffectModule.cvs[v],
+								{|x| redEffectModule.specs[k].constrain(x)},
+								{|x| redEffectModule.specs[k].constrain(x)}
+							)
+						);
+						views.last.view.maxHeight_(lh);
+						views.last,
+
+						RedStaticText(nil, nil, v).maxHeight_(lh)
+					).spacing_(0)
+				});
+			};
+		).margins_(4).spacing_(4);
+
+		view.maxWidth_(bw+4+(RedGUICVKnob.defaultWidth+4*params.size));
+		view.maxHeight_(8+RedGUICVSlider.defaultHeight);
 	}
+
 	close {
 		if(win.notNil and:{win.isClosed.not}, {win.close});
 	}
+
 	onClose_ {|func|
-		win.onClose= func;
+		view.onClose_(func);
+	}
+
+	cmp {
+		this.deprecated(thisMethod, this.class.findMethod(\view));
+		^view
 	}
 
 	//--private
 	prContainer {|num|
-		var cmp, width, height, margin= Point(4, 4), gap= Point(4, 4);
+		var width, height;
 		position= position ?? {Point(400, 400)};
-		width= margin.x*2+RedGUICVSlider.defaultWidth+(RedGUICVKnob.defaultWidth+gap.x*num);
-		height= margin.y*2+RedGUICVSlider.defaultHeight;
+		width= 8+RedGUICVSlider.defaultWidth+(RedGUICVKnob.defaultWidth+4*num);
+		height= 8+RedGUICVSlider.defaultHeight;
 		if(parent.isNil, {
 			win= Window(
 				redEffectModule.class.name,
@@ -89,12 +106,10 @@ RedEffectModuleGUI {
 			);
 			parent= win;
 			win.front;
-			CmdPeriod.doOnce({if(win.isClosed.not, {win.close})});
+			CmdPeriod.doOnce({this.close});
 		});
-		cmp= CompositeView(parent, Point(width, height))
-		.background_(GUI.skins.redFrik.background);
-		cmp.decorator= FlowLayout(cmp.bounds, margin, gap);
-		cmp.onClose= {this.close};
-		^cmp;
+		^View(parent, Point(width, height))
+		.background_(GUI.skins.redFrik.background)
+		.onClose_({this.close});
 	}
 }

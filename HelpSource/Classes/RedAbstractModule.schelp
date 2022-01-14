@@ -5,7 +5,7 @@ RELATED:: Classes/RedEffectModule, Classes/RedInstrumentModule
 
 DESCRIPTION::
 WARNING::
-Do not instantiate. Use its subclasses.
+Do not instantiate. Use its sub-subclasses.
 ::
 
 CLASSMETHODS::
@@ -18,10 +18,39 @@ List of all registered modules.
 SUBSECTION:: subclass responsibility
 
 METHOD:: def
+The class link::Classes/SynthDef:: according to a standard.
 
 INSTANCEMETHODS::
 
-PRIVATE:: initRedAbstractModule
+PRIVATE:: initRedAbstractModule, initMethods
+
+METHOD:: cvs
+Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
+
+METHOD:: cvsToParam
+Look up SynthDef argument name.
+
+ARGUMENT:: name
+A link::Classes/Symbol::.
+
+CODE::
+a= RedEfxDist();
+a.cvsToParam(\distMix);  //'mix'
+a.cvsToParam(\distFreq);  //'freq'
+a.free;
+::
+
+METHOD:: def
+Calls link::#*def::
+
+METHOD:: free
+Remove internal controllers. Free the node and remove this module from code::RedAbstractModule.all::.
+
+METHOD:: group
+The link::Classes/Group:: if passed in when this module created - else code::nil::.
+
+METHOD:: specs
+Dictionary with all available key and link::Classes/ControlSpec:: pairs for this module.
 
 SUBSECTION:: subclass responsibility
 

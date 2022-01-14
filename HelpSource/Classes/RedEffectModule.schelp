@@ -26,21 +26,31 @@ A link::Classes/Symbol::.
 ARGUMENT:: lag
 a non-modulatable lag time for all parameters.
 
+SUBSECTION:: subclass responsibility
+
+COPYMETHOD:: RedAbstractModule *def
+
 INSTANCEMETHODS::
 
-PRIVATE:: initRedEffectModule, prAddControllers
+PRIVATE:: initModule, initRedEffectModule, prAddControllers
 
-METHOD:: free
-Free the synth and remove this module from code::RedAbstractModule.all::.
+COPYMETHOD:: RedAbstractModule -cvs
+COPYMETHOD:: RedAbstractModule -cvsToParam
+COPYMETHOD:: RedAbstractModule -free
+COPYMETHOD:: RedAbstractModule -group
+COPYMETHOD:: RedAbstractModule -specs
 
 METHOD:: gui
 Create a link::Classes/RedEffectModuleGUI::.
 
 ARGUMENT:: parent
-Can be a link::Classes/Window:: or a link::Classes/CompositeView::.
+Can be a link::Classes/Window:: or a link::Classes/View::.
 
 ARGUMENT:: position
 A link::Classes/Point::.
+
+METHOD:: synth
+The internal effect node.
 
 EXAMPLES::
 
