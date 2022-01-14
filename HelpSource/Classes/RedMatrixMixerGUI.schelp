@@ -25,8 +25,14 @@ PRIVATE:: initRedMatrixMixerGUI
 METHOD:: close
 Close the window if open.
 
+METHOD:: redMatrixMixer
+The current link::Classes/RedMatrixMixer:: instance.
+
 METHOD:: time
 Slider to go from now to later.
+
+METHOD:: win
+Returns the link::Classes/Window::
 
 EXAMPLES::
 

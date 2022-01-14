@@ -60,6 +60,15 @@ A link::Classes/Point::.
 METHOD:: group
 The link::Classes/Group:: in use.
 
+METHOD:: isReady
+code::true:: after the server is booted and the internal mixer is added and created.
+
+METHOD:: nIn
+Number of input audio busses.
+
+METHOD:: nOut
+Number of output audio busses.
+
 METHOD:: synth
 The mixer synth.
 

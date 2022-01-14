@@ -1,7 +1,7 @@
 //redFrik
 
 //--related:
-//RedEffectsRackGUI
+//RedEffectsRackGUI, RedMixerGUI
 
 //--ideas:
 //time should also be a ref too or?
@@ -18,81 +18,13 @@ RedMatrixMixerGUI {
 	}
 	initRedMatrixMixerGUI {|argRedMatrixMixer, position|
 		Routine({
-			var tab, winWidth, winHeight, tabWidth, tabHeight, topHeight, tabOffset,
-			macroMenu, macroFunctions,
-			margin= Point(4, 4), gap= Point(4, 4),
-			savePosLeft, savePosTop,
+			var tab,
+			macroMenu, macroFunctions, macroItems, makeMirror,
 			inNumbers, outNumbers,
-			inBox, outBox, lagBox, controllers= List.new,
+			inBox, outBox, lagBox, bw= 44, lh= 14, controllers= List.new,
 			nIn= argRedMatrixMixer.nIn,
 			nOut= argRedMatrixMixer.nOut;
 			while({argRedMatrixMixer.isReady.not}, {0.02.wait});
-
-			redMatrixMixer= argRedMatrixMixer;
-			position= position ?? {Point(700, 400)};
-
-			tabWidth= RedGUICVMultiSliderView.defaultWidth+gap.x*nOut;
-			tabHeight= RedGUICVMultiSliderView.defaultHeight*nIn+14;
-			topHeight= 14+gap.y;
-			tabOffset= "o99".bounds(RedFont.new).width;
-			winWidth= (tabWidth+(margin.x*2)+tabOffset).max(280);
-			winHeight= tabHeight+topHeight+(margin.y*2)+28;
-			win= Window(
-				"redMatrixMixer nIn"++nIn+"nOut"++nOut,
-				Rect(position.x, position.y, winWidth, winHeight),
-				false
-			);
-			win.front;
-			win.view.background= GUI.skins.redFrik.background;
-			win.view.decorator= FlowLayout(win.view.bounds, margin, gap);
-
-			inBox= RedNumberBox(win)
-			.value_(redMatrixMixer.in)
-			.action_({|v|
-				var val= v.value.round.max(0);
-				redMatrixMixer.in= val;
-				inNumbers.do{|x, i| x.string= "i"++(i+val)};
-			});
-			controllers.add(
-				SimpleController(redMatrixMixer.cvs.in).put(\value, {|ref|
-					inBox.value= ref.value;
-					inNumbers.do{|x, i| x.string= "i"++(i+ref.value)};
-				})
-			);
-			win.view.decorator.shift(-2, 2);
-			RedStaticText(win, nil, "in");
-			win.view.decorator.shift(2, -2);
-
-			outBox= RedNumberBox(win)
-			.value_(redMatrixMixer.out)
-			.action_({|v|
-				var val= v.value.round.max(0);
-				redMatrixMixer.out= val;
-				outNumbers.do{|x, i| x.string= "o"++(i+val)};
-			});
-			controllers.add(
-				SimpleController(redMatrixMixer.cvs.out).put(\value, {|ref|
-					outBox.value= ref.value;
-					outNumbers.do{|x, i| x.string= "o"++(i+ref.value)};
-				})
-			);
-			win.view.decorator.shift(-2, 2);
-			RedStaticText(win, nil, "out");
-			win.view.decorator.shift(2, -2);
-
-			lagBox= RedNumberBox(win)
-			.value_(redMatrixMixer.lag)
-			.action_({|v|
-				redMatrixMixer.lag= v.value.max(0);
-			});
-			controllers.add(
-				SimpleController(redMatrixMixer.cvs.lag).put(\value, {|ref|
-					lagBox.value= ref.value;
-				})
-			);
-			win.view.decorator.shift(-2, 2);
-			RedStaticText(win, nil, "lag");
-			win.view.decorator.shift(2, -2);
 
 			macroFunctions= {|index|
 				var gui;
@@ -151,8 +83,7 @@ RedMatrixMixerGUI {
 					}}}
 				][index].value;
 			};
-			macroMenu= RedPopUpMenu(win)
-			.items_([
+			macroItems= [
 				"_macros_",
 				"default",
 				"backwards",
@@ -171,111 +102,181 @@ RedMatrixMixerGUI {
 				"copy >",
 				"save preset",
 				"load preset"
-			])
-			.action_{|view|
-				macroFunctions.value(view.value);
-				mainGUI.do{|x| x.save};
-			};
-			RedButton(win, Point(14, 14), "<").action= {
-				macroFunctions.value(macroMenu.value);
-				mainGUI.do{|x| x.save};
-			};
-			win.view.decorator.nextLine;
-
-			win.view.decorator.shift(100+tabOffset, 0);
-			time= RedSlider(win)
-			.action_{|view|
-				if(tab.activeTab==0, {
-					if(lastTime==0 and:{view.value>0}, {
-						mainGUI.do{|x| x.save};
-					});
-					mainGUI.do{|x, i|
-						x.interp(mirrorGUI[i].value, view.value);
-					};
-					tab.backgrounds_([
-						GUI.skins.redFrik.foreground.copy.alpha_(1-view.value),
-						GUI.skins.redFrik.background
-					]);
-				});
-				lastTime= view.value;
-			};
-
-			win.view.decorator.shift(-100-tabOffset-time.bounds.width-4, 10);
-			savePosLeft= win.view.decorator.left+tabOffset;
-			savePosTop= win.view.decorator.top;
-			inNumbers= {|i|
-				var v= RedStaticText(win, nil, "i"++i);
-				var h= RedGUICVMultiSliderView.defaultHeight;
-				v.bounds= Rect(
-					v.bounds.left,
-					savePosTop+14+(i*h)+(h*0.2),
-					tabOffset,
-					v.bounds.height
-				);
-				win.view.decorator.nextLine;
-				v;
-			}.dup(nIn);
-
-			win.view.decorator.left= savePosLeft;
-			win.view.decorator.top= savePosTop;
-
-			tab= TabbedView(
-				win,
-				Point(tabWidth, tabHeight),
-				#[\now, \later],
-				[Color.grey(0.2, 0.2), GUI.skins.redFrik.background]
-			);
-			tab.font= RedFont.new;
-			tab.stringFocusedColor= GUI.skins.redFrik.foreground;
-			tab.stringColor= GUI.skins.redFrik.foreground;
-			tab.backgrounds= [GUI.skins.redFrik.foreground, GUI.skins.redFrik.background];
-			tab.unfocusedColors= [Color.grey(0.2, 0.2), GUI.skins.redFrik.background];
-			tab.focusActions= [
-				{
-					time.valueAction= lastTime;
-					time.enabled= true;
-					time.canFocus= true;
-				},
-				{
-					mainGUI.do{|x| x.save};
-					time.value= 1;
-					time.enabled= false;
-					time.canFocus= false;
-				}
 			];
-			tab.views[0].flow{|v|
-				mainGUI= {|i|
-					var ref= redMatrixMixer.cvs[("o"++i).asSymbol];
-					var vi= RedGUICVMultiSliderView(v, nil, ref, nil, nil, (num: ref.value.size));
-					vi.view.action= vi.view.action+{vi.save};
-					vi;
-				}.dup(nOut);
-			};
-			tab.views[1].flow{|v|
-				mirrorGUI= {|i|
-					var ref= redMatrixMixer.cvs[("o"++i).asSymbol].copy;
-					var vi= RedGUICVMultiSliderView(v, nil, ref, nil, nil, (num: ref.value.size));
-					vi.view.action= vi.view.action+{vi.save};
-					vi;
-				}.dup(nOut);
-			};
 
-			win.view.decorator.nextLine;
-			outNumbers= {|i|
-				var v= RedStaticText(win, nil, "o"++i);
-				var w= RedGUICVMultiSliderView.defaultWidth;
-				v.bounds= Rect(
-					i*(w+gap.x)+(w*0.2)+savePosLeft,
-					v.bounds.top,
-					tabOffset,
-					v.bounds.height
-				);
-			}.dup(nOut);
+			redMatrixMixer= argRedMatrixMixer;
+			position= position ?? {Point(700, 400)};
+
+			win= Window(
+				"redMatrixMixer nIn"++nIn+"nOut"++nOut,
+				Rect(
+					position.x,
+					position.y,
+					(RedGUICVMultiSliderView.defaultWidth+4*nOut+8+"o99".bounds(RedFont.new).width).max(280),
+					RedGUICVMultiSliderView.defaultHeight*nIn+14+14+46
+				),
+				false
+			);
+			win.front;
+			win.view.background= GUI.skins.redFrik.background;
+
+			win.view.layout= VLayout(
+				HLayout(
+					inBox= RedNumberBox().maxHeight_(lh).maxWidth_(bw)
+					.value_(redMatrixMixer.in)
+					.action_({|v|
+						var val= v.value.round.max(0);
+						redMatrixMixer.in= val;
+						inNumbers.do{|x, i| x.string= "i"++(i+val)};
+					});
+					controllers.add(
+						SimpleController(redMatrixMixer.cvs.in).put(\value, {|ref|
+							inBox.value= ref.value;
+							inNumbers.do{|x, i| x.string= "i"++(i+ref.value)};
+						})
+					);
+					inBox,
+					RedStaticText(nil, nil, "in").maxHeight_(lh).maxWidth_(12),
+
+					outBox= RedNumberBox().maxHeight_(lh).maxWidth_(bw)
+					.value_(redMatrixMixer.out)
+					.action_({|v|
+						var val= v.value.round.max(0);
+						redMatrixMixer.out= val;
+						outNumbers.do{|x, i| x.string= "o"++(i+val)};
+					});
+					controllers.add(
+						SimpleController(redMatrixMixer.cvs.out).put(\value, {|ref|
+							outBox.value= ref.value;
+							outNumbers.do{|x, i| x.string= "o"++(i+ref.value)};
+						})
+					);
+					outBox,
+					RedStaticText(nil, nil, "out").maxHeight_(lh).maxWidth_(16),
+
+					lagBox= RedNumberBox().maxHeight_(lh).maxWidth_(bw)
+					.value_(redMatrixMixer.lag)
+					.action_({|v|
+						redMatrixMixer.lag= v.value.max(0);
+					});
+					controllers.add(
+						SimpleController(redMatrixMixer.cvs.lag).put(\value, {|ref|
+							lagBox.value= ref.value;
+						})
+					);
+					lagBox,
+					RedStaticText(nil, nil, "lag").maxHeight_(lh).maxWidth_(20),
+
+					macroMenu= RedPopUpMenu().maxHeight_(lh)
+					.items_(macroItems)
+					.action_{|view|
+						macroFunctions.value(view.value);
+						mainGUI.do{|x| x.save};
+					},
+					RedButton(nil, Point(14, 14), "<").maxHeight_(lh).maxWidth_(lh)
+					.action= {
+						macroFunctions.value(macroMenu.value);
+						mainGUI.do{|x| x.save};
+					}
+				),
+
+				HLayout(
+					100,  //spacer
+
+					time= RedSlider().maxHeight_(lh).maxWidth_(100)
+					.action_{|view|
+						if(tab.activeTab==0, {
+							if(lastTime==0 and:{view.value>0}, {
+								mainGUI.do{|x| x.save};
+							});
+							mainGUI.do{|x, i|
+								x.interp(mirrorGUI[i].value, view.value);
+							};
+							tab.backgrounds_([
+								GUI.skins.redFrik.foreground.copy.alpha_(1-view.value),
+								GUI.skins.redFrik.background
+							]);
+						});
+						lastTime= view.value;
+					},
+
+					View().maxHeight_(lh)  //spacer
+				),
+
+				HLayout(
+					VLayout(*[
+						View().fixedHeight_(12),  //spacer
+						inNumbers= {|i|
+							RedStaticText(nil, nil, "i"++i).fixedWidth_(12)
+						}.dup(nIn)
+					].flat),
+
+					tab= TabbedView(
+						win,
+						nil,
+						#[\now, \later],
+						[Color.grey(0.2, 0.2), GUI.skins.redFrik.background]
+					);
+					tab.font= RedFont.new;
+					tab.stringFocusedColor= GUI.skins.redFrik.foreground;
+					tab.stringColor= GUI.skins.redFrik.foreground;
+					tab.backgrounds= [GUI.skins.redFrik.foreground, GUI.skins.redFrik.background];
+					tab.unfocusedColors= [Color.grey(0.2, 0.2), GUI.skins.redFrik.background];
+					tab.focusActions= [
+						{
+							time.valueAction= lastTime;
+							time.enabled= true;
+							time.canFocus= true;
+						},
+						{
+							mainGUI.do{|x| x.save};
+							time.value= 1;
+							time.enabled= false;
+							time.canFocus= false;
+						}
+					];
+					tab.views[0].flow{|v|
+						mainGUI= {|i|
+							var ref= redMatrixMixer.cvs[("o"++i).asSymbol];
+							var vi= RedGUICVMultiSliderView(v, nil, ref, nil, nil, (num: ref.value.size));
+							vi.view.bounds.postln;
+							vi.view.action= vi.view.action+{vi.save};
+							vi;
+						}.dup(nOut);
+					};
+					tab.view,
+
+					View().maxWidth_(14)  //spacer
+				),
+
+				HLayout(*[
+					View().fixedWidth_(12+8).maxHeight_(lh),  //spacer
+					outNumbers= {|i|
+						RedStaticText(nil, nil, "o"++i)
+						.fixedWidth_(RedGUICVMultiSliderView.defaultWidth).maxHeight_(lh)
+					}.dup(nOut),
+					View().maxHeight_(lh)  //spacer
+				].flat)
+			).margins_(4).spacing_(4);
+
+			makeMirror= {|v, i|
+				var ref= redMatrixMixer.cvs[("o"++i).asSymbol].copy;
+				var rect= mainGUI[i].view.bounds.copy;
+				var vi= RedGUICVMultiSliderView(v, rect, ref, nil, nil, (num: ref.value.size));
+				vi.view.action= vi.view.action+{vi.save};
+				vi;
+			};
+			tab.view.toFrontAction_{
+				mirrorGUI= {|i|
+					makeMirror.value(tab.views[1], i);
+				}.dup(nOut);
+			};
 
 			win.onClose_({controllers.do{|x| x.remove}});
-			CmdPeriod.doOnce({if(win.isClosed.not, {win.close})});
+			CmdPeriod.doOnce({this.close});
 		}).play(AppClock);
 	}
+
 	close {
 		if(win.isClosed.not, {win.close});
 	}
