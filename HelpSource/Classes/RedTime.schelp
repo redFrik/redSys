@@ -7,39 +7,89 @@ A simple class for keeping track of and calculating with time.
 
 INSTANCEMETHODS::
 
-METHOD:: setLocalTime
-Uses code::Date.localtime:: to reset link::#-h::, link::#-m::, link::#-s::.
-
 METHOD:: +
 Adds time. Wraps around 00:00:00 - 23:59:59
+
+RETURNS:: A link::Classes/RedTime::.
 
 METHOD:: -
 Subtracts time. Wraps around 00:00:00 - 23:59:59
 
+RETURNS:: A link::Classes/RedTime::.
+
+METHOD:: ==
+Compare with another link::Classes/RedTime:: instance.
+
+RETURNS:: A link::Classes/Boolean::.
+
+METHOD:: addHour
+
+ARGUMENT:: hour
+A link::Classes/SimpleNumber::.
+
+METHOD:: addMin
+
+ARGUMENT:: min
+A link::Classes/SimpleNumber::.
+
+METHOD:: addSec
+
+ARGUMENT:: sec
+A link::Classes/SimpleNumber::.
+
+METHOD:: asArray
+For example code::[6, 0, 15]  //h:m:s::
+
+RETURNS:: An link::Classes/Array::.
+
+METHOD:: asHours
+Calculates the number of hours using code::((h*3600)+(m*60)+s)/60/60::.
+
+RETURNS:: A link::Classes/Float::.
+
+METHOD:: asMinutes
+Calculates the number of minutes using code::((h*3600)+(m*60)+s)/60::.
+
+RETURNS:: A link::Classes/Float::.
+
+METHOD:: asSeconds
+Calculates the number of seconds using code::(h*3600)+(m*60)+s::.
+
+RETURNS:: A link::Classes/SimpleNumber::.
+
 METHOD:: h
 Hours.
+
+RETURNS:: A link::Classes/SimpleNumber::.
 
 METHOD:: m
 Minutes.
 
+RETURNS:: A link::Classes/SimpleNumber::.
+
 METHOD:: s
 Seconds.
+
+RETURNS:: A link::Classes/SimpleNumber::.
+
+METHOD:: setLocalTime
+Uses code::Date.localtime:: to reset link::#-h::, link::#-m::, link::#-s::.
 
 EXAMPLES::
 
 CODE::
-a= RedTime(12, 0, 1)	//one second past noon
-b= RedTime.newLocalTime	//now
-a==b	//compare two times
-c= b-a	//time since noon
-c= b+a	//time 12 hours from now
+a= RedTime(12, 0, 1)  //one second past noon
+b= RedTime.newLocalTime  //now
+a==b  //compare two times
+c= b-a  //time since noon
+c= b+a  //time 12 hours from now
 
-c= c.addSec(10)	//+10 sec ahead
-c= c.addMin(-1)	//-1 min earier
-c= c.addHour(3)	//+3 hours ahead
+c= c.addSec(10)  //+10 sec ahead
+c= c.addMin(-1)  //-1 min earier
+c= c.addHour(3)  //+3 hours ahead
 
-c.h_(23).m_(59).s_(59)	//set new hour, min, sec
-c.setLocalTime	//update now
+c.h_(23).m_(59).s_(59)  //set new hour, min, sec
+c.setLocalTime  //update now
 c.asSeconds
 c.asMinutes
 c.asHours
@@ -51,12 +101,12 @@ c.asHours
 c.asArray
 
 //calculating the number of hours and minutes between two points in time
-RedTime(13, 30)-RedTime(12, 20);	//from 13:30 backwards to 12:20
+RedTime(13, 30)-RedTime(12, 20);  //from 13:30 backwards to 12:20
 //-> 1h 10m difference
 
-RedTime(3, 30)-RedTime(12, 20);	//from 03:00 backwards to 12:20
+RedTime(3, 30)-RedTime(12, 20);  //from 03:00 backwards to 12:20
 //-> 15h 10m difference
 
-RedTime(0, 0, 50)-RedTime(22, 10, 51);	//from 00:00:50 backwards to 22:10:51
+RedTime(0, 0, 50)-RedTime(22, 10, 51);  //from 00:00:50 backwards to 22:10:51
 //-> 1h 49m 59s difference
 ::

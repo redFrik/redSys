@@ -28,10 +28,49 @@ Predefined maximum input range.
 ARGUMENT:: reset
 A trigger that reset range.
 
+SUBSECTION:: Language side implementation
+
+METHOD:: new
+
+ARGUMENT:: lo
+Desired output range minimum.
+
+ARGUMENT:: hi
+Desired output range maximum.
+
+ARGUMENT:: inLo
+Predefined minimum input range.
+
+ARGUMENT:: inHi
+Predefined maximum input range.
+
 INSTANCEMETHODS::
 
+SUBSECTION:: Language side implementation
+
 METHOD:: autoScale
-Language side implementation.
+Perform the calculation and output a value.
+
+METHOD:: lo
+Get or set the desired output range minimum.
+
+METHOD:: hi
+Get or set the desired output range maximum.
+
+METHOD:: inLo
+Predefined minimum input range.
+
+METHOD:: inHi
+Predefined maximum input range.
+
+METHOD:: min
+Current minimum.
+
+METHOD:: max
+Current maximum.
+
+METHOD:: reset
+Reset the running link::#-min:: and link::#-max:: to the predefined input range.
 
 EXAMPLES::
 
@@ -52,7 +91,7 @@ a.free
 
 //--
 a= RedAutoScale(-10, 10);
-a.autoScale(100.rand.postln)	//run repeatedly.  eventually 0 will be -10 and 99 will be 10
+a.autoScale(100.rand.postln)  //run repeatedly. eventually 0 will be -10 and 99 will be 10
 a.min
 a.max
 ::

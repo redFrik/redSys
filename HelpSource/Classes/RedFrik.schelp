@@ -9,6 +9,19 @@ NOTE::
 Requires link::Classes/GlitchRHPF:: from sc3-plugins.
 ::
 
+CLASSMETHODS::
+
+METHOD:: ar
+
+ARGUMENT:: year
+Initialize value.
+
+METHOD:: new
+Boot code::Server.default:: and start the noise!
+
+ARGUMENT:: year
+Initialize value.
+
 EXAMPLES::
 
 CODE::

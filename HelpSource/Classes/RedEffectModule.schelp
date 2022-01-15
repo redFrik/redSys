@@ -86,8 +86,8 @@ RedEfxTemp : RedEffectModule {
 			ReplaceOut.ar(out, XFade2.ar(dry, wet, mix));
 		}, [0, lag, lag], metadata: (
 			specs: (
-				\out: \audiobus.asSpec,	//this should always be present
-				\mix: ControlSpec(-1, 1, 'lin', 0, -1),	//and this too
+				\out: \audiobus.asSpec,  //this should always be present
+				\mix: ControlSpec(-1, 1, 'lin', 0, -1),  //and this too
 				\amount: ControlSpec(0, 999, 'lin', 0, 1.5)
 			),
 			order: [

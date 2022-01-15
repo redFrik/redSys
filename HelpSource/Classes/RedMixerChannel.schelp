@@ -19,6 +19,8 @@ If code::nil:: then code::Server.default.defaultGroup:: will be used.
 ARGUMENT:: lag
 For eq settings, balance and volume. In seconds.
 
+SUBSECTION:: archiving
+
 METHOD:: restoreFile
 Reads back a redMixerChannel with all settings from an archived instance. Also see link::#-store::.
 
@@ -43,11 +45,54 @@ INSTANCEMETHODS::
 
 PRIVATE:: initRedMixerChannel, prEqAction
 
+METHOD:: bal
+Get and set channel stereo balance (-1.0 to 1.0).
+
+METHOD:: cvs
+Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
+
+TABLE::
+## levels || array of amplitudes
+## peaks || array of max amplitudes
+## out || output bus offset
+## lag || ramp time in seconds for eq settings, balance and volume
+## mute || silence output
+## amp || volume
+## bal || stereo balance -1 to 1
+## eqHi || enable high band 0 / 1
+## eqMi || enable middle band 0 / 1
+## eqLo || enable low band 0 / 1
+## hiFreq || high cutoff frequency in Hz
+## hiBand || bandwidth (rq)
+## hiGain || gain in dB
+## miFreq || middle center frequency in Hz
+## miBand || bandwidth (rq)
+## miGain || gain in dB
+## loFreq || low cutoff frequency in Hz
+## loBand || bandwidth (rq)
+## loGain || gain in dB
+::
+
+METHOD:: def
+Returns the mixer channel link::Classes/SynthDef::.
+
+METHOD:: defEq
+Returns the equalizer link::Classes/SynthDef::.
+
+METHOD:: free
+Free synth, equalizer and inserts.
+
 METHOD:: group
 The link::Classes/Group:: in use.
 
-METHOD:: out
-Get or set current bus.
+METHOD:: gui
+Create a link::Classes/RedMixerChannelGUI::.
+
+ARGUMENT:: parent
+Can be a link::Classes/Window:: or link::Classes/View:: or code::nil:: (then a new window will be created).
+
+ARGUMENT:: position
+A link::Classes/Point::.
 
 METHOD:: interp
 Blend in values from another channel. Ignores out, mute, peaks and levels.
@@ -57,6 +102,55 @@ Another link::Classes/RedMixerChannel:: instance.
 
 ARGUMENT:: val
 Blend fraction 0.0-1.0
+
+METHOD:: lag
+Lag for this channel. Also for any equalizer parameters.
+
+ARGUMENT:: val
+Time in seconds.
+
+METHOD:: levels
+An link::Classes/Array:: with floats representing the current channel amplitudes.
+
+METHOD:: mute
+Mute the input sound. Post level meter.
+
+ARGUMENT:: val
+An link::Classes/Integer:: where 1 is muted and 0 unmuted.
+
+METHOD:: out
+Get or set current bus.
+
+METHOD:: peaks
+Array of current amplitudes.
+
+METHOD:: peaks
+Array with maximum amplitudes. Clear with link::#-resetPeaks::.
+
+METHOD:: resetPeaks
+Set the all values in code::peaks:: to 0.
+
+METHOD:: vol
+Get and set channel volume (in dB).
+
+SUBSECTION:: archiving
+
+METHOD:: archive
+Returns a dictionary with settings that will be archived. Normally it is better to use link::#-store:: and write the archive to disk.
+
+METHOD:: restore
+Load settings from a dictionary. Normally it is better to use link::#*restoreFile:: and read the archive from disk.
+
+ARGUMENT:: archive
+Current settings as a dictionary.
+
+METHOD:: store
+Saves an instance as an archive to disk. All settings and effect inserts are stored. To read it back use link::#*restoreFile::.
+
+ARGUMENT:: path
+A file path as a string.
+
+SUBSECTION:: inserts (effect modules)
 
 METHOD:: insertClass
 Creates a new link::Classes/RedEffectModule:: before the equalizer.
@@ -96,69 +190,43 @@ Free and remove this link::Classes/RedEffectModule::. Can also be an array.
 METHOD:: removeAll
 Free and remove all effects in one go.
 
-METHOD:: gui
-Create a link::Classes/RedMixerChannelGUI::.
+SUBSECTION:: equalizer
 
-METHOD:: free
-Free synth, equalizer and inserts.
+METHOD:: eqHi
+Activate channel equalizer high band (0=off, 1=on). Also get.
 
-METHOD:: lag
-Lag for this channel. Also for any equalizer parameters.
+METHOD:: eqLo
+Activate channel equalizer low band (0=off, 1=on). Also get.
 
-ARGUMENT:: val
-Time in seconds.
+METHOD:: eqMi
+Activate channel equalizer middle band (0=off, 1=on). Also get.
 
-METHOD:: mute
-Mute the input sound. Post level meter.
+METHOD:: hiBand
+Get and set channel equalizer high band bandwidth (rq). Note: activate band first with code::eqHi= 1::.
 
-ARGUMENT:: val
-An link::Classes/Integer:: where 1 is muted and 0 unmuted.
+METHOD:: hiFreq
+Get and set channel equalizer high band frequency (in Hz). Note: activate band first with code::eqHi= 1::.
 
-METHOD:: def
-Returns the mixer channel link::Classes/SynthDef::.
+METHOD:: hiGain
+Get and set channel equalizer high band gain (in dB). Note: activate band first with code::eqHi= 1::.
 
-METHOD:: defEq
-Returns the equalizer link::Classes/SynthDef::.
+METHOD:: loBand
+Get and set channel equalizer low band bandwidth (rq). Note: activate band first with code::eqLo= 1::.
 
-METHOD:: store
-Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see link::#*restoreFile::.
+METHOD:: loFreq
+Get and set channel equalizer low band frequency (in Hz). Note: activate band first with code::eqLo= 1::.
 
-ARGUMENT:: path
-A file path as a string.
+METHOD:: loGain
+Get and set channel equalizer low band gain (in dB). Note: activate band first with code::eqLo= 1::.
 
-METHOD:: peaks
-Array of current amplitudes.
+METHOD:: miBand
+Get and set channel equalizer middle band bandwidth (rq). Note: activate band first with code::eqMi= 1::.
 
-METHOD:: peaks
-Array with maximum amplitudes. Clear with link::#-resetPeaks::.
+METHOD:: miFreq
+Get and set channel equalizer middle band frequency (in Hz). Note: activate band first with code::eqMi= 1::.
 
-METHOD:: resetPeaks
-Set the all values in code::peaks:: to 0.
-
-METHOD:: cvs
-Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
-
-TABLE::
-## levels || array of amplitudes
-## peaks || array of max amplitudes
-## out || output bus offset
-## lag || ramp time in seconds for eq settings, balance and volume
-## mute || silence output
-## amp || volume
-## bal || stereo balance -1 to 1
-## eqHi || enable highpass 0 / 1
-## eqMi || enable bandpass 0 / 1
-## eqLo || enable lowpass 0 / 1
-## hiFreq ||
-## hiBand ||
-## hiGain ||
-## miFreq ||
-## miBand ||
-## miGain ||
-## loFreq ||
-## loBand ||
-## loGain ||
-::
+METHOD:: miGain
+Get and set channel equalizer middle band gain (in dB). Note: activate band first with code::eqMi= 1::.
 
 EXAMPLES::
 
@@ -169,20 +237,22 @@ s.plotTree;
 
 a= RedMixerChannel(0);
 b= Pbind(\pan, Pseq([-1, 1], inf), \dur, 0.5, \amp, 0.5).play;
+c= a.gui;  //optional
 a.vol= -9
-a.out= 20	//this will move and the (internal ReplaceOut) the mixerchannel to bus 20
-a.out= 0	//move it back
-a.lag= 1	//fade time in seconds (applies to volume, balance and all eq settings)
+a.out= 20  //this will move and the (internal ReplaceOut) the mixerchannel to bus 20
+a.out= 0  //move it back
+a.lag= 1  //fade time in seconds (applies to volume, balance and all eq settings)
 a.vol= 0
 a.bal= -0.9
 a.bal= 0.9
 a.bal= 0
-a.levels	//current amplitudes
-a.peaks	//max amplitudes
-a.resetPeaks	//reset max amplitudes to 0
+a.levels  //current amplitudes
+a.peaks  //max amplitudes
+a.resetPeaks  //reset max amplitudes to 0
 a.mute= 1
 a.mute= 0
 a.free
+c.close
 b.stop
 
 //--equalizer
@@ -190,13 +260,13 @@ a= RedMixerChannel();
 a.vol= -9
 b= {Pan2.ar(WhiteNoise.ar(0.5), 0)}.play;
 a.eqHi= 1
-a.hiFreq= 9000
+a.hiGain= -20  //-20dB
 a.hiBand= 0.5
-a.hiGain= -20	//-20db
-a.lag= 3
-a.hiGain= 0	//slowly fade back to 0db
-a.eqHi= 0	//as no eq active the synth will be removed
-a.eqMi= 1	//recreates the eq synth
+a.hiFreq= 9000
+a.lag= 4
+a.hiGain= 0  //slowly fade back from -20 to 0dB
+a.eqHi= 0  //as no eq active the synth will be removed
+a.eqMi= 1  //recreates the eq synth
 a.miFreq= 2000
 a.miBand= 0.2
 a.miGain= 20
@@ -206,7 +276,7 @@ a.loBand= 0.1
 a.loGain= 6
 a.eqMi= 0
 a.eqLo= 0
-a.free	//remove the channel and play sound straight though (loud)
+a.free  //remove the channel and play sound straight though (loud)
 b.free
 
 //--inserts
@@ -266,18 +336,19 @@ a.insertClass(RedEfxRing);
 a.insertClass(RedEfxVerb, \addToTail);
 a.inserts[0].ringMix= 1;
 a.inserts[0].ringFreq= 20;
-a.store("~/Desktop/redMixerChannel-test.txt".standardizePath)	//same as .writeArchive, ignore the warnings
+a.store("~/Desktop/redMixerChannel-test.txt".standardizePath)  //same as .writeArchive, ignore the warnings "cannot archive open Functions"
+a.free; b.free;
 //recompile
 a= RedMixerChannel.restoreFile("~/Desktop/redMixerChannel-test.txt".standardizePath);
 a.init
-a.lag	//should be 2
-a.vol	//shoud be -9
-a.eqMi	//should be 1
-a.miGain	//should be -20
+a.lag  //should be 2
+a.vol  //shoud be -9
+a.eqMi  //should be 1
+a.miGain  //should be -20
 a.inserts[0].ringMix
 a.inserts[0].ringFreq
-b= {Pan2.ar(WhiteNoise.ar(0.5), 0)}.play;	//get the same sound back
-a.inserts	//should contain a RedEfxRing
-a.free	//remove the channel and play sound straight though (loud)
+b= {Pan2.ar(WhiteNoise.ar(0.5), 0)}.play;  //get the same sound back
+a.inserts  //should contain a RedEfxRing and a RedEfxVerb
+a.free  //remove the channel and play sound straight though (loud)
 b.free
 ::

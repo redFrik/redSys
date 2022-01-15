@@ -18,6 +18,57 @@ INSTANCEMETHODS::
 
 PRIVATE:: initRedAbstractMix
 
+METHOD:: amp
+Get or set volume 0.0 to 1.0
+
+METHOD:: cvs
+Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
+
+TABLE::
+## inA || input audio bus number
+## inB || second audio bus number
+## out || output audio bus number
+## mix || mix control (balance) -1.0 to 1.0
+## amp || volume 0.0 to 1.0
+## lag || ramp time in seconds for mix and amp
+::
+
+METHOD:: def
+Calls link::#*def::
+
+METHOD:: free
+Free the mixer synth.
+
+METHOD:: group
+The link::Classes/Group:: in use.
+
+METHOD:: gui
+create a link::Classes/RedMixGUI::.
+
+ARGUMENT:: parent
+A link::Classes/Window::, link::Classes/View:: or code::nil::.
+
+ARGUMENT:: position
+A link::Classes/Point:: or code::nil::.
+
+METHOD:: inA
+Get or set first input audio bus number.
+
+METHOD:: inB
+Get or set second input audio bus number.
+
+METHOD:: isReady
+code::true:: after the server is booted and the internal mixer is added and created.
+
+METHOD:: lag
+Get or set the ramp time in seconds for mix and amp.
+
+METHOD:: mix
+Get or set the mix control (balance) -1.0 to 1.0
+
+METHOD:: out
+Get or set the audio output bus number.
+
 EXAMPLES::
 
 see link::Classes/RedMixMono::, link::Classes/RedMixStereo::, link::Classes/RedMixStereoMono:: and link::Classes/RedMixGUI::.

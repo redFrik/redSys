@@ -10,6 +10,16 @@ NOTE::
 Do not instantiate. It is only a helper class for link::Classes/RedGIF::.
 ::
 
+CLASSMETHODS::
+
+METHOD:: new
+
+ARGUMENT:: bounds
+A link::Classes/Rect::.
+
+ARGUMENT:: flags
+An link::Classes/Integer::.
+
 INSTANCEMETHODS::
 
 METHOD:: bounds
@@ -17,6 +27,9 @@ Image dimensions as a link::Classes/Rect::.
 
 METHOD:: flags
 Semi-private image settings. Use the methods link::#-depth::, link::#-hasColorMap::, link::#-interlaced:: below instead.
+
+METHOD:: codeSize
+An link::Classes/Integer::.
 
 METHOD:: colorMap
 Image specific (a.k.a. local) array of link::Classes/Color:: objects.

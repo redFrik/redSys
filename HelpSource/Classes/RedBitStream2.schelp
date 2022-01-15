@@ -8,22 +8,34 @@ Modeled after link::Classes/CollStream::. Produces a bit stream out if an array 
 
 CLASSMETHODS::
 
-METHOD:: new
+COPYMETHOD:: RedBitStream *new
 
-ARGUMENT:: collection
-An link::Classes/Array:: of integers.
+INSTANCEMETHODS::
 
-ARGUMENT:: byte
-Number of bits per byte in this collection of integers. If byte is 8 then integers should not be greater than 255.
+COPYMETHOD:: RedBitStream -bytePos
+COPYMETHOD:: RedBitStream -collection
+COPYMETHOD:: RedBitStream -contents
+COPYMETHOD:: RedBitStream -next
+COPYMETHOD:: RedBitStream -nextByte
+COPYMETHOD:: RedBitStream -peek
+COPYMETHOD:: RedBitStream -peekByte
+COPYMETHOD:: RedBitStream -poke
+COPYMETHOD:: RedBitStream -pos
+COPYMETHOD:: RedBitStream -put
+COPYMETHOD:: RedBitStream -putByte
+COPYMETHOD:: RedBitStream -reset
 
 EXAMPLES::
 
 CODE::
-a= RedBitStream2((0..255), 8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
+a= RedBitStream2((0..255), 8);  //MSB
+a.nextByte;
+a.nextByte;
+a.nextByte;
+a.peekByte;
+a.pos= 0;  //bit position
+a.nextByte;
+a.nextN(8);  //same as a.nextByte
 a.nextN(16);
+a.peekByte;
 ::

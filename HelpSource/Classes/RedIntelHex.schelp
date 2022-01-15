@@ -8,29 +8,29 @@ See http://en.wikipedia.org/wiki/Intel_HEX and http://www.sbprojects.com/knowled
 
 CLASSMETHODS::
 
-METHOD::read
+METHOD:: read
 Instantiate, read and decode a .hex file.
 
-ARGUMENT::path
+ARGUMENT:: path
 Path to file as a link::Classes/String::.
 
 INSTANCEMETHODS::
 
-PRIVATE::prRead, prHexStrToInt
+PRIVATE:: prRead, prHexStrToInt
 
-METHOD::read
+METHOD:: read
 Read and decode a .hex file.
 
-ARGUMENT::path
+ARGUMENT:: path
 Path to file as a link::Classes/String::.
 
-METHOD::data
+METHOD:: data
 After a successful read, this returns the raw data.
 
 RETURNS::
 An link::Classes/Array:: with raw data - no addresses.
 
-METHOD::addressData
+METHOD:: addressData
 After a successful read, this contains the data with addresses.
 
 NOTE::
@@ -40,7 +40,7 @@ Addresses are normally not needed. Use the link::#-data:: method instead.
 RETURNS::
 An link::Classes/Array:: of arrays in the format of code::[address, [data]]::.
 
-METHOD::hexFormatString
+METHOD:: hexFormatString
 Mainly for display.
 
 RETURNS::

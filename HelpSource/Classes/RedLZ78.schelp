@@ -29,7 +29,7 @@ c= RedLZ78.decompress(b);
 a==c
 
 
-a= "abracadabra";	//string instead of array
+a= "abracadabra";  //string instead of array
 b= RedLZ78.compress(a);
 c= RedLZ78.decompress(b);
 a==c.join
@@ -37,14 +37,14 @@ a==c.join
 
 a= "JOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEY".ascii;
 b= RedLZ78.compress(a);
-b.size/a.size;	//compressed to 75%
+b.size/a.size;  //compressed to 75%
 c= RedLZ78.decompress(b);
 a==c
 
 
 a= "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.".ascii;
 b= RedLZ78.compress(a);
-b.size/a.size;	//compressed to 94%
+b.size/a.size;  //compressed to 94%
 c= RedLZ78.decompress(b);
 c.collect{|x| x.asAscii}.join;
 a==c
@@ -52,7 +52,7 @@ a==c
 
 a= {[0, 0, 0, 0.1].choose}.dup(5000);
 b= RedLZ78.compress(a);
-b.size/a.size;	//compressed to 22%
+b.size/a.size;  //compressed to 22%
 c= RedLZ78.decompress(b);
 c.size
 a==c

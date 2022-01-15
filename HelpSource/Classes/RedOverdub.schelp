@@ -46,8 +46,8 @@ a.free;
 
 //setting feedback and rate - click mouse to overdub
 a= {|fb= 1, rate= 1| RedOverdub.ar(b, SoundIn.ar([0, 1]), MouseButton.kr, fb, rate:rate)}.play;
-a.set(\fb, 0.7)	//leave 70% of the sound in the buffer
-a.set(\fb, 0)		//completely erase what is in the buffer
+a.set(\fb, 0.7)  //leave 70% of the sound in the buffer
+a.set(\fb, 0)  //completely erase what is in the buffer
 a.set(\rate, 0.9)
 a.set(\rate, -0.8)
 a.free

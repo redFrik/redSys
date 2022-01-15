@@ -30,14 +30,16 @@ Boot the server before passing in a group.
 ARGUMENT:: lag
 For equalizer settings, balance and volume. In seconds.
 
-METHOD::restoreFile
+SUBSECTION:: archiving
+
+METHOD:: restoreFile
 Reads back a redMixer with all settings from an archived instance. Also see link::#-store::.
 
 NOTE::
 Call code::.init:: after this to initialize server side objects.
 ::
 
-ARGUMENT::path
+ARGUMENT:: path
 A file path as a string.
 
 METHOD:: restoreArchive
@@ -54,23 +56,18 @@ INSTANCEMETHODS::
 
 PRIVATE:: initRedMixer, prRestore
 
-METHOD:: group
-The link::Classes/Group:: in use.
-
 METHOD:: channels
 An array of link::Classes/RedMixerChannel:: objects matching *new's inputChannels argument.
 
-METHOD:: mixers
-An array of link::Classes/RedMixerChannel:: objects matching *new's outputChannels argument.
+METHOD:: cvs
+Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
 
-METHOD:: mixer
-Shortcut for mixers[0] as in the normal case only this one mixer is used (no subgroups). See link::#-mixers::.
+TABLE::
+## lag || lag time in seconds (linear)
+::
 
-METHOD:: inputChannels
-Get or set the array of current inputChannels.
-
-METHOD:: outputChannels
-Get or set the array of current outputChannels.
+METHOD:: def
+Should probably be private.
 
 METHOD:: free
 Free synths and, if created, the internal group.
@@ -81,11 +78,26 @@ Create a link::Classes/RedMixerGUI::.
 ARGUMENT:: position
 A link::Classes/Point::.
 
+METHOD:: group
+The link::Classes/Group:: in use.
+
+METHOD:: inputChannels
+Get or set the array of current inputChannels.
+
+METHOD:: isReady
+code::true:: after the server is booted and the internal mixer is added and created.
+
 METHOD:: lag
 Lag for all mixers and channels.
 
 ARGUMENT:: val
 Time in seconds.
+
+METHOD:: mixer
+Shortcut for mixers[0] as in the normal case only this one mixer is used (no subgroups). See link::#-mixers::.
+
+METHOD:: mixers
+An array of link::Classes/RedMixerChannel:: objects matching *new's outputChannels argument.
 
 METHOD:: mute
 Mute input channels.
@@ -93,89 +105,90 @@ Mute input channels.
 ARGUMENT:: val
 1= mute all channels, 0= unmute
 
+METHOD:: outputChannels
+Get or set the array of current outputChannels.
+
 METHOD:: solo
 Solo input channel(s)
 
 ARGUMENT:: channel
 Index of input channel. Can also be an array of indices.
 
-METHOD:: def
-Should probably be private.
+SUBSECTION:: archiving
 
-METHOD:: isReady
-code::true:: after the server is booted and the internal mixer is added and created.
+METHOD:: archive
+Returns a dictionary with settings that will be archived. Normally it is better to use link::#-store:: and write the archive to disk.
 
-METHOD::store
-Saves an instance as an archive to disk. All settings and effect inserts are stored. Also see link::#*restoreFile::.
+METHOD:: restore
+Load settings from a dictionary. Normally it is better to use link::#*restoreFile:: and read the archive from disk.
 
-ARGUMENT::path
+ARGUMENT:: archive
+Current settings as a dictionary.
+
+METHOD:: store
+Saves an instance as an archive to disk. All settings and effect inserts are stored. To read it back use link::#*restoreFile::.
+
+ARGUMENT:: path
 A file path as a string.
-
-METHOD:: cvs
-Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
-
-TABLE::
-## lag || lag time in seconds (linear)
-::
 
 EXAMPLES::
 
 CODE::
 s.boot;
 
-//--mixing two stereo channels
-b= Pbind(\out, 4, \pan, Pseq([-1, 1], inf), \amp, 0.7).play;	//src1
-c= {BPF.ar(Saw.ar(LFNoise2.kr(1).exprange(100, 1000)*[1, 1.01]))}.play(outbus: 6);	//src2
-a= RedMixer(#[4, 6], #[0]);	//take stereo input from [4, 5] and [6, 7], mix to [0, 1]
-a.channels	//two stereo channel objects
+//--mixing two stereo channels (4,5 + 6,7 = 0,1)
+b= Pbind(\out, 4, \pan, Pseq([-1, 1], inf), \amp, 0.7).play;  //src1
+c= {BPF.ar(Saw.ar(LFNoise2.kr(1).exprange(100, 1000)*[1, 1.01]))}.play(outbus: 6);  //src2
+a= RedMixer(#[4, 6], #[0]);  //take stereo input from [4,5] and [6,7], mix to [0,1]
+a.channels  //two stereo channel objects
 a.channels[0].out
-a.mixers	//one stereo mixer
-a.cvs	//possible global setting
-a.mixer.cvs	//possible mixer settings
-a.mixer.bal= -0.9	//balance mixer output left
-a.lag= 2	//global lag time
-a.mixer.lag	//all internal objects now have the same delay
+a.mixers  //one stereo mixer
+a.cvs  //possible global setting
+a.mixer.cvs  //possible mixer settings
+a.mixer.bal= -0.9  //balance mixer output left
+a.lag= 3  //global lag time
+a.mixer.lag  //all internal objects now have the same lag
 a.channels[0].lag
 a.channels[1].lag
-a.mixer.bal= 1	//balance mixer output right (note the lag)
-a.mixer.vol= -6	//minus 6 db (note the lag)
+a.mixer.bal= 1  //balance mixer output right (note the lag)
+a.mixer.vol= -6  //minus 6 db (note the lag)
 a.channels[1].vol= -12
 b.stop
 c.free
 a.free
 
 //--mixing 6 stereo channels
-a= RedMixer(#[20, 30, 40, 50, 60, 70], [0, 2]);
+a= RedMixer(#[20, 30, 40, 50, 60, 70]);
 b= Pbind(\out, Pseq([20, 30, 40, 50, 60, 70], inf).trace, \degree, Pseq((1..6), inf), \dur, 0.5, \amp, 0.7).play;
-a.channels[1].vol= -16	//turn down volume on second mixer channel (index 1)
-a.channels[0].vol= -16	//turn down volume on first mixer channel (index 0)
-a.mixer.vol= -12	//turn down all inputs
-a.channels[1].vol= 12	//turn up second input
-a.channels[1].bal= 1	//balance hard right on second mixer channel
-a.channels[1].bal= -1	//balance hard left
-a.mixer.bal= 0.9	//main out balance right
-c= a.gui;
+a.channels[1].vol= -16  //turn down volume on second mixer channel (index 1)
+a.channels[0].vol= -16  //turn down volume on first mixer channel (index 0)
+a.mixer.vol= -12  //turn down all inputs
+a.channels[1].vol= 12  //turn up second input
+a.channels[1].bal= 1  //balance hard right on second mixer channel
+a.channels[1].bal= -1  //balance hard left
+a.mixer.bal= 0.9  //main out balance right
+c= a.gui;  //optional RedMixerGUI
 c.close;
 b.stop
 a.free
 
 //--use mixer built in equalizer
-a= RedMixer(#[20]);	//just one stereo input and stereo output
+a= RedMixer(#[20]);  //just one stereo input and stereo output
 b= {WhiteNoise.ar([0.25, 0.25])}.play(outbus: 20);
 s.plotTree;
 FreqScope.new;
-a.mixer.eqMi= 1	//set global eq parameter (eq main out channel)
+a.mixer.eqMi= 1  //set global eq parameter (eq main out channel)
 a.mixer.miFreq= 1000
 a.mixer.miBand= 1
 a.mixer.miGain= 20
 a.mixer.cvs
-a.channels[0].eqMi= 1	//set channel eq parameter (eq a single channel)
+a.channels[0].eqMi= 1  //set channel eq parameter (eq a single channel)
 a.channels[0].miFreq= 2000
 a.channels[0].miBand= 0.05
 a.channels[0].miGain= 20
 a.channels[0].cvs
 a.mixer.eqMi= 0
-a.channels[0].eqMi= 0	//note number of running synths goes down as eq setting is turned off
+a.channels[0].eqMi= 0  //note number of running synths goes down as eq setting is turned off
 a.mixer.lag= 3
 a.mixer.eqMi= 1
 a.mixer.miFreq= 4000
@@ -199,27 +212,29 @@ s.options.numOutputBusChannels= 8;
 s.reboot;
 s.meter;
 a= RedMixer(#[20, 30, 40, 50], #[0, 2]);
+c= a.gui;
 b= Pbind(\out, Pseq([20, 30, 40, 50], inf), \degree, Pseq((0..3), inf), \dur, 0.5, \amp, 0.7).play;
-a.mixers[1].vol= -16	//turn down second output stereo channel
-a.channels[1].vol= -16	//turn down second input stereo channel
-a.inputChannels= [20, 40, 60, 70]	//dynamically set input channels - silence on 60+70
+a.mixers[1].vol= -16  //turn down second output stereo channel
+a.channels[1].vol= -16  //turn down second input stereo channel (out 2+3)
+a.inputChannels= [20, 40, 60, 70]  //dynamically set input channels - silence on 60+70
 a.inputChannels= [30, 20, 60, 70]
 a.inputChannels= [30, 20, 50, 40]
 a.inputChannels
-a.outputChannels= [1, 3]	//also set output channels dynamically
+a.outputChannels= [1, 3]  //also set output channels dynamically
 a.outputChannels= [0, 6]
 a.outputChannels
 a.free
 b.stop
+c.close
 
 //--mute and solo
 a= RedMixer(#[20, 30, 40], #[0, 6]);
 b= Pbind(\out, Pseq([20, 30, 40], inf), \degree, Pseq([0, 1, 2], inf), \amp, 0.7, \dur, 0.5).play;
-a.solo_(0)	//solo first channel
-a.solo_(2)	//solo last channel
-a.solo_([1, 2])	//can also be an array
-a.mute= 1	//mute all
-a.mute= 0	//unmute all
+a.solo_(0)  //solo first channel
+a.solo_(2)  //solo last channel
+a.solo_([1, 2])  //can also be an array
+a.mute= 1  //mute all
+a.mute= 0  //unmute all
 a.free
 b.stop
 
@@ -229,50 +244,48 @@ b= {SinOsc.ar([400, 404], 0, 0.5)}.play(outbus: 20);
 c= {PinkNoise.ar(0.5!2)}.play(outbus: 30);
 d= {WhiteNoise.ar(0.1!2)}.play(outbus: 40);
 a.lag= 2
-a.mixer.bal= 0.75	//balance all right
-a.mixer.vol= -6	//turn down volume 6db
-a.mixer.eqMi= 1	//turn on global eq middle (no lag)
-a.mixer.miGain= 16	//gain eq a lot
-a.mixer.miBand= 0.1	//make very narrow
-a.mixer.miFreq= 300	//frequency sweep from 700 (default) down to 300hz
-a.channels[0].vol= -20	//lower beating sines volume a lot
-a.channels[1].eqLo= 1	//turn on channel specific eq
+a.mixer.bal= 0.75  //balance all right
+a.mixer.vol= -6  //turn down volume 6db
+a.mixer.eqMi= 1  //turn on global eq middle (no lag)
+a.mixer.miGain= 16  //gain eq a lot
+a.mixer.miBand= 0.1  //make very narrow
+a.mixer.miFreq= 300  //frequency sweep from 700 (default) down to 300hz
+a.channels[0].vol= -20  //lower beating sines volume a lot
+a.channels[1].eqLo= 1  //turn on channel specific eq
 a.channels[1].loGain= 9
-a.channels[1].loFreq= 1000	//frequency sweep from 70 (defalut) up to 1000hz
+a.channels[1].loFreq= 1000  //frequency sweep from 70 (default) up to 1000hz
 a.channels[0].insertClass(RedEfxRing, \addToHead);
 a.channels[0].inserts[0].ringMix= 0.75;
 a.channels[0].inserts[0].ringMul= 400;
 a.channels[0].inserts[0].ringRate= 0.3;
-a.store("~/Desktop/redMixer-test.txt".standardizePath)	//same as .writeArchive
+a.store("~/Desktop/redMixer-test.txt".standardizePath)  //same as .writeArchive
+a.free; b.free; c.free; d.free;
 //recompile
-a= RedMixer.restoreFile("~/Desktop/redMixer-test.txt".standardizePath);	//same as readArchive
-a.init;	//reinitialize and activate all server side stuff again
-a.lag	//should be 2
-a.mixer.bal	//should be 0.75
-a.mixer.vol	//should be -6
-a.mixer.miFreq	//should be 300
-a.channels[1].loFreq	//should be 1000
-a.channels[0].inserts[0].ringMix	//should be 0.75
-a.channels[0].inserts[0].ringMul	//should be 400
-a.channels[0].inserts[0].ringRate	//should be 0.3
+a= RedMixer.restoreFile("~/Desktop/redMixer-test.txt".standardizePath);  //same as readArchive
+a.init;  //reinitialize and activate all server side stuff again
+a.lag  //should be 2
+a.mixer.bal  //should be 0.75
+a.mixer.vol  //should be -6
+a.mixer.miFreq  //should be 300
+a.channels[1].loFreq  //should be 1000
+a.channels[0].inserts[0].ringMix  //should be 0.75
+a.channels[0].inserts[0].ringMul  //should be 400
+a.channels[0].inserts[0].ringRate  //should be 0.3
 b= {SinOsc.ar([400, 404], 0, 0.5)}.play(outbus: 20);
 c= {PinkNoise.ar(0.5!2)}.play(outbus: 30);
 d= {WhiteNoise.ar(0.1!2)}.play(outbus: 40);
 //back to same sound
-a.channels[1].eqLo= 0	//turn off channel eq
-a.mixer.eqMi= 0	//turn off master eq
-b.free
-c.free
-d.free
-a.free
+a.channels[1].eqLo= 0  //turn off channel eq
+a.mixer.eqMi= 0  //turn off master eq
+b.free; c.free; d.free; a.free
 
 //--passing in a group
 s.plotTree;
 g= Group();
 a= RedMixer(#[20, 30], #[0], g);
-b= Pbind(\out, Pseq([20, 30], inf).trace, \degree, Pseq((1..2), inf), \dur, 0.5, \amp, 0.7).play;
+b= Pbind(\out, Pseq([20, 30], inf), \degree, Pseq((1..2), inf), \dur, 0.5, \amp, 0.7).play;
 a.group
 b.stop
-a.free	//note passed in groups are not freed automatically
-g.free	//need to manually free it
+a.free  //NOTE: passed in groups are not freed automatically
+g.free  //need to manually free it
 ::

@@ -13,24 +13,24 @@ There are two classes... one with positive edge clock (link::Classes/RedDifferen
 
 CLASSMETHODS::
 
-METHOD::new
+METHOD:: new
 Creates a new encoder.
 
-ARGUMENT::numBits
+ARGUMENT:: numBits
 The maximum number of bits in the data to be encoded. The default 8 can deal with values between 0 and 255.
 
-ARGUMENT::initPhase
+ARGUMENT:: initPhase
 Initial phase.
 
 INSTANCEMETHODS::
 
-METHOD::reset
+METHOD:: reset
 To reset the phase to the initial value.
 
-METHOD::encode
+METHOD:: encode
 The lowest level method for encoding. Give and return arrays with raw 0/1 bits.
 
-ARGUMENT::bits
+ARGUMENT:: bits
 An array of raw bits (zeros and ones) representing the n-bit value to be encoded. The length of this array should match numBits.
 
 RETURNS::
@@ -39,28 +39,28 @@ NOTE::
 The array returned will be double in length of the argument array (and also 2*numBits in length).
 ::
 
-METHOD::encodeValue
+METHOD:: encodeValue
 A method for encoding single numbers. Converts the number to bits and then calls link::#-encode::.
 
-ARGUMENT::value
+ARGUMENT:: value
 Some number to be encoded. Make sure to not go above the current set numBits capacity (0-255 by default).
 
 RETURNS::
 Same as link::#-encode:: above
 
-METHOD::encodeArray
+METHOD:: encodeArray
 A method for encoding arrays of numbers.
 
-ARGUMENT::array
+ARGUMENT:: array
 Some array of numbers to be encoded.
 
 RETURNS::
 Same as link::#-encode:: above
 
-METHOD::numBits
+METHOD:: numBits
 Get or set the number of bits dynamically.
 
-METHOD::phase
+METHOD:: phase
 Get or set the phase dynamically (either 0 or 1).
 
 EXAMPLES::
@@ -84,16 +84,16 @@ RedDifferentialManchesterCode(11).encode([1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0])*2-1
 //the example just sequence differential manchester encoded bytes.
 (
 SynthDef(\redBitsPlayer, {|out= 0, amp= 1, rate= 1000|
-	var numBits= 8*2;	//double because of manchester encoding
+	var numBits= 8*2;  //double because of manchester encoding
 	var data= Control.names([\data]).ir(Array.fill(numBits, 0));
-	var src= Duty.ar(1/rate, 0, Dseq(data*2-1++0), 2);	//zero padded because doneAction2 is not stopping sample accurate
+	var src= Duty.ar(1/rate, 0, Dseq(data*2-1++0), 2);  //zero padded because doneAction2 is not stopping sample accurate
 	OffsetOut.ar(out, src*amp!2);
 }).add;
 )
 
 //test counter
 (
-t= 2400;	//datarate
+t= 2400;  //datarate
 Routine.run({
 	var encoder= RedDifferentialManchesterCode(8);
 	inf.do{|i|

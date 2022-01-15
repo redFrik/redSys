@@ -8,30 +8,14 @@ Based on link::Classes/VDiskIn::. Use link::Classes/RedSFPlayer:: for playing ba
 
 CLASSMETHODS::
 
-METHOD:: new
-Create a new player on a link::Classes/Server::.
-
-ARGUMENT:: server
-If code::nil:: it will use code::Server.default::.
-
-METHOD:: read
-Create a new player on a link::Classes/Server::.
-
-ARGUMENT:: path
-A link::Classes/String:: pointing to a soundfile.
-
-ARGUMENT:: server
-If code::nil:: it will use code::Server.default::.
+COPYMETHOD:: RedSFPlayer *new
+COPYMETHOD:: RedSFPlayer *read
 
 INSTANCEMETHODS::
 
 PRIVATE:: prSendDefs, prStop, prFree, prPlay, prRead
 
-METHOD:: read
-The server should be booted before reading.
-
-ARGUMENT:: path
-A link::Classes/String:: pointing to a soundfile.
+COPYMETHOD:: RedSFPlayer -read
 
 METHOD:: loop, play
 Starts playing the soundfile.
@@ -53,25 +37,16 @@ NOTE::
 For this disk player version there is no crossfade of loops.
 ::
 
-METHOD:: stop
+COPYMETHOD:: RedSFPlayer -stop
 
-ARGUMENT:: fadeTime
-In seconds.
-
-METHOD:: free
-Stop playing and free internal buffer.
-
-METHOD:: amp
-Get or set the amplitude.
-
-METHOD:: isPlaying
-A link::Classes/Boolean::
-
-METHOD:: duration
-Length of the soundfile in seconds. Updated after reading.
-
-METHOD:: channels
-Number of channels of the soundfile. Updated after reading.
+COPYMETHOD:: RedSFPlayer -amp
+COPYMETHOD:: RedSFPlayer -buffer
+COPYMETHOD:: RedSFPlayer -channels
+COPYMETHOD:: RedSFPlayer -duration
+COPYMETHOD:: RedSFPlayer -free
+COPYMETHOD:: RedSFPlayer -isPlaying
+COPYMETHOD:: RedSFPlayer -server
+COPYMETHOD:: RedSFPlayer -synth
 
 EXAMPLES::
 
@@ -80,12 +55,12 @@ s.boot;
 
 a= RedSFPlayerDisk.new;
 a.read(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff");
-a.play;	//default is play out on bus 0 with rate 1 and 0 fadeTime
+a.play;  //default is play out on bus 0 with rate 1 and 0 fadeTime
 a.stop;
 
-a.loop(0, 3, 4);	//start looping with long fadeTime and high rate
-a.loop(0, 1.2);	//another loop (crossfade will not work and fadeTime is ignored)
-a.stop(4);	//fadeout
+a.loop(0, 3, 4);  //start looping with long fadeTime and high rate
+a.loop(0, 1.2);  //another loop (crossfade will not work and fadeTime is ignored)
+a.stop(4);  //fadeout
 
 a.free;
 ::

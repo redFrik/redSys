@@ -13,28 +13,16 @@ There are two classes... one with positive edge clock (link::Classes/RedDifferen
 
 CLASSMETHODS::
 
-METHOD::new
-Creates a new encoder.
-
-ARGUMENT::numBits
-The maximum number of bits in the data to be encoded. The default 8 can deal with values between 0 and 255.
+COPYMETHOD:: RedDifferentialManchesterCode *new
 
 INSTANCEMETHODS::
 
-METHOD::reset
-To reset the phase to the initial value.
-
-METHOD::encode
-The lowest level method for encoding. Give and return arrays with raw 0/1 bits.
-
-ARGUMENT::bits
-An array of raw bits (zeros and ones) representing the n-bit value to be encoded. The length of this array should match numBits.
-
-RETURNS::
-An array of raw bits (zeros and ones) with encoded clock and data bits.
-NOTE::
-The array returned will be double in length of the argument array (and also 2*numBits in length).
-::
+COPYMETHOD:: RedDifferentialManchesterCode -reset
+COPYMETHOD:: RedDifferentialManchesterCode -encode
+COPYMETHOD:: RedDifferentialManchesterCode -encodeValue
+COPYMETHOD:: RedDifferentialManchesterCode -encodeArray
+COPYMETHOD:: RedDifferentialManchesterCode -numBits
+COPYMETHOD:: RedDifferentialManchesterCode -phase
 
 EXAMPLES::
 
@@ -56,16 +44,16 @@ RedDifferentialManchesterCodeNegative(11).encode([1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 
 //the example just sequence differential manchester encoded bytes.
 (
 SynthDef(\redBitsPlayer, {|out= 0, amp= 1, rate= 1000|
-	var numBits= 8*2;	//double because of manchester encoding
+	var numBits= 8*2;  //double because of manchester encoding
 	var data= Control.names([\data]).ir(Array.fill(numBits, 0));
-	var src= Duty.ar(1/rate, 0, Dseq(data*2-1++0), 2);	//zero padded because doneAction2 is not stopping sample accurate
+	var src= Duty.ar(1/rate, 0, Dseq(data*2-1++0), 2);  //zero padded because doneAction2 is not stopping sample accurate
 	OffsetOut.ar(out, src*amp!2);
 }).add;
 )
 
 //test counter
 (
-t= 2400;	//datarate
+t= 2400;  //datarate
 Routine.run({
 	var encoder= RedDifferentialManchesterCodeNegative(8);
 	inf.do{|i|

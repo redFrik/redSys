@@ -21,10 +21,10 @@ TABLE::
 EXAMPLES::
 
 CODE::
-GUI.skins.redFrik		//also includes a skin
+GUI.skins.redFrik  //also includes a skin
 RedFont.new.dump
 (
-var w= Window("RedGUI test", Rect(100, 200, 400, 400)).front;
+var w= Window("RedGUI test", Rect(100, 200, 300, 400)).front;
 w.view.layout= VLayout();
 Red2DSlider(w);
 RedButton(w);
@@ -33,8 +33,8 @@ RedKnob(w);
 RedLevelIndicator(w).value_(0.5);
 RedMultiSliderView(w);
 RedNumberBox(w);
-RedPopUpMenu(w);
-RedPopUpTreeMenu(w);
+RedPopUpMenu(w).items_(['abc', 'def']);
+//RedPopUpTreeMenu(w);  //depends on PopUpTreeMenu quark
 RedSlider(w);
 RedStaticText(w, nil, "test123");
 RedTextView(w);

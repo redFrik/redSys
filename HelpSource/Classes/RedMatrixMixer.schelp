@@ -85,7 +85,7 @@ s.options.numOutputBusChannels= 8;
 s.reboot;
 s.meter;
 
-a= RedMatrixMixer(4, 4, 0, 0);	//4 channels in, 4 channels out
+a= RedMatrixMixer(4, 4, 0, 0);  //4 channels in, 4 channels out
 (
 SynthDef(\redMatrixMixerTest, {|out= 0, freq= 400, gate= 1, amp= 0.5|
 	var e= EnvGen.kr(Env.asr(0.01, 1, 0.01), gate, doneAction:2);
@@ -103,31 +103,31 @@ b= Pbind(
 ).play;
 )
 
-a.gui;	//optional
+a.gui;  //optional
 
-a.o0= [1, 0, 0.3, 0];	//in0 to out0 with full amp, in2 to out0 with 0.3 amp
-a.o1= [0, 1, 0, 0.2];	//in1 to out1 with full amp, in3 to out1 with 0.2 amp
-a.in= 1;	//change to listen to input busses to 1-4
+a.o0= [1, 0, 0.3, 0];  //in0 to out0 with full amp, in2 to out0 with 0.3 amp
+a.o1= [0, 1, 0, 0.2];  //in1 to out1 with full amp, in3 to out1 with 0.2 amp
+a.in= 1;  //change to listen to input busses to 1-4
 
-a.out= 1;	//left channel still outputs because the pbinds plays there
+a.out= 1;  //left channel still outputs because the pbinds plays there
 //and no ReplaceOut is blocking it
 a.out= 0;
 a.in= 0;
 
 a.o1= [0, 0, 0, 0];
 a.lag= 2;
-a.o0= [0, 1, 1, 0.3];	//change mix with a 2 second lag
+a.o0= [0, 1, 1, 0.3];  //change mix with a 2 second lag
 a.o0= [1, 0, 0, 0.2];
 a.o1= [0, 0.5, 0, 0];
 
-a.cvs	//current settings
-a.defString	//current synth def as a string
+a.cvs  //current settings
+a.defString  //current synth def as a string
 a.def
 
 a.free;
 b.stop;
 
-a= RedMatrixMixer(24, 22, 0, 0);	//14 channels in, 12 channels out
+a= RedMatrixMixer(24, 22, 0, 0);  //14 channels in, 12 channels out
 a.defString
 a.free
 ::

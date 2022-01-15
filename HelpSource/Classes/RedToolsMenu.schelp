@@ -6,6 +6,9 @@ CLASSMETHODS::
 
 PRIVATE:: initClass
 
+METHOD:: list
+A link::Classes/List:: containing two symbols (category and tool name) and a function.
+
 METHOD:: listToLibrary
 Adds the tools to the link::Classes/Library::.
 

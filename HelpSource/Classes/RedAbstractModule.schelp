@@ -65,9 +65,9 @@ RedAbstractModule.all;
 RedEffectModule.all;
 RedEfxDist.all;
 a.cvs;
-a.distMix= 0;	//50% effect
-a.out= 1;	//move stereo effect to busses 1+2
-a.out= 0;	//move back to 0+1
+a.distMix= 0;  //50% effect
+a.out= 1;  //move stereo effect to busses 1+2
+a.out= 0;  //move back to 0+1
 a.distDepth= 0.1;
 a.distDepth= 0.5;
 a.distFreq= 20;

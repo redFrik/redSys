@@ -7,32 +7,65 @@ DESCRIPTION::
 A class for mapping values between different ranges using different curvatures. It works best in combination with the link::Overviews/EaseOverview##Ease:: quark, but is also fine to use on its own.
 Basically it maps a value from a certain range to another range with an optional curvature.
 
-
 CLASSMETHODS::
 
-METHOD::new
+METHOD:: ar, kr
 
-ARGUMENT::source
+Create an UGen version.
+
+SUBSECTION:: Language side implementation
+
+METHOD:: new
+
+ARGUMENT:: source
 The beginning.
 
-ARGUMENT::target
+ARGUMENT:: target
 The destination.
 
-ARGUMENT::curve
+ARGUMENT:: curve
 The curvature.
 
-ARGUMENT::inMin
+ARGUMENT:: inMin
 Lowest input value.
 
-ARGUMENT::inMax
+ARGUMENT:: inMax
 Highest input value.
 
 DISCUSSION::
-If the curve argument is CODE::nil:: then a linear mapping will be used. If it is a link::Classes/SimpleNumber:: then internally a lincurve method will be applied (so the curvature will work in the same was as for the link::Classes/Env:: class). Though the real benefit of this class is to set the curve argument to an link::Overviews/EaseOverview##Ease:: object or write a custom mapping function. This allows to do proper tweening/easing.
+If the curve argument is code::nil:: then a linear mapping will be used. If it is a link::Classes/SimpleNumber:: then internally a lincurve method will be applied (so the curvature will work in the same was as for the link::Classes/Env:: class). Though the real benefit of this class is to set the curve argument to an link::Overviews/EaseOverview##Ease:: object or write a custom mapping function. This allows to do proper tweening/easing.
+
+METHOD:: value
 
 INSTANCEMETHODS::
 
-PRIVATE::initRedTween
+PRIVATE:: initRedTween
+
+SUBSECTION:: Language side implementation
+
+METHOD:: curve
+Curvature if set. Else code::nil::.
+
+METHOD:: func
+Function.
+
+METHOD:: inMax
+Get or set the maximum.
+
+METHOD:: inMin
+Get or set the minimum.
+
+METHOD:: source
+Get or set the source (start) value.
+
+METHOD:: target
+Get or set the target (end) value.
+
+METHOD:: value
+Perform the lookup.
+
+ARGUMENT:: t
+A link::Classes/Float:: 0.0 to 1.0.
 
 EXAMPLES::
 

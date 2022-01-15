@@ -15,31 +15,40 @@ NUMBEREDLIST::
 
 CLASSMETHODS::
 
-METHOD::read
-create a new instance and read a hex file.
+METHOD:: read
+Create a new instance and read a hex file.
 
 INSTANCEMETHODS::
 
-METHOD::read
-read a hex file.
+METHOD:: read
+Read a hex file.
 
-METHOD::upload
-starts the server and the upload process.
+METHOD:: upload
+Starts the server and the upload process.
 
 NOTE::
-do not change the last three arguments if you want the upload to work with the AudioBoot_V2_0 bootloader. if you are only interested in the sound of serial data, you can of course try to change these arguments.
+Do not change the last three arguments if you want the upload to work with the AudioBoot_V2_0 bootloader. if you are only interested in the sound of serial data, you can of course try to change these arguments.
 ::
 
-ARGUMENT::server
-if nil then the Server.default will be used.
+ARGUMENT:: server
+If nil then the Server.default will be used.
 
-ARGUMENT::out
-which audio bus to play to. note: can also be an link::Classes/Array::.
+ARGUMENT:: out
+Which audio bus to play to. Note: can also be an link::Classes/Array::.
 
-ARGUMENT::amp
-amplitude
+ARGUMENT:: amp
+Amplitude.
 
-METHOD::intel
+ARGUMENT:: silenceBetweenPages
+Gap in seconds.
+
+ARGUMENT:: startSequencePulses
+Pulses in the beginning.
+
+ARGUMENT:: manchesterNumberOfSamplesPerBit
+Samples per bit.
+
+METHOD:: intel
 After a successful read, this holds an instance of link::Classes/RedIntelHex::.
 
 EXAMPLES::
@@ -51,5 +60,5 @@ CODE::
 //3. put the hex file path in the code below, turn up volume to 80%, reset the ATmega168 and run the example below to upload.
 
 a= RedArduino.read("/var/folders/wf/43mk9crd027f10mkp_ksv1zh0000gn/T/build3164609001308421888.tmp/Blink.cpp.hex");//edit path
-a.upload	//boots the server and start the uploading process
+a.upload  //boots the server and start the uploading process
 ::

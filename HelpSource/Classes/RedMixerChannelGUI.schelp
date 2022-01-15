@@ -76,6 +76,7 @@ a.free
 c.close
 b.stop
 
+//--save and recall settings
 a= RedMixerChannel(0);
 b= {WhiteNoise.ar(0.1!2)}.play;
 c= RedMixerChannelGUI(a, name: "testing");
@@ -87,18 +88,21 @@ a.loGain= -90
 a.vol= -6
 a.out= 1
 a.store("~/Desktop/redMixerChannelGUI-test.txt".standardizePath)
+a.free; b.free;
 //recompile
-s.boot
+s.boot;
 b= {WhiteNoise.ar(0.1!2)}.play;
-a= RedMixerChannel.restoreFile("~/Desktop/redMixerChannelGUI-test.txt".standardizePath)
+a= RedMixerChannel.restoreFile("~/Desktop/redMixerChannelGUI-test.txt".standardizePath);
 a.init
-a.out
+a.vol  //should be -6
+a.out  //should be 1
 c= RedMixerChannelGUI(a, name: "testing");
 a.out= 0
 b.free
 a.free
 c.close
 
+//--synchronized views
 a= RedMixerChannel(0);
 b= a.gui;  //shortcut
 //changes are synced using SimpleController
@@ -107,5 +111,6 @@ RedMixerChannelGUI.height= 300;
 RedMixerChannelGUI.width= 300;
 RedMixerChannelGUI.numInserts= 4;
 d= a.gui(position: Point(100, 200));
+a.vol= -4;  //all GUIs should reflect this change
 a.free; b.close; c.close; d.close;
 ::

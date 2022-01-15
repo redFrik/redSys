@@ -31,23 +31,23 @@ COPYMETHOD:: RedMixMono *def
 
 INSTANCEMETHODS::
 
-COPYMETHOD:: RedMixMono -amp
-COPYMETHOD:: RedMixMono -cvs
-COPYMETHOD:: RedMixMono -def
-COPYMETHOD:: RedMixMono -free
-COPYMETHOD:: RedMixMono -group
-COPYMETHOD:: RedMixMono -gui
-COPYMETHOD:: RedMixMono -inA
-COPYMETHOD:: RedMixMono -inB
-COPYMETHOD:: RedMixMono -isReady
-COPYMETHOD:: RedMixMono -lag
-COPYMETHOD:: RedMixMono -mix
-COPYMETHOD:: RedMixMono -out
+COPYMETHOD:: RedAbstractMix -amp
+COPYMETHOD:: RedAbstractMix -cvs
+COPYMETHOD:: RedAbstractMix -def
+COPYMETHOD:: RedAbstractMix -free
+COPYMETHOD:: RedAbstractMix -group
+COPYMETHOD:: RedAbstractMix -gui
+COPYMETHOD:: RedAbstractMix -inA
+COPYMETHOD:: RedAbstractMix -inB
+COPYMETHOD:: RedAbstractMix -isReady
+COPYMETHOD:: RedAbstractMix -lag
+COPYMETHOD:: RedAbstractMix -mix
+COPYMETHOD:: RedAbstractMix -out
 
 EXAMPLES::
 
 CODE::
-a= RedMixStereo(20, 40, 0);	//stereo inputs on 20 and 40, stereo output on 0
+a= RedMixStereo(20, 40, 0);  //stereo inputs on 20 and 40, stereo output on 0
 b= Pbind(\degree, Pseq([0, 1, 5, 4, 3], inf), \dur, 0.25, \pan, Pseq([-1, 1], inf), \out, 20).play;
 c= Pbind(\degree, Pseq([10, 11, 16, 15], inf), \dur, 0.25, \pan, Pseq([-1, 1], inf), \out, 40).play;
 
@@ -57,7 +57,7 @@ a.lag= 2;
 a.mix= 0;
 a.amp= 0.2;
 
-g= a.gui;	//optional
+g= a.gui;  //optional
 g.close;
 
 b.stop;

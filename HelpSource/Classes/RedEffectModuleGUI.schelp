@@ -73,7 +73,7 @@ a.free;
 b.close;
 c.close;
 
-//embed in a window
+//embed in a Window or a View
 (
 var efx= [RedEfxRing.new, RedEfxDist.new, RedEfxTank.new, RedEfxGuit.new];
 var win= Window("test", Rect(100, 200, 300, 400));

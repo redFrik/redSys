@@ -16,7 +16,7 @@ The signal to be lagged.
 ARGUMENT:: up
 Lag amount for increasing numbers.
 
-ARGUMENT::down
+ARGUMENT:: down
 Lag amount for decreasing numbers. If nil then set to same as strong::up::.
 
 METHOD:: new
@@ -24,7 +24,7 @@ METHOD:: new
 ARGUMENT:: up
 Lag amount for increasing numbers.
 
-ARGUMENT::down
+ARGUMENT:: down
 Lag amount for decreasing numbers. If nil then set to same as strong::up::.
 
 INSTANCEMETHODS::
@@ -40,8 +40,8 @@ Set or get the amount of lag when using the strong::slide:: method.
 EXAMPLES::
 
 CODE::
-b= 1;	//target
-a= RedSlide(10, 5);	//10= upwards lag, 5= downwards
+b= 1;  //target
+a= RedSlide(10, 5);  //10= upwards lag, 5= downwards
 b= a.slide(1)
 b= a.slide(1)
 b= a.slide(1)
@@ -51,7 +51,7 @@ b= a.slide(1)
 
 //--smoothing out an array of 0 and 1
 
-b= {|i| i.div(500)%2}.dup(3000);	//array
+b= {|i| i.div(500)%2}.dup(3000);  //array
 a= RedSlide(100);
 b.collect{|x| a.slide(x)}.plot;
 
@@ -59,11 +59,11 @@ b.collect{|x| a.slide(x)}.plot;
 //--audio and control rate
 
 {RedSlide.ar(LFPulse.ar(30, 0.6), 100)}.plot(0.1);
-{LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)}.plot(0.1);	//compare lagud
+{LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)}.plot(0.1);  //compare lagud
 
 
 {RedSlide.ar(LFPulse.ar(30, 0.6), 100)}.plot(0.1);
-{RedSlide.kr(LFPulse.kr(30, 0.6), 2)}.plot(0.1);	//roughly  the same
+{RedSlide.kr(LFPulse.kr(30, 0.6), 2)}.plot(0.1);  //roughly  the same
 
 
 //--audio examples

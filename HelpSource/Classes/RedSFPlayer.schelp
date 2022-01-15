@@ -50,20 +50,29 @@ METHOD:: stop
 ARGUMENT:: fadeTime
 In seconds.
 
-METHOD:: free
-Stop playing and free internal buffer.
-
 METHOD:: amp
 Get or set the amplitude.
 
-METHOD:: isPlaying
-A link::Classes/Boolean::
+METHOD:: buffer
+Get the current link::Classes/Buffer::.
+
+METHOD:: channels
+Number of channels of the soundfile. Updated after reading.
 
 METHOD:: duration
 Length of the soundfile in seconds. Updated after reading.
 
-METHOD:: channels
-Number of channels of the soundfile. Updated after reading.
+METHOD:: free
+Stop playing and free internal buffer.
+
+METHOD:: isPlaying
+A link::Classes/Boolean::
+
+METHOD:: server
+Get or set the link::Classes/Server:: in use.
+
+METHOD:: synth
+Get or set the internal link::Classes/Synth::.
 
 EXAMPLES::
 
@@ -72,12 +81,12 @@ s.boot;
 
 a= RedSFPlayer.new;
 a.read(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff");
-a.play;	//default is play out on bus 0 with rate 1 and 0 fadeTime
+a.play;  //default is play out on bus 0 with rate 1 and 0 fadeTime
 a.stop;
 
-a.loop(0, 3, 4);	//start looping with long fadeTime and high rate
-a.loop(0, -2, 8);	//crossfade to backwards rate
-a.stop(4);	//fadeout
+a.loop(0, 3, 4);  //start looping with long fadeTime and high rate
+a.loop(0, -2, 8);  //crossfade to backwards rate
+a.stop(4);  //fadeout
 
 a.free;
 ::

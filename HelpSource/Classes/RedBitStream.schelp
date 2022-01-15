@@ -16,24 +16,74 @@ An link::Classes/Array:: of integers.
 ARGUMENT:: byte
 Number of bits per byte in this collection of integers. If byte is 8 then integers should not be greater than 255.
 
+INSTANCEMETHODS::
+
+METHOD:: bytePos
+Get or set the byte position.
+
+METHOD:: collection
+Get the current collection.
+
+METHOD:: contents
+Get the current bit stream.
+
+METHOD:: next
+Step one bit forward and return the bit value at that position. Returns code::nil:: when reached the end.
+
+METHOD:: nextByte
+Step forward byte number of bits. Returns an link::Classes/Array:: of bit values and can contain code::nil:: when reached the end.
+
+METHOD:: peek
+Get the bit value (0/1) at the current position.
+
+METHOD:: peekByte
+Get the byte at the current link::#-bytePos:: position (reading from link::#-collection::).
+
+METHOD:: poke
+Set the bit value (0/1) at the current position.
+
+ARGUMENT:: bit
+Value 0 or 1.
+
+METHOD:: pos
+Get or set the bit position.
+
+METHOD:: put
+Write a value at current position and advance the position by one bit.
+
+ARGUMENT:: item
+Value 0 or 1.
+
+METHOD:: putByte
+Write a byte value at the current position and advance the position by one byte.
+
+ARGUMENT:: item
+A byte value.
+
+METHOD:: reset
+Empty the link::#-collection:: and set link::#-pos:: to 0.
+
 EXAMPLES::
 
 CODE::
-a= RedBitStream((0..255), 8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
-a.nextN(8);
+a= RedBitStream((0..255), 8);  //LSB
+a.nextByte;
+a.nextByte;
+a.nextByte;
+a.peekByte;
+a.pos= 0;  //bit position
+a.nextByte;
+a.nextN(8);  //same as a.nextByte
 a.nextN(16);
+a.peekByte;
 
-//--count from 0 to 255 lsb.  the process takes 4min and 25sec
+//--count from 0 to 255 LSB. The process takes 4min and 25sec
 s.boot;
 a= RedBitStream((0..255), 8);
 b= Pbind(\degree, a, \dur, 0.125, \amp, 0.3, \legato, 0.4).play;
 b.stop
 
-//--same but msb
+//--same but MSB
 a= RedBitStream2((0..255), 8);
 b= Pbind(\degree, a, \dur, 0.125, \amp, 0.3, \legato, 0.4).play;
 b.stop

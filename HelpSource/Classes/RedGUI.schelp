@@ -15,5 +15,5 @@ Creates a skin in code::GUI.skins:: called code::\redFrik::.
 EXAMPLES::
 
 CODE::
-GUI.skins.redFrik;	//test it
+GUI.skins.redFrik;  //test it
 ::

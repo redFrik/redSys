@@ -25,15 +25,15 @@ EXAMPLES::
 CODE::
 a= [0, 0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 0.5, 0.5, 0.5, \abc, \abc, \abc];
 b= RedRLE.encode(a);
-b.size/a.size;	//compressed to 55%
+b.size/a.size;  //compressed to 55%
 c= RedRLE.decode(b);
 c==a;
 
 
-a= "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW";	//string instead of array
+a= "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW";  //string instead of array
 a.size;
 b= RedRLE.encode(a);
-b.size/a.size;	//compressed to 21%
+b.size/a.size;  //compressed to 21%
 c= RedRLE.decode(b);
 c.size;
 a==c.join;
@@ -42,7 +42,7 @@ a==c.join;
 a= "JOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEY".ascii;
 a.size;
 b= RedRLE.encode(a);
-b.size/c.size;	//expanded to 167%. performs really bad with non-repeating values
+b.size/c.size;  //expanded to 167%. performs really bad with non-repeating values
 c= RedRLE.decode(b);
 c.size;
 a==c;

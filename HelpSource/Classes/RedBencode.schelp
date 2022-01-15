@@ -77,7 +77,7 @@ a==c//convert back - should be the same array as above
 //--arduino real world test reading bencoded data from the serial port
 //upload the serialSend example from https://github.com/jcw/embencode to an arduino
 (
-var port= SerialPort("/dev/tty.usbmodemfa131", 57600);	//modify this port name
+var port= SerialPort("/dev/tty.usbmodemfa131", 57600);  //modify this port name
 CmdPeriod.doOnce({port.close});
 Routine.run({
 	var lastByte= -1, stream;
@@ -85,15 +85,15 @@ Routine.run({
 		var byte;
 		while({byte= port.read; byte.notNil}, {
 			if(byte==10 and:{lastByte==13}, {
-				if(stream.notNil, {	//skip the initial "\n[serialSend]"
+				if(stream.notNil, {  //skip the initial "\n[serialSend]"
 					stream.pos= 0;
-					RedBencode.decode(stream).postln;	//should post the result every 3sec
+					RedBencode.decode(stream).postln;  //should post the result every 3sec
 				});
 				stream= CollStream.new;
 				lastByte= -1;
 			}, {
 				if(lastByte!= -1, {
-					if(stream.notNil, {	//skip the initial "\n[serialSend]"
+					if(stream.notNil, {  //skip the initial "\n[serialSend]"
 						stream.put(lastByte.asAscii);
 					});
 				});
@@ -107,7 +107,7 @@ Routine.run({
 //--arduino real world test sending bencoded data to the serial port
 //upload the serialReceive example from https://github.com/jcw/embencode to an arduino
 (
-var port= SerialPort("/dev/tty.usbmodemfa131", 57600);	//modify this port name
+var port= SerialPort("/dev/tty.usbmodemfa131", 57600);  //modify this port name
 CmdPeriod.doOnce({port.close});
 Routine.run({
 	var lastByte= -1, stream= CollStream.new;
@@ -125,7 +125,6 @@ Routine.run({
 				lastByte= byte;
 			});
 		});
-
 	};
 });
 Routine.run({
@@ -141,7 +140,7 @@ Routine.run({
 //--arduino real world test
 //upload the blinky example from https://github.com/jcw/embencode to an arduino
 (
-~port= SerialPort("/dev/tty.usbmodemfa131", 57600);	//modify this port name
+~port= SerialPort("/dev/tty.usbmodemfa131", 57600);  //modify this port name
 CmdPeriod.doOnce({~port.close});
 Routine.run({
 	var stream= CollStream.new;

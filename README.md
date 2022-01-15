@@ -4,14 +4,27 @@ install it from within supercollider with the command `Quarks.install("redSys")`
 
 # redSys
 
-red system including mixers, effects, instruments, presets, tools, gui
+red system including mixers, effects, instruments, presets, tools, compression algorithms, gui...
 
-dependencies: [TabbedView](https://github.com/supercollider-quarks/TabbedView) quark (should be automatically installed)
+see `redSysOverview` in help
 
-see redSysOverview in help
+## Dependancies
 
-## changelog:
+Some of the gui classes need the [TabbedView2](https://github.com/supercollider-quarks/TabbedView2) quark (should get automatically installed when installing this quark)
 
+## Screenshots:
+
+Most classes do not have a GUI, but here are a few screenshots of ones that do...
+
+![RedEffectsRackGUI](images/RedEffectsRackGUI.png)
+![RedMatrixMixerGUI](images/RedMatrixMixerGUI.png)
+![RedMixerGUI](images/RedMixerGUI.png)
+![RedMixerChannelGUI](images/RedMixerChannelGUI.png)
+![RedTapTempoGUI](images/RedTapTempoGUI.png)
+
+## Changelog:
+
+* 220116 - added a few screenshots, helpfile cleanup
 * 220115 - rewrite to use TabbedView2 instead of TabbedView (about time)
 * 220114 - redMix, redTapTempo, redMixer, redMatrixMixer, redEffectsRack, redModule - rework gui and helpfiles
 * 210610 - huge speed improvements to most data compression classes, RedGIF massive speed improvements and important fixes

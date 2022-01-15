@@ -102,6 +102,7 @@ RedPopUpMenu {
 	}
 }
 
+//NOTE: depends on PopUpTreeMenu quark
 RedPopUpTreeMenu {
 	*new {|parent, bounds|
 		bounds= bounds ?? {Point(74, 14)};

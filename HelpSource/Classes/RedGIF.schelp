@@ -68,6 +68,15 @@ Optional data as an array.
 METHOD:: images
 Array of link::Classes/RedGIFImage:: objects.
 
+METHOD:: read
+Read and decode a .gif file from disk into an already existing instance.
+
+METHOD:: resolution
+Get or set. link::Classes/Integer::
+
+METHOD:: sorted
+Get or set. link::Classes/Integer::
+
 EXAMPLES::
 
 CODE::

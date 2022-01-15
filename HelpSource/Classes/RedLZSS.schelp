@@ -42,7 +42,7 @@ EXAMPLES::
 CODE::
 a= [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3];
 b= RedLZSS.compress(a);
-RedLZSS.binaryStringToBytes(b).size/a.size;	//compressed to 29%
+RedLZSS.binaryStringToBytes(b).size/a.size;  //compressed to 29%
 c= RedLZSS.decompress(b);
 a==c
 
@@ -63,7 +63,7 @@ a==c
 a= "JOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEYJOEYNJOEYNJOEY".ascii;
 b= RedLZSS.compress(a);
 c= RedLZSS.binaryStringToBytes(b);
-c.size/a.size;	//compressed to 27%
+c.size/a.size;  //compressed to 27%
 d= RedLZSS.bytesToBinaryString(c);
 e= RedLZSS.decompress(d);
 e.collect{|x| x.asAscii}.join;
@@ -72,17 +72,17 @@ a==e
 
 a= "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.".ascii;
 b= RedLZSS.compress(a);
-RedLZSS.binaryStringToBytes(b).size/a.size;	//compressed to 99%
+RedLZSS.binaryStringToBytes(b).size/a.size;  //compressed to 99%
 c= RedLZSS.decompress(b);
 c.collect{|x| x.asAscii}.join;
 a==c
 
 
 a= {|i| [0, 0, 0, 1].choose}.dup(5000);
-RedLZSS.window= 512;	//decrease window and length to speed up compression
+RedLZSS.window= 512;  //decrease window and length to speed up compression
 RedLZSS.length= 16;
-b= RedLZSS.compress(a);	//very slow to compress large arrays
-RedLZSS.binaryStringToBytes(b).size/a.size;	//compressed to around 22% (also 22% with default window and length values)
-c= RedLZSS.decompress(b);	//fast to decompress
+b= RedLZSS.compress(a);  //very slow to compress large arrays
+RedLZSS.binaryStringToBytes(b).size/a.size;  //compressed to around 22% (also 22% with default window and length values)
+c= RedLZSS.decompress(b);  //fast to decompress
 a==c
 ::

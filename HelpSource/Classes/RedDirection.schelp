@@ -13,10 +13,22 @@ METHOD:: ar, kr
 ARGUMENT:: in
 Signal to track.
 
+SUBSECTION:: Language side implementation
+
+METHOD:: new
+
+ARGUMENT:: start
+Initial sample value.
+
 INSTANCEMETHODS::
+
+SUBSECTION:: Language side implementation
 
 METHOD:: direction
 Language side.
+
+METHOD:: last
+Get or set previous sample value.
 
 EXAMPLES::
 

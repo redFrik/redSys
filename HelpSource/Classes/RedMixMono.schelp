@@ -32,61 +32,23 @@ Returns the link::Classes/SynthDef::.
 
 INSTANCEMETHODS::
 
-METHOD:: amp
-Get or set volume 0.0 to 1.0
-
-METHOD:: cvs
-Dictionary with all link::Classes/Ref:: objects. (used to be CV objects)
-
-TABLE::
-## inA || input audio bus number
-## inB || second audio bus number
-## out || output audio bus number
-## mix || mix control (balance) -1.0 to 1.0
-## amp || volume 0.0 to 1.0
-## lag || ramp time in seconds for mix and amp
-::
-
-METHOD:: def
-Calls link::#*def::
-
-METHOD:: free
-Free the mixer synth.
-
-METHOD:: group
-The link::Classes/Group:: in use.
-
-METHOD:: gui
-create a link::Classes/RedMixGUI::.
-
-ARGUMENT:: parent
-A link::Classes/Window::, link::Classes/View:: or code::nil::.
-
-ARGUMENT:: position
-A link::Classes/Point:: or code::nil::.
-
-METHOD:: inA
-Get or set first input audio bus number.
-
-METHOD:: inB
-Get or set second input audio bus number.
-
-METHOD:: isReady
-code::true:: after the server is booted and the internal mixer is added and created.
-
-METHOD:: lag
-Get or set the ramp time in seconds for mix and amp.
-
-METHOD:: mix
-Get or set the mix control (balance) -1.0 to 1.0
-
-METHOD:: out
-Get or set the audio output bus number.
+COPYMETHOD:: RedAbstractMix -amp
+COPYMETHOD:: RedAbstractMix -cvs
+COPYMETHOD:: RedAbstractMix -def
+COPYMETHOD:: RedAbstractMix -free
+COPYMETHOD:: RedAbstractMix -group
+COPYMETHOD:: RedAbstractMix -gui
+COPYMETHOD:: RedAbstractMix -inA
+COPYMETHOD:: RedAbstractMix -inB
+COPYMETHOD:: RedAbstractMix -isReady
+COPYMETHOD:: RedAbstractMix -lag
+COPYMETHOD:: RedAbstractMix -mix
+COPYMETHOD:: RedAbstractMix -out
 
 EXAMPLES::
 
 CODE::
-a= RedMixMono(20, 40, 0);	//mono inputs on 20 and 40, stereo output on 0
+a= RedMixMono(20, 40, 0);  //mono inputs on 20 and 40, stereo output on 0
 b= Pbind(\degree, Pseq([0, 1, 5, 4, 3], inf), \dur, 0.25, \pan, -1, \out, 20).play;
 c= Pbind(\degree, Pseq([10, 11, 16, 15], inf), \dur, 0.25, \pan, -1, \out, 40).play;
 
@@ -96,7 +58,7 @@ a.lag= 2;
 a.mix= 0;
 a.amp= 0.2;
 
-g= a.gui;	//optional
+g= a.gui;  //optional
 g.close;
 
 b.stop;
