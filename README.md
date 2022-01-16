@@ -16,10 +16,11 @@ Some of the gui classes need the [TabbedView2](https://github.com/supercollider-
 
 Most classes do not have a GUI, but here are a few screenshots of ones that do...
 
+![RedEffectModuleGUI](images/RedEffectModuleGUI.png)
 ![RedEffectsRackGUI](images/RedEffectsRackGUI.png)
-![RedMatrixMixerGUI](images/RedMatrixMixerGUI.png)
-![RedMixerGUI](images/RedMixerGUI.png)
 ![RedMixerChannelGUI](images/RedMixerChannelGUI.png)
+![RedMixerGUI](images/RedMixerGUI.png)
+![RedMatrixMixerGUI](images/RedMatrixMixerGUI.png)
 ![RedTapTempoGUI](images/RedTapTempoGUI.png)
 
 ## Changelog:
