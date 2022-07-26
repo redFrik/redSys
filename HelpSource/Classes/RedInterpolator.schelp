@@ -52,7 +52,7 @@ EXAMPLES::
 CODE::
 a= RedInterpolator.new;
 a.action= {|val, ramp, i, steps| [val, ramp, i, steps].postln};
-a.goto(20, 1);  //go to 20 over 1 second (the the default 60 ticks per second)
+a.goto(20, 1);  //go to 20 over 1 second (with the default 60 ticks per second)
 a.goto(-10, 2);  //go from current value (20) to -10 over 2 seconds
 a.value= 3;  //jump to value 3
 a.goto(100, 4, -4);  //goto 100 over 4 seconds with a curvature of -4

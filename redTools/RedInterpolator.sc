@@ -17,7 +17,7 @@ RedInterpolator {
 				action.value(value, 1, 0, 0);
 			}, {
 				steps.do{|i|
-					var r= (i+1)/steps;//ramp 0-1
+					var r= (i+1)/steps;  //ramp 0-1
 					value= RedTween.value(r, source, target, curve);
 					action.value(value, r, i, steps);
 					tick.wait;

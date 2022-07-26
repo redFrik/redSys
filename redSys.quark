@@ -3,10 +3,10 @@
 	\path:			"redSys",
 	\summary:		"red system including mixers, effects, instruments, presets, tools, gui",
 	\author:		"redFrik",
-	\helpdoc:		"RedSys.html",
+	\schelp:		"redSysOverview",
 	\url:			"https://www.fredrikolofsson.com/",
 	\dependencies:	["TabbedView2_QT", "TabbedView2"],
-	\version:		0.6,
+	\version:		"0.6",
 	\since:			"2009",
 	\isCompatible:	{Main.versionAtLeast(3, 6)}
 )
