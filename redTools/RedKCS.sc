@@ -1,10 +1,14 @@
+//redFrik
+
 RedKCS {
 	var <sampleRate, <baudRate, <zeroFreq, <oneFreq,
 	<addNewlineGap, <addCarriageReturn,
 	<leaderDur, <trailerDur;
-	var arrayClass, mul, add;
+	var <synth, <buffer, <listenSynth, listenResponder;
+	var arrayClass, mul, add, frameLen;
 	var oneBits, zeroBits, gapBits, leaderBits, trailerBits;
 
+	//squarewaves
 	*new {|sampleRate, baudRate= 300, zeroFreq= 1200, oneFreq= 2400,
 		addNewlineGap= true, addCarriageReturn= true,
 		leaderDur= 5, trailerDur= 5|
@@ -12,21 +16,39 @@ RedKCS {
 			sampleRate, baudRate, zeroFreq, oneFreq,
 			addNewlineGap, addCarriageReturn,
 			leaderDur, trailerDur
-		).initRedKCS.initRedKCSadditional;
+		).initSquare.initArrays;
 	}
 
-	initRedKCS {
-		var len;
-		mul= 1;
-		add= -0.5;
+	//sinewaves
+	*newSine {|sampleRate, baudRate= 300, zeroFreq= 1200, oneFreq= 2400,
+		addNewlineGap= true, addCarriageReturn= true,
+		leaderDur= 5, trailerDur= 5|
+		^super.newCopyArgs(
+			sampleRate, baudRate, zeroFreq, oneFreq,
+			addNewlineGap, addCarriageReturn,
+			leaderDur, trailerDur
+		).initSine.initArrays;
+	}
+
+	initSquare {
 		arrayClass= Int8Array;
 		sampleRate= sampleRate?9600;
-		len= sampleRate.div(baudRate);
-		oneBits= arrayClass.fill(len, {|i| i.div((sampleRate/oneFreq).div(2))%2});
-		zeroBits= arrayClass.fill(len, {|i| i.div((sampleRate/zeroFreq).div(2))%2});
+		frameLen= sampleRate.div(baudRate);
+		mul= 1;
+		add= -0.5;
+		zeroBits= arrayClass.fill(frameLen, {|i| i.div((sampleRate/zeroFreq).div(2))%2});
+		oneBits= arrayClass.fill(frameLen, {|i| i.div((sampleRate/oneFreq).div(2))%2});
 	}
-
-	initRedKCSadditional {
+	initSine {
+		arrayClass= FloatArray;
+		sampleRate= sampleRate?Server.default.sampleRate?44100;
+		frameLen= sampleRate.div(baudRate);
+		mul= 0.5;
+		add= 0;
+		zeroBits= arrayClass.fill(frameLen, {|i| sin(i/frameLen*(zeroFreq/baudRate)*2pi)});
+		oneBits= arrayClass.fill(frameLen, {|i| sin(i/frameLen*(oneFreq/baudRate)*2pi)});
+	}
+	initArrays {
 		if(addNewlineGap, {
 			gapBits= arrayClass.with(*[zeroBits.dup(9), oneBits.dup(2)].dup(10).flat);
 		});
@@ -34,12 +56,14 @@ RedKCS {
 		trailerBits= arrayClass.with(*oneBits.dup(baudRate*trailerDur).flat);
 	}
 
+	//--sclang encode
+
 	encodeByte {|byte|
 		var i= 0;
-		var bits= arrayClass.new(sampleRate.div(baudRate)*11);
+		var bits= arrayClass.new(frameLen*11);
 		bits.addAll(zeroBits);
 		while({i<8}, {
-			bits.addAll(if(byte.rightShift(i)&1==1, {oneBits}, {zeroBits}));
+			bits.addAll(if(byte.rightShift(i)&1==0, {zeroBits}, {oneBits}));
 			i= i+1;
 		});
 		bits.addAll(oneBits);
@@ -55,7 +79,7 @@ RedKCS {
 		if(addNewlineGap, {
 			extra= str.occurrencesOf(Char.nl)*gapBits.size;
 		});
-		bits= arrayClass.new(sampleRate.div(baudRate)*11*str.size+extra);
+		bits= arrayClass.new(frameLen*11*str.size+extra);
 		str.do{|char|
 			bits.addAll(this.encodeByte(char.ascii));
 			if(addNewlineGap and:{char==Char.nl}, {bits.addAll(gapBits)});
@@ -92,6 +116,8 @@ RedKCS {
 		});
 		^file.notNil;
 	}
+
+	//--sclang decode
 
 	decodeFloatArray {|arr, rate, channels= 1|
 		var len= (rate?sampleRate/oneFreq*8).round.asInteger;
@@ -146,7 +172,7 @@ RedKCS {
 			if(raw, {
 				action.value(res);
 			}, {
-				action.value(this.bytesToString(res));
+				action.value(this.prBytesToString(res));
 			});
 		});
 	}
@@ -162,7 +188,7 @@ RedKCS {
 			if(raw, {
 				^res;
 			}, {
-				^this.bytesToString(res);
+				^this.prBytesToString(res);
 			});
 		}, {
 			"% - failed to open %".format(this.class.name, path).warn;
@@ -170,20 +196,184 @@ RedKCS {
 		});
 	}
 
-	bytesToString {|arr|
-		^arr.reject{|x| x==0}.collect{|x| x.asAscii}.join;
+	prBytesToString {|arr|
+		^arr.reject{|x| x==0}.collect{|x| if(x<0, {x= 256-x}); x.asAscii}.join;
 	}
-}
 
-RedKCSsine : RedKCS {
-	initRedKCS {
-		var len;
-		mul= 0.5;
-		add= 0;
-		arrayClass= FloatArray;
-		sampleRate= sampleRate?Server.default.sampleRate?44100;
-		len= sampleRate.div(baudRate);
-		oneBits= arrayClass.fill(len, {|i| sin(i/len*(oneFreq/baudRate)*2pi)});
-		zeroBits= arrayClass.fill(len, {|i| sin(i/len*(zeroFreq/baudRate)*2pi)});
+	//--scserver encode
+
+	play {|target, out= 0, amp= 0.5, addAction= \addToHead|
+		var group= if(target.isKindOf(Server), {
+			target.defaultGroup;
+		}, {
+			target?Server.default.defaultGroup;
+		});
+		if(group.server.serverRunning, {
+			fork{
+				if(SynthDescLib.at(\redKCSencode).isNil, {
+
+					SynthDef(\redKCSencode, {
+						|out= 0, buf, t_trig= 0, amp= 0.5, baudRate= 300, zeroFreq= 1200, oneFreq= 2400|
+						var trig= Latch.ar(Trig1.ar(t_trig, 2/baudRate), Impulse.ar(baudRate, 2/baudRate));
+						var gate= SetResetFF.ar(trig);
+						var phasor= Sweep.ar(trig, baudRate);
+						var data= BufRd.ar(1, buf, phasor*gate, 0, 1)+(1-gate);
+						var f0= baudRate/zeroFreq;
+						var f1= baudRate/oneFreq;
+						var snd= (phasor%f0>(f0*0.5)*(1-data))+(phasor%f1>(f1*0.5)*data);
+						Out.ar(out, snd*2-1*amp);
+					}).add;
+
+					group.server.sync;
+				});
+
+				synth.free;
+				buffer.free;
+				buffer= Buffer.alloc(group.server, 1);
+				group.server.sync;
+				synth= Synth(\redKCSencode,
+					[
+						\out, out, \amp, amp, \buf, buffer,
+						\baudRate, baudRate, \zeroFreq, zeroFreq, \oneFreq, oneFreq
+					],
+					group.server,
+					addAction
+				);
+			};
+		}, {
+			"% - boot server first".format(this.class.name).warn;
+		});
+	}
+
+	playSine {|target, out= 0, amp= 0.5, addAction= \addToHead|
+		var group= if(target.isKindOf(Server), {
+			target.defaultGroup;
+		}, {
+			target?Server.default.defaultGroup;
+		});
+		if(group.server.serverRunning, {
+			fork{
+				if(SynthDescLib.at(\redKCSencodeSine).isNil, {
+
+					SynthDef(\redKCSencodeSine, {
+						|out= 0, buf, t_trig= 0, amp= 0.5, baudRate= 300, zeroFreq= 1200, oneFreq= 2400|
+						var trig= Latch.ar(Trig1.ar(t_trig, 2/baudRate), Impulse.ar(baudRate, 2/baudRate));
+						var gate= SetResetFF.ar(trig);
+						var phasor= Sweep.ar(trig, baudRate);
+						var data= BufRd.ar(1, buf, phasor*gate, 0, 1)+(1-gate);
+						var snd= (SinOsc.ar(zeroFreq)*(1-data))+(SinOsc.ar(oneFreq)*data);
+						Out.ar(out, snd*amp);
+					}).add;
+
+					group.server.sync;
+				});
+
+				synth.free;
+				buffer.free;
+				buffer= Buffer.alloc(group.server, 1);
+				group.server.sync;
+				synth= Synth(\redKCSencodeSine,
+					[
+						\out, out, \amp, amp, \buf, buffer,
+						\baudRate, baudRate, \zeroFreq, zeroFreq, \oneFreq, oneFreq
+					],
+					group.server,
+					addAction
+				);
+			};
+		}, {
+			"% - boot server first".format(this.class.name).warn;
+		});
+	}
+
+	send {|str= ""|
+		if(synth.notNil, {
+			fork{
+				buffer.free;
+				buffer= Buffer.loadCollection(buffer.server, this.prEncodeBytes(str.ascii));
+				buffer.server.sync;
+				synth.set(\buf, buffer, \t_trig, 1);
+			};
+		}, {
+			"% - call play or playSine first".format(this.class.name).warn;
+		});
+	}
+
+	stop {
+		synth.free;
+		synth= nil;
+		buffer.free;
+	}
+
+	prEncodeBytes {|bytes|
+		^bytes.collect{|byte| [0]++byte.asBinaryDigits.reverse++#[1, 1]}.flat;
+	}
+
+	//--scserver decode
+
+	listen {|target, action, in= 0, thresh= 0.01, rq= 0.2, addAction= \addToTail|
+		var group= if(target.isKindOf(Server), {
+			target.defaultGroup;
+		}, {
+			target?Server.default.defaultGroup;
+		});
+		if(group.server.serverRunning, {
+			action= action?{|byte| byte.asAscii.post};
+			fork{
+				if(SynthDescLib.at(\redKCSdecode).isNil, {
+
+					SynthDef(\redKCSdecode, {
+						|in= 0, baudRate= 300, zeroFreq= 1200, oneFreq= 2400, thresh= 0.01, rq= 0.2|
+						var startTrig, trig, byte;
+						var arr= 0!11;
+						var zeroCycles= zeroFreq/baudRate;
+						var oneCycles= oneFreq/baudRate;
+						var snd= In.ar(in);
+						snd= BPF.ar(snd, zeroFreq, rq)+BPF.ar(snd, oneFreq, rq);
+						snd= Schmidt.ar(snd, 0-thresh, thresh)-0.5;
+						snd= (ZeroCrossing.ar(snd)/baudRate).round(1);
+						startTrig= SetResetFF.ar(BinaryOpUGen('==', snd, zeroCycles));
+						10.do{|i|
+							var d= 10-i/baudRate;
+							arr[i]= DelayN.ar(snd, d, d);
+						};
+						arr[10]= snd;
+						arr= Latch.ar(arr, Phasor.ar(startTrig, baudRate*SampleDur.ir)>0.1);
+						trig= Trig1.ar(
+							BinaryOpUGen('==', arr[0], zeroCycles)&
+							BinaryOpUGen('==', arr[9], oneCycles)&
+							BinaryOpUGen('==', arr[10], oneCycles),
+							10/baudRate
+						);
+						byte= arr[1..8].sum{|x, i| BinaryOpUGen('==', x, oneCycles)*2.pow(i)};
+						SendReply.ar(trig, '/redKCSdecode', byte);
+					}).add;
+
+					group.server.sync;
+				});
+
+				listenSynth.free;
+				group.server.sync;
+				listenResponder.free;
+				listenResponder= OSCFunc({|msg|
+					action.value(msg[3].asInteger);
+				}, '/redKCSdecode', group.server.addr);
+				listenSynth= Synth(\redKCSdecode,
+					[
+						\in, in, \thresh, thresh, \rq, rq,
+						\baudRate, baudRate, \zeroFreq, zeroFreq, \oneFreq, oneFreq
+					],
+					group.server,
+					addAction
+				);
+			};
+		}, {
+			"% - boot server first".format(this.class.name).warn;
+		});
+	}
+
+	stopListening {
+		listenSynth.free;
+		listenResponder.free;
 	}
 }

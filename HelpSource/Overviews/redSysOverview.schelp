@@ -128,6 +128,7 @@ TABLE::
 ## link::Classes/RedHuffman:: || huffman coding
 ## link::Classes/RedIntelHex:: || read and decode intel hex files
 ## link::Classes/RedInterpolator:: || holds a value and interpolates to new target
+## link::Classes/RedKCS:: || kansas city standard encoder/decoder for sclang and server
 ## link::Classes/RedLZ77:: || lz77 compression/decompression
 ## link::Classes/RedLZ78:: || lz78 compression/decompression
 ## link::Classes/RedLZSS:: || lzss compression/decompression

@@ -1,0 +1,214 @@
+CLASS:: RedKCS
+SUMMARY:: kansas city standard encoder/decoder for sclang and server
+CATEGORIES:: Red>redTools
+RELATED:: Classes/RedArduino
+
+DESCRIPTION::
+audio frequency-shift keying (AFSK) as used by old computers to store data on cassette.
+See https://en.wikipedia.org/wiki/Kansas_City_standard
+
+CLASSMETHODS::
+
+METHOD:: new, newSine
+a new encoder/decoder using square or sine waves.
+
+ARGUMENT:: sampleRate
+defaults to the server's sample rate.
+
+ARGUMENT:: baudRate
+can go lower and higher. lower can be interesting sound-wise. higher for faster transmission.
+
+ARGUMENT:: zeroFreq
+in Hz. the standard specifies 1200 which mean that at 300 bauds there will be four pulses/cycles for marking a zero bit.
+
+ARGUMENT:: oneFreq
+in Hz. the standard specifies 2400 which mean that at 300 bauds there will be eight pulses/cycles for marking a one bit.
+
+ARGUMENT:: addNewlineGap
+optional. add ten extra NULL characters at the end of each line.
+
+ARGUMENT:: addCarriageReturn
+optional. add an extra CODE::Char.ret:: (ascii 13) for each CODE::Char.nl:: (ascii 10).
+
+ARGUMENT:: leaderDur
+in seconds. lead-in data (stream of 1).
+
+ARGUMENT:: trailerDur
+in seconds. trailing data (stream of 1).
+
+DISCUSSION::
+600 baud is possible without increasing the zeroFreq and oneFreq values. for 1200 baud use frequencies of 2400 and 4800.
+
+INSTANCEMETHODS::
+
+PRIVATE:: initArrays, initSquare, initSine, prBytesToString, prEncodeBytes
+
+SUBSECTION:: language side encoding
+
+METHOD:: encodeByte
+convert an 8-bit value into an array of samples.
+
+NOTE::normally no need to call this method directly.::
+
+ARGUMENT:: byte
+an link::Classes/Integer:: 0-255.
+
+RETURNS::
+an array of samples. for square waves an link::Classes/Int8Array:: and for sines a link::Classes/FloatArray::.
+
+METHOD:: encodeString
+convert a string into an array of samples.
+
+NOTE::normally no need to call this method directly.::
+
+ARGUMENT:: str
+a link::Classes/String::.
+
+RETURNS::
+a link::Classes/FloatArray:: of samples. either square waves or sines.
+
+METHOD:: encodeStringAsBuffer
+convert a string into a buffer that can be played. NOTE::it's easier to use the link::#-play:: method below.::
+
+ARGUMENT:: server
+defaults to CODE::Server.default::.
+
+ARGUMENT:: str
+the string to be encoded.
+
+ARGUMENT:: action
+a link::Classes/Function:: for what to do when the buffer is created.
+
+RETURNS::
+the link::Classes/Buffer:: instance (if successful). note that the buffer will not be filled with samples yet - use the action function.
+
+METHOD:: encodeStringAsSoundFile
+convert a string into a sound file (render to disk).
+
+ARGUMENT:: str
+the string to be encoded.
+
+ARGUMENT:: path
+a string specifying where to save the resulting sound file.
+
+RETURNS::
+a link::Classes/Boolean:: indicating if creating the file was successful.
+
+SUBSECTION:: language side decoding
+
+METHOD:: decodeFloatArray
+convert an array of sample values into an array of 8-bit bytes.
+
+NOTE::normally no need to call this method directly.::
+
+ARGUMENT:: arr
+a link::Classes/FloatArray::.
+
+ARGUMENT:: rate
+sample rate of the data. if not specified link::#-sampleRate:: will be used.
+
+ARGUMENT:: channels
+might need to adapt this if the samples in the array are interleaved (stereo).
+
+RETURNS::
+an link::Classes/Int8Array::.
+
+METHOD:: decodeBuffer
+convert a buffer of sample values into a string.
+
+ARGUMENT:: buf
+the link::Classes/Buffer:: instance to decode.
+
+ARGUMENT:: raw
+a link::Classes/Boolean:: indicating if output should be the raw bytes (link::Classes/Int8Array::) or a link::Classes/String:: (with any NULL characters removed).
+
+ARGUMENT:: action
+a link::Classes/Function:: that will be called when the decoding is finished. the string or array with raw bytes is passed in as the first argument.
+
+METHOD:: decodeSoundFile
+convert a sound file into a string.
+
+ARGUMENT:: path
+a link::Classes/String:: pointing at the sound file to be decoded. mono or multi-channel does not matter - only the first (left) channel will be used.
+
+ARGUMENT:: raw
+a link::Classes/Boolean:: indicating if output should be the raw bytes (link::Classes/Int8Array::) or a link::Classes/String:: (with any NULL characters removed).
+
+RETURNS::
+a link::Classes/String:: or an link::Classes/Int8Array::. CODE::nil:: if unsuccessful.
+
+SUBSECTION:: server side encoding
+
+METHOD:: play, playSine
+start realtime generation using square or sine waves.
+
+ARGUMENT:: target
+the link::Classes/Group:: or link::Classes/Server:: to add the node to.
+
+ARGUMENT:: out
+bus to play on.
+
+ARGUMENT:: amp
+volume
+
+ARGUMENT:: addAction
+a link::Classes/Symbol::.
+
+METHOD:: send
+encode and generate sound in realtime.
+
+ARGUMENT:: str
+the link::Classes/String:: to send.
+
+METHOD:: stop
+turn off realtime generation
+
+SUBSECTION:: server side decoding
+
+METHOD:: listen
+start realtime analysis.
+
+ARGUMENT:: target
+the link::Classes/Group:: or link::Classes/Server:: to add the node to.
+
+ARGUMENT:: action
+a link::Classes/Function:: that will be called when and if the decoding is finished. a string is passed in as the first argument.
+
+ARGUMENT:: in
+bus to listen to. use CODE::s.options.numOutputBusChannels:: for the mic (same as CODE::SoundIn.ar(0)::)
+
+ARGUMENT:: thresh
+internal analyser synth's amplitude threshold (+/-).
+
+ARGUMENT:: rq
+internal analyser synth's bandpass filter bandwidth.
+
+ARGUMENT:: addAction
+a link::Classes/Symbol::. NOTE::defaults to \addToTail because normally the internal analyser synth needs to be below any sound generating synths in the order of execution::
+
+METHOD:: stopListening
+free internal analyser synth and responder. also a code::CmdPeriod:: will clear these.
+
+EXAMPLES::
+
+CODE::
+//soundfile
+a= RedKCS(leaderDur:1, trailerDur: 1);
+a.encodeStringAsSoundFile("hej du glade!", "~/Desktop/hej.wav");
+a.decodeSoundFile("~/Desktop/hej.wav");
+
+//buffer
+a= RedKCS(leaderDur:1, trailerDur: 1);
+b= a.encodeStringAsBuffer(str:"hej du glade!");
+a.decodeBuffer(b, false, action:{|a| a.postln});
+b.free;
+
+//realtime
+s.boot;
+a= RedKCS();
+a.playSine();
+a.listen;
+a.send("hej du glade!");
+a.stopListening;
+a.stop;
+::

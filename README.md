@@ -41,7 +41,7 @@ red system including mixers, effects, instruments, presets, tools, compression a
 
 | redGUI (gui) | |
 | ------------- | ------------- |
-redGUIOverview | overview of gui wrappers |
+| redGUIOverview | overview of gui wrappers |
 
 | redInstrument (sound generators) | |
 | ------------- | ------------- |
@@ -49,96 +49,97 @@ redGUIOverview | overview of gui wrappers |
 
 | redMatrixMixer (matrix mixing) | |
 | ------------- | ------------- |
-RedMatrixMixer | mix any number of input and output channels |
-RedMatrixMixerGUI | gui for RedMatrixMixer |
+| RedMatrixMixer | mix any number of input and output channels |
+| RedMatrixMixerGUI | gui for RedMatrixMixer |
 
 | redMix (small mixer units) | |
 | ------------- | ------------- |
-redMixOverview | overview of redMix classes |
-RedAbstractMix | abstract class |
-RedMixGUI | gui for RedMixMono, RedMixStereo, RedMixStereoMono |
-RedMixMono | mix 2 mono channels in stereo |
-RedMixStereo | mix 2 stereo channels in stereo |
-RedMixStereoMono | mix 1 stereo channel and 1 mono channel in stereo |
+| redMixOverview | overview of redMix classes |
+| RedAbstractMix | abstract class |
+| RedMixGUI | gui for RedMixMono, RedMixStereo, RedMixStereoMono |
+| RedMixMono | mix 2 mono channels in stereo |
+| RedMixStereo | mix 2 stereo channels in stereo |
+| RedMixStereoMono | mix 1 stereo channel and 1 mono channel in stereo |
 
 | redMixer (mixer system) | |
 | ------------- | ------------- |
-RedMixer | create and hold multiple RedMixerChannel |
-RedMixerChannel | channel strip |
-RedMixerChannelGUI | gui for RedMixerChannel |
-RedMixerGUI | gui for RedMixer |
+| RedMixer | create and hold multiple RedMixerChannel |
+| RedMixerChannel | channel strip |
+| RedMixerChannelGUI | gui for RedMixerChannel |
+| RedMixerGUI | gui for RedMixer |
 
 | redModule (modular system) | |
 | ------------- | ------------- |
-RedAbstractModule | abstract class |
-RedEffectModule | abstract class |
-RedEffectModuleGUI | gui for RedEffectModule |
-RedInstrumentModule | abstract class |
-RedInstrumentModuleGUI | gui for RedInstrumentModule |
+| RedAbstractModule | abstract class |
+| RedEffectModule | abstract class |
+| RedEffectModuleGUI | gui for RedEffectModule |
+| RedInstrumentModule | abstract class |
+| RedInstrumentModuleGUI | gui for RedInstrumentModule |
 
 | redSF (sound file player) | |
 | ------------- | ------------- |
-RedSFPlayer | play soundfiles from memory |
-RedSFPlayerDisk | play soundfiles from disk |
+| RedSFPlayer | play soundfiles from memory |
+| RedSFPlayerDisk | play soundfiles from disk |
 
 | redTapTempo (tap tempo) | |
 | ------------- | ------------- |
-RedTapTempoGUI | average tempo of the last n taps/clicks |
-RedTempoClockGUI | list and edit active tempo clocks |
+| RedTapTempoGUI | average tempo of the last n taps/clicks |
+| RedTempoClockGUI | list and edit active tempo clocks |
 
 | redTest (test signals) | |
 | ------------- | ------------- |
-RedTest | generate test signals |
+| RedTest | generate test signals |
 
 | redTools (various) | |
 | ------------- | ------------- |
-RedALF | ascii to list-of-floats conversion |
-RedArduino | for uploading sketches to arduino |
-RedBase64 | base64 encoding/decoding |
-RedBencode | bencode encoder and decoder |
-RedBitStream | stream bits |
-RedBMP | bitmap image |
-RedDifferentialManchesterCode | differential manchester encoding |
-RedDifferentialManchesterCodeNegative | differential manchester encoding |
-RedGIF | gif image decoder |
-RedHarmonicTree | sorted harmonic tree |
-RedHuffman | huffman coding |
-RedIntelHex | read and decode intel hex files |
-RedInterpolator | holds a value and interpolates to new target |
-RedLZ77 | lz77 compression/decompression |
-RedLZ78 | lz78 compression/decompression |
-RedLZSS | lzss compression/decompression |
-RedLZW | lzw compression/decompression |
-RedManchesterCode | manchester encoding |
-Redraw | simple drawing with the mouse |
-RedRLE | run-length compression/decompression |
-RedTime | calculate with time |
-RedToolsMenu | various tools |
-RedTween | tweening for sclang and scserver |
+| RedALF | ascii to list-of-floats conversion |
+| RedArduino | for uploading sketches to arduino |
+| RedBase64 | base64 encoding/decoding |
+| RedBencode | bencode encoder and decoder |
+| RedBitStream | stream bits |
+| RedBMP | bitmap image |
+| RedDifferentialManchesterCode | differential manchester encoding |
+| RedDifferentialManchesterCodeNegative | differential manchester encoding |
+| RedGIF | gif image decoder |
+| RedHarmonicTree | sorted harmonic tree |
+| RedHuffman | huffman coding |
+| RedIntelHex | read and decode intel hex files |
+| RedInterpolator | holds a value and interpolates to new target |
+| RedKCS | kansas city standard encoder/decoder for sclang and server |
+| RedLZ77 | lz77 compression/decompression |
+| RedLZ78 | lz78 compression/decompression |
+| RedLZSS | lzss compression/decompression |
+| RedLZW | lzw compression/decompression |
+| RedManchesterCode | manchester encoding |
+| Redraw | simple drawing with the mouse |
+| RedRLE | run-length compression/decompression |
+| RedTime | calculate with time |
+| RedToolsMenu | various tools |
+| RedTween | tweening for sclang and scserver |
 
 | redUGens (pseudo ugens) | |
 | ------------- | ------------- |
-RedAutoScale | scales an unknown signal to a known range |
-RedComb | comb delay line with crossfade |
-RedDelay | delay line with crossfade |
-RedDestroyer | distortion effect |
-RedDTMF | old-skool telephone |
-RedFrik | noise socks! |
-RedDirection | detects inc/dec of a signal |
-RedImpulse | resettable impulse train |
-RedLFSR4 | 4-bit linear feedback shift register |
-RedLFSR4BitStream | 4-bit linear feedback shift register |
-RedLine | resettable line generator |
-RedLive | sample and repeat |
-RedOnePole | one pole filter with separate up and down coefficients |
-RedOverdub | overdub recording |
-RedRamp | resettable phasor with per period rate control |
-RedSequencer | simple sequencer |
-RedSequencer2 | simple sequencer |
-RedSlide | logarithmic lag |
-RedStereo | panning effect |
-RedStereo2 | panning effect |
-RedTapeRecorder | sampling and looping |
+| RedAutoScale | scales an unknown signal to a known range |
+| RedComb | comb delay line with crossfade |
+| RedDelay | delay line with crossfade |
+| RedDestroyer | distortion effect |
+| RedDTMF | old-skool telephone |
+| RedFrik | noise socks! |
+| RedDirection | detects inc/dec of a signal |
+| RedImpulse | resettable impulse train |
+| RedLFSR4 | 4-bit linear feedback shift register |
+| RedLFSR4BitStream | 4-bit linear feedback shift register |
+| RedLine | resettable line generator |
+| RedLive | sample and repeat |
+| RedOnePole | one pole filter with separate up and down coefficients |
+| RedOverdub | overdub recording |
+| RedRamp | resettable phasor with per period rate control |
+| RedSequencer | simple sequencer |
+| RedSequencer2 | simple sequencer |
+| RedSlide | logarithmic lag |
+| RedStereo | panning effect |
+| RedStereo2 | panning effect |
+| RedTapeRecorder | sampling and looping |
 
 ## Dependancies
 
@@ -157,6 +158,7 @@ Most classes do not have a GUI, but here are a few screenshots of ones that do..
 
 ## Changelog:
 
+* 220731 - added RedKCS, added overview to this readme
 * 220116 - added a few screenshots, helpfile cleanup
 * 220115 - rewrite to use TabbedView2 instead of TabbedView (about time)
 * 220114 - redMix, redTapTempo, redMixer, redMatrixMixer, redEffectsRack, redModule - rework gui and helpfiles
