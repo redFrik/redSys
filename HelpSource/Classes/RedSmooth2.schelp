@@ -1,7 +1,7 @@
 CLASS:: RedSmooth2
 SUMMARY:: data filter with trend
 CATEGORIES:: Red>redTools
-RELATED:: Classes/RedSmooth2UD, Classes/RedSmooth, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
+RELATED:: Classes/RedSmoothUD, Classes/RedSmooth, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
 
 DESCRIPTION::
 A simple class for filtering values. Double exponential smoothing.

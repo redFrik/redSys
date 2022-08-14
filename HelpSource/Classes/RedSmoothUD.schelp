@@ -1,7 +1,7 @@
 CLASS:: RedSmoothUD
 SUMMARY:: data filter
 CATEGORIES:: Red>redTools
-RELATED:: Classes/RedSmooth, Classes/RedSmooth2UD, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
+RELATED:: Classes/RedSmooth, Classes/RedSmooth2, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
 
 DESCRIPTION::
 A simple class for filtering values. Single exponential smoothing with different factors for increasing and decreasing values.
