@@ -14,7 +14,7 @@ ARGUMENT:: in
 The signal to be lagged.
 
 ARGUMENT:: up
-Lag amount for increasing numbers.
+Lag amount for increasing numbers. A higher value here will result in more lag.
 
 ARGUMENT:: down
 Lag amount for decreasing numbers. If nil then set to same as strong::up::.
@@ -58,9 +58,14 @@ b.collect{|x| a.slide(x)}.plot;
 
 //--audio and control rate
 
-{RedSlide.ar(LFPulse.ar(30, 0.6), 100)}.plot(0.1);
-{LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)}.plot(0.1);  //compare lagud
+{RedSlide.ar(LFPulse.ar(300), 30)}.plot;
 
+(  //compared with .lagud
+{[
+	RedSlide.ar(LFPulse.ar(30, 0.6), 100),
+	LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)
+]}.plot(0.1);
+)
 
 {RedSlide.ar(LFPulse.ar(30, 0.6), 100)}.plot(0.1);
 {RedSlide.kr(LFPulse.kr(30, 0.6), 2)}.plot(0.1);  //roughly  the same

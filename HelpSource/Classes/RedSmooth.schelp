@@ -1,0 +1,80 @@
+CLASS:: RedSmooth
+SUMMARY:: data filter
+CATEGORIES:: Red>redTools
+RELATED:: Classes/RedSmoothUD, Classes/RedSmooth2, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
+
+DESCRIPTION::
+A simple class for filtering values. Single exponential smoothing.
+
+Similar to LINK::Classes/Lag::. See LINK::Classes/RedSlide:: for another implementation.
+
+CLASSMETHODS::
+
+METHOD:: new
+
+Create a new filter.
+
+ARGUMENT:: factor
+A link::Classes/Float::. Less is more.
+
+ARGUMENT:: initVal
+Initial value.
+
+DISCUSSION::
+Note that a factor of CODE::0.0:: will 'freeze' the filter, and factors above CODE::1.0:: will be unstable - overshoot, ring and even start to oscillate.
+
+INSTANCEMETHODS::
+
+METHOD:: factor
+How much smoothing.
+
+METHOD:: filter
+Perform the smoothing.
+
+METHOD:: val
+Get or set the current value.
+
+EXAMPLES::
+
+CODE::
+a= RedSmooth(0.05);
+a.filter(1.0.rand);  //run repeatedly - low pass filtered random data
+
+
+//plot example
+a= RedSmooth(0.1);
+~squarewave= (0..1000).collect{|x| (x%200>100).binaryValue};
+~smoothed= ~squarewave.collect{|x| a.filter(x)};
+[~squarewave, ~smoothed].plot;
+
+
+//gui example
+(
+var win= Window();
+var flt= RedSmooth(0.1, 0.5);
+var number, slider, plot, fifo;
+number= NumberBox(win, Rect(10, 10, 90, 20));
+number.value= flt.factor;
+number.decimals= 3;
+number.action= {|view|
+	view.value= view.value.max(0);
+	flt.factor= view.value;
+};
+StaticText(win, Rect(110, 10, 300, 20)).string_("factor. lower is smoother");
+slider= Slider(win, Rect(10, 40, 20, 350));
+slider.value= flt.val;
+plot= MultiSliderView(win, Rect(40, 40, 350, 350));
+plot.elasticMode= true;
+CmdPeriod.doOnce({win.close});
+win.front;
+fifo= List.fill(100, flt.val);
+Routine({
+	inf.do{|i|
+		fifo.pop;
+		fifo.addFirst(flt.filter(slider.value));
+		plot.value= fifo;
+		(1/50).wait;
+	};
+}).play(AppClock);
+)
+::

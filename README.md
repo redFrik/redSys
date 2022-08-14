@@ -113,6 +113,9 @@ red system including mixers, effects, instruments, presets, tools, compression a
 | RedManchesterCode | manchester encoding |
 | Redraw | simple drawing with the mouse |
 | RedRLE | run-length compression/decompression |
+| RedSmooth | single exponential smoothing |
+| RedSmooth2 | double exponential smoothing |
+| RedSmoothUD | single exponential smoothing with different rise/fall |
 | RedTime | calculate with time |
 | RedToolsMenu | various tools |
 | RedTween | tweening for sclang and scserver |
@@ -158,6 +161,7 @@ Most classes do not have a GUI, but here are a few screenshots of ones that do..
 
 ## Changelog:
 
+* 220814 - added RedSmooth, RedSmooth2, RedSmoothUD
 * 220731 - added RedKCS, added overview to this readme
 * 220116 - added a few screenshots, helpfile cleanup
 * 220115 - rewrite to use TabbedView2 instead of TabbedView (about time)

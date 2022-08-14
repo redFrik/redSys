@@ -136,6 +136,9 @@ TABLE::
 ## link::Classes/RedManchesterCode:: || manchester encoding
 ## link::Classes/Redraw:: || simple drawing with the mouse
 ## link::Classes/RedRLE:: || run-length compression/decompression
+## link::Classes/RedSmooth:: || single exponential smoothing
+## link::Classes/RedSmooth2:: || double exponential smoothing
+## link::Classes/RedSmoothUD:: || single exponential smoothing with different rise/fall
 ## link::Classes/RedTime:: || calculate with time
 ## link::Classes/RedToolsMenu:: || various tools
 ## link::Classes/RedTween:: || tweening for sclang and scserver

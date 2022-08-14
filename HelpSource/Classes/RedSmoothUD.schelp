@@ -1,0 +1,94 @@
+CLASS:: RedSmoothUD
+SUMMARY:: data filter
+CATEGORIES:: Red>redTools
+RELATED:: Classes/RedSmooth, Classes/RedSmooth2UD, Classes/RedSlide, Classes/RedInterpolator, Classes/RedTween
+
+DESCRIPTION::
+A simple class for filtering values. Single exponential smoothing with different factors for increasing and decreasing values.
+
+Similar to LINK::Classes/LagUD::. See LINK::Classes/RedSlide:: for another implementation.
+
+CLASSMETHODS::
+
+METHOD:: new
+
+Create a new filter.
+
+ARGUMENT:: factorUp
+Smoothing for increasing values. Less is more.
+
+ARGUMENT:: factorDown
+Smoothing for decreasing values. Less is more.
+
+ARGUMENT:: initVal
+The initial value.
+
+DISCUSSION::
+Note that a factor of CODE::0.0:: will 'freeze' the filter, and factors above CODE::1.0:: will be unstable - overshoot, ring and even start to oscillate.
+
+INSTANCEMETHODS::
+
+METHOD:: factorUp
+Dynamically set how much smoothing for increasing values.
+
+METHOD:: factorDown
+Dynamically set how much smoothing for decreasing values.
+
+METHOD:: filter
+Perform the smoothing.
+
+METHOD:: val
+Get or set the current value.
+
+EXAMPLES::
+
+CODE::
+a= RedSmoothUD(0.05, 0.95);
+a.filter(1.0.rand);  //run repeatedly - low pass filtered random data
+
+
+//plot example
+a= RedSmoothUD(0.9, 0.1);
+~squarewave= (0..1000).collect{|x| (x%200>100).binaryValue};
+~smoothed= ~squarewave.collect{|x| a.filter(x)};
+[~squarewave, ~smoothed].plot;
+
+
+//gui example
+(
+var win= Window();
+var flt= RedSmoothUD(0.95, 0.05, 0.5);
+var numberUp, numberDown, slider, plot, fifo;
+numberUp= NumberBox(win, Rect(10, 10, 90, 20));
+numberUp.value= flt.factorUp;
+numberUp.decimals= 3;
+numberUp.action= {|view|
+	view.value= view.value.max(0);
+	flt.factorUp= view.value;
+};
+StaticText(win, Rect(110, 10, 30, 20)).string_("up");
+numberDown= NumberBox(win, Rect(150, 10, 90, 20));
+numberDown.value= flt.factorDown;
+numberDown.decimals= 3;
+numberDown.action= {|view|
+	view.value= view.value.max(0);
+	flt.factorDown= view.value;
+};
+StaticText(win, Rect(250, 10, 35, 20)).string_("down");
+slider= Slider(win, Rect(10, 40, 20, 350));
+slider.value= flt.val;
+plot= MultiSliderView(win, Rect(40, 40, 350, 350));
+plot.elasticMode= true;
+CmdPeriod.doOnce({win.close});
+win.front;
+fifo= List.fill(100, flt.val);
+Routine({
+	inf.do{|i|
+		fifo.pop;
+		fifo.addFirst(flt.filter(slider.value));
+		plot.value= fifo;
+		(1/50).wait;
+	};
+}).play(AppClock);
+)
+::
