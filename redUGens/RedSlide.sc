@@ -13,14 +13,14 @@ RedSlide {
 		prev= res;
 		^res;
 	}
-	
+
 	//--ugen
 	*ar {|in, up= 10, down|
 		var buf, prev, res;
 		down= down?up;
 		buf= LocalBuf(1).clear;
 		prev= Dbufrd(buf);
-		res= if(in>prev, prev+((in-prev)/up), prev+((in-prev)/down));
+		res= prev+((in-prev)/if(in>prev, up, down));
 		^Duty.ar(SampleDur.ir, 0, Dbufwr(res, buf));
 	}
 	*kr {|in, up= 10, down|
@@ -28,7 +28,7 @@ RedSlide {
 		down= down?up;
 		buf= LocalBuf(1).clear;
 		prev= Dbufrd(buf);
-		res= if(in>prev, prev+((in-prev)/up), prev+((in-prev)/down));
+		res= prev+((in-prev)/if(in>prev, up, down));
 		^Duty.kr(ControlDur.ir, 0, Dbufwr(res, buf));
 	}
 }

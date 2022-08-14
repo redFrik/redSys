@@ -1,7 +1,7 @@
 CLASS:: RedSlide
 SUMMARY:: logarithmic lag
 CATEGORIES:: Red>redUGens
-RELATED:: Classes/RedOnePole
+RELATED:: Classes/RedOnePole, Classes/RedSmooth
 
 DESCRIPTION::
 Very similar to .lagud. Useful for smoothing sensor data.

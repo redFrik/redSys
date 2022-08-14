@@ -1,7 +1,7 @@
 CLASS:: RedOnePole
 SUMMARY:: one pole filter with separate up and down coefficients
 CATEGORIES:: Red>redUGens
-RELATED:: Classes/RedSlide
+RELATED:: Classes/RedSlide, Classes/RedSmooth
 
 DESCRIPTION::
 Very similar to link::Classes/OnePole:: but can have different coef going upward or downward and also a sclang method. Useful for smoothing sensor data.
@@ -58,9 +58,14 @@ b.collect{|x| a.onepole(x)}.plot;
 
 //--audio and control rate
 
-{RedOnePole.ar(LFPulse.ar(30, 0.6), 0.99)}.plot(0.1);
-{LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)}.plot(0.1);  //compare lagud
+{RedOnePole.ar(LFPulse.ar(300), 0.9)}.plot;
 
+(  //compared with .lagud
+{[
+	RedOnePole.ar(LFPulse.ar(30, 0.6), 0.99),
+	LFPulse.ar(30, 0.6).lagud(0.0155, 0.0155)
+]}.plot(0.1);
+)
 
 {RedOnePole.ar(LFPulse.ar(30, 0.6), 0.99)}.plot(0.1);
 {RedOnePole.kr(LFPulse.kr(30, 0.6), 0.5)}.plot(0.1);  //roughly the same
