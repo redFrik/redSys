@@ -28,7 +28,7 @@ EXAMPLES::
 
 CODE::
 s.boot;
-b= Buffer.alloc(s, 44100*3, 2);
+b= Buffer.alloc(s, s.sampleRate*3, 2);
 
 {RedLive.ar(b, Dust.ar([4, 4]), K2A.ar(MouseButton.kr), 2)}.play;
 {RedLive.ar(b, Dust.ar([4, 4]), Impulse.ar(0.5), 2)+Impulse.ar(0.5)}.play;
@@ -38,7 +38,7 @@ b= Buffer.alloc(s, 44100*3, 2);
 {Resonz.ar(Decay.ar(RedLive.ar(b, Pulse.ar(2.99.dup), Impulse.ar(10), 9, 4), 0.1), 50, 0.25)}.play;
 b.free
 
-b= Buffer.alloc(s, 44100*3, 1);
+b= Buffer.alloc(s, s.sampleRate*3, 1);
 {SinOsc.ar(RedLive.kr(b, LFNoise1.kr(2, 100, 400), Impulse.kr(0.5), 2), 0, 0.1)}.play;
 {SinOsc.ar(RedLive.kr(b, SinOsc.kr(2, 0, 100, 400), Dust.kr(0.2), 2), 0, 0.1)}.play;
 b.free
