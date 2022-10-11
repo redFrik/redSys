@@ -61,7 +61,7 @@ RedTapTempoGUI {
 							var bps= (view.value/60).round(0.0001);
 							clock.tempo= bps;
 							bpsView.value= bps;
-							(this.class.name++": new tempo... bps:"+bps+" bpm:"+(bps*60)).postln;
+							//(this.class.name++": new tempo... bps:"+bps+" bpm:"+(bps*60)).postln;
 						}.maxWidth_(bw).maxHeight_(lh),
 						RedStaticText(nil, nil, "bpm").maxHeight_(lh),
 						bpsView= RedNumberBox().value_(clock.tempo).action_{|view|
