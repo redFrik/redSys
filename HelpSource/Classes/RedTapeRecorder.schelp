@@ -33,12 +33,12 @@ CODE::
 //in the following examples click and hold down to record (max recording duration is 3sec)
 s.boot;
 
-b= Buffer.alloc(s, 44100*3, 2);
+b= Buffer.alloc(s, s.sampleRate*3, 2);
 a= {RedTapeRecorder.ar(b, SoundIn.ar([0, 1]), MouseButton.kr>0.5, 1, MouseX.kr>0.5)}.play;
 a.free;
 b.free;
 
-b= Buffer.alloc(s, 44100*3, 1);
+b= Buffer.alloc(s, s.sampleRate*3, 1);
 a= {SinOsc.ar(RedTapeRecorder.kr(b, LFNoise1.kr(2, 100, 400), MouseButton.kr>0.5, 1, MouseX.kr>0.5), 0, 0.1)}.play;
 a.free;
 b.free;

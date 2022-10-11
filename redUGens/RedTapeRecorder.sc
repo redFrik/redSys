@@ -11,15 +11,15 @@ RedTapeRecorder {
 			EnvGen.ar(
 				Env(#[0, 1, 0], #[1, 0], 'lin', 1),
 				gate,
-				BufFrames.kr(buffer.bufnum),
+				BufFrames.kr(buffer),
 				0,
-				BufDur.kr(buffer.bufnum)
+				BufDur.kr(buffer)
 			),
 			gate
 		);
 		var playPhasor= Phasor.ar(playTrigger, 1, 0, Latch.ar(recPhasor, playTrigger));
-		BufWr.ar(in, buffer.bufnum, recPhasor, 0);
-		^BufRd.ar(buffer.numChannels, buffer.bufnum, playPhasor, 1, interpol)*mute;
+		BufWr.ar(in, buffer, recPhasor, 0);
+		^BufRd.ar(buffer.numChannels, buffer, playPhasor, 1, interpol)*mute;
 	}
 
 	*kr {|buffer, in, gate, interpol= 1, muteWhileRecording= 0, lag= 0|	//1=no, 2=linear, 4=cubic
@@ -29,14 +29,14 @@ RedTapeRecorder {
 			EnvGen.kr(
 				Env(#[0, 1, 0], #[1, 0], 'lin', 1),
 				gate,
-				BufFrames.kr(buffer.bufnum),
+				BufFrames.kr(buffer),
 				0,
-				BufDur.kr(buffer.bufnum)*buffer.server.options.blockSize
+				BufDur.kr(buffer)*buffer.server.options.blockSize
 			),
 			gate
 		);
 		var playPhasor= Phasor.kr(playTrigger, 1, 0, Latch.kr(recPhasor, playTrigger));
-		BufWr.kr(in, buffer.bufnum, recPhasor, 0);
-		^BufRd.kr(buffer.numChannels, buffer.bufnum, playPhasor, 1, interpol)*mute;
+		BufWr.kr(in, buffer, recPhasor, 0);
+		^BufRd.kr(buffer.numChannels, buffer, playPhasor, 1, interpol)*mute;
 	}
 }
