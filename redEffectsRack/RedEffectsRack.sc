@@ -80,7 +80,7 @@ RedEffectsRack {
 							k= (k++"_"++suffix).asSymbol;
 						});
 						cvs.put(k, v);
-						this.addUniqueMethod((k++"_").asSymbol, {|obj, val|
+						this.addUniqueMethod(k.asSetter, {|obj, val|
 							cvs[k].value_(spec.constrain(val)).changed(\value);
 							this;
 						});

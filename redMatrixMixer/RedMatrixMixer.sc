@@ -53,8 +53,7 @@ RedMatrixMixer {
 			nOut.do{|i|
 				var arr;
 				var name= ("o"++i).asSymbol;
-				var setName= ("o"++i++"_").asSymbol;
-				this.addUniqueMethod(setName, {|mixer, arr|
+				this.addUniqueMethod(name.asSetter, {|mixer, arr|
 					cvs[name].value_(arr).changed(\value);
 					this;
 				});

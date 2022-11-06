@@ -55,7 +55,7 @@ RedAbstractModule {	//abstract class
 
 	initMethods {
 		cvs.keysValuesDo{|k, v|
-			this.addUniqueMethod((k++"_").asSymbol, {|obj, val|
+			this.addUniqueMethod(k.asSetter, {|obj, val|
 				cvs[k].value_(specs[this.cvsToParam(k)].constrain(val)).changed(\value);
 				this;
 			});
