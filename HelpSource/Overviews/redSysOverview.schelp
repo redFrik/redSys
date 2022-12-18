@@ -148,6 +148,7 @@ SECTION:: redUGens (pseudo ugens)
 
 TABLE::
 ## link::Classes/RedAutoScale:: || scales an unknown signal to a known range
+## link::Classes/RedBernoulli:: || white noise with Bernoulli distribution
 ## link::Classes/RedComb:: || comb delay line with crossfade
 ## link::Classes/RedDelay:: || delay line with crossfade
 ## link::Classes/RedDestroyer:: || distortion effect

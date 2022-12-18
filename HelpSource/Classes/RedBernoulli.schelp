@@ -1,0 +1,29 @@
+CLASS:: RedBernoulli
+SUMMARY:: white noise with Bernoulli distribution
+CATEGORIES:: Red>redUGens
+RELATED:: Classes/WhiteNoise
+
+DESCRIPTION::
+Pseudo UGen. Noise with Bernoulli distribution.
+
+CLASSMETHODS::
+
+METHOD:: ar, kr
+
+ARGUMENT:: thresh
+Usually a value close to 1.0
+
+ARGUMENT:: mul
+Scale the output.
+
+ARGUMENT:: add
+Offset the output.
+
+EXAMPLES::
+
+CODE::
+s.boot;
+
+a= {LeakDC.ar(RedBernoulli.ar(MouseX.kr(0.5, 1), 0.1))!2}.play;
+a.free
+::
