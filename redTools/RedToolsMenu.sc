@@ -4,12 +4,12 @@ RedToolsMenu {
 	classvar <>list;
 	*initClass {
 		StartUp.add({
-			
+
 			//--list of tools in the format: [ [category, name], function, [category, name], function, ... ]
 			list= List[
-//				['redSys', 'RedDiskInPlayer'], {
-//					RedDiskInPlayer.new;
-//				},
+				//				['redSys', 'RedDiskInPlayer'], {
+				//					RedDiskInPlayer.new;
+				//				},
 				['redSys', '~redEfx'], {
 					if(~redEfx.isKindOf(RedEffectsRack), {
 						"overwrote ~redEfx with a new".warn;
@@ -66,7 +66,11 @@ RedToolsMenu {
 					Redraw.new;
 				},
 				['redSys', 'redSys overview'], {
-					RedSys.openHelpFile;
+					if(Main.versionAtLeast(3, 6), {
+						"Overviews/redSysOverview".help;
+					}, {
+						RedSys.openHelpFile;
+					});
 				},
 				['system', 'SynthDescLib read+browse'], {
 					SynthDescLib.read.global.browse;
@@ -81,58 +85,68 @@ RedToolsMenu {
 					Spec.specs.keysValuesDo{|key, val| if(val.class==ControlSpec, {[key, val].postln})};
 				},
 				['system', 'count characters'], {
-					("there are"+Document.current.selectedText.size+"characters in the current selection").postln;
+					if(Main.versionAtMost(3, 5), {
+						("there are"+Document.current.selectedText.size+"characters in the current selection").postln;
+					});
 				},
 				['system', 'post all window positions'], {
 					Window.allWindows.do{|x| x.name.post; "   ".post; x.bounds.postln};
 				},
 				['system', 'post all document positions'], {
-					Document.allDocuments.do{|x| x.title.post; "   ".post; x.bounds.postln};
+					if(Main.versionAtMost(3, 5), {
+						Document.allDocuments.do{|x| x.title.post; "   ".post; x.bounds.postln};
+					});
 				},
 				['template', 'post all incoming osc'], {
 					Document(
 						"listen to all incoming osc",
 						"//start (sc3.4)\nthisProcess.recvOSCfunc= {|time, addr, msg| if(msg[0].asString.contains(\"status.reply\").not, {(\"time:\"+time+\"sender:\"+addr+\"\\nmessage:\"+msg).postln})};\n//stop\nthisProcess.recvOSCfunc= nil;\n\n//for sc3.5\nOSCFunc.trace(true);\nOSCFunc.trace(false);"
-					).syntaxColorize;
+					);
 				},
 				['template', 'normalize soundfile'], {
 					Document(
 						"normalize soundfile",
 						"//--edit paths and evaluate the code below.  it will take a while for large files\nSoundFile.normalize(\n\t\"~/Music/SuperCollider Recordings/SC_090410_125330.aiff\".standardizePath,\n\t\"~/Music/SuperCollider Recordings/SC_090410_125330+.aiff\".standardizePath,\n\tnil, //\"AIFF\" \"WAVE\"\n\t\"int16\"\n)"
-					).syntaxColorize;
+					);
 				},
 				['template', 'userview'], {
 					Document(
 						"userview",
 						"(\nvar width= 500, height= 500;\nvar win= Window(\"animation template\", Rect(300, 300, width, height), false);\nvar usr= UserView(win, Rect(0, 0, width, height));\nusr.background= Color.white;\nusr.clearOnRefresh= true;\nusr.animate= true;\nusr.drawFunc= {\n\tPen.smoothing= true;\n\tPen.width= 1;\n\tPen.fillColor= Color.red;\n\tPen.fillOval(Rect(usr.frame*3%width, usr.frame*4%height, 20, 20));\n};\nwin.front;\nCmdPeriod.doOnce({if(win.isClosed.not, {win.close})});\n)"
-					).syntaxColorize;
+					);
 				},
 				['extras', 'random helpfile'], {
-					var files;
-					if(Main.versionAtLeast(3, 5), {
-						files= List.new;
+					case
+					{Main.versionAtLeast(3, 6)} {
+						SCDoc.documents.choose.path.help;
+					}
+					{Main.versionAtLeast(3, 5)} {
+						var files= List.new;
 						PathName(Help.dir).filesDo{|x| if(x.extension=="html", {files.add(x)})};
 						files.choose.fileNameWithoutExtension.openHelpFile;
-					}, {
-						Document.open(PathName("Help").deepFiles.reject{|x| #[\jpg, \png, \qtz].includes(x.extension.asSymbol)}.choose.fullPath);
-					});
+					}
+					{
+						Document.open(PathName("Help").deepFiles.reject{|x|
+							#[\jpg, \png, \qtz].includes(x.extension.asSymbol)
+						}.choose.fullPath);
+					};
 				},
 				['extras', 'swing boot'], {
 					if('SwingOSC'.asClass.notNil, {
 						SwingOSC.default.boot;
 						GUI.swing;
 					}, {
-						"swingosc not installed".warn;
+						"SwingOSC GUI not installed".warn;
 					});
 				},
 				['extras', 'Quarks.gui'], {
 					Quarks.gui;
 				},
-				['extras', 'Quarks.checkoutAll'], {
-					Quarks.checkoutAll;
+				['extras', 'Quarks.checkForUpdates'], {
+					Quarks.checkForUpdates({"Quarks.checkForUpdates done".postln});
 				},
 				['extras', 'open RedToolsMenu.sc'], {
-					RedToolsMenu.openCodeFile
+					RedToolsMenu.openCodeFile;
 				},
 				['extras', 'open startup'], {
 					var extensions= #[".scd", ".rtf"];
@@ -144,16 +158,16 @@ RedToolsMenu {
 					};
 				}
 			];
-			
+
 			RedToolsMenu.listToMenuLibrary;
 		});
 	}
-	
+
 	//--add tools to Library
 	*listToLibrary {
 		list.pairsDo{|x, y| Library.putList([\redTools]++x, y)}
 	}
-	
+
 	//--add tools to Library menu (osx only) to open with cmd+r shortcut
 	*listToMenuLibrary {
 		Platform.case(\osx, {
@@ -163,13 +177,13 @@ RedToolsMenu {
 			});
 		});
 	}
-	
+
 	//--adds tools to list
 	*add {|nameArray, func|
 		list.add(nameArray);
 		list.add(func);
 	}
-	
+
 	//--create separate window with listview
 	*makeWindow {|position|
 		var w, names= [], fnt= RedFont.new, width= 0, height;
@@ -196,20 +210,20 @@ RedToolsMenu {
 			}
 		);
 		w= Window("_redTools", Rect(position.x, position.y, width, height), false)
-			.front;
+		.front;
 		if(Main.versionAtMost(3, 4) and:{GUI.scheme!=\cocoa}, {
 			w.alpha_(GUI.skins[\redFrik].unfocus);
 		});
 		ListView(w, w.view.bounds.width@w.view.bounds.height)
-			.font_(RedFont.new)
-			.focus
-			.background_(GUI.skins[\redFrik].background)
-			.stringColor_(GUI.skins[\redFrik].foreground)
-			.hiliteColor_(GUI.skins[\redFrik].selection)
-			.items_(names)
-			.enterKeyAction_{|view|
-				(list[view.value*2+1]).value;
-				w.close;
-			};
+		.font_(RedFont.new)
+		.focus
+		.background_(GUI.skins[\redFrik].background)
+		.stringColor_(GUI.skins[\redFrik].foreground)
+		.hiliteColor_(GUI.skins[\redFrik].selection)
+		.items_(names)
+		.enterKeyAction_{|view|
+			(list[view.value*2+1]).value;
+			w.close;
+		};
 	}
 }

@@ -162,7 +162,7 @@ Most classes do not have a GUI, but here are a few screenshots of ones that do..
 
 ## Changelog:
 
-* 221218 - added RedBernoulli
+* 221218 - added RedBernoulli and updated RedToolsMenu
 * 220814 - added RedSmooth, RedSmooth2, RedSmoothUD
 * 220731 - added RedKCS, added overview to this readme
 * 220116 - added a few screenshots, helpfile cleanup

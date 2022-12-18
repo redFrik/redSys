@@ -6,7 +6,7 @@
 	\schelp:		"Overviews/redSysOverview",
 	\url:			"https://www.fredrikolofsson.com/",
 	\dependencies:	["TabbedView2_QT", "TabbedView2"],
-	\version:		"0.63",
+	\version:		"0.64",
 	\since:			"2009",
 	\isCompatible:	{Main.versionAtLeast(3, 6)}
 )
