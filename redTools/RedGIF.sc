@@ -41,7 +41,7 @@ RedGIF {
 		var b= bounds ?? {Rect(300, 300, width, height)};
 		var win= Window(this.class.name, b);
 		var img= Image(width, height).interpolation_(interpolation);
-		var index= 0, image, row;
+		var index= 0, image;
 		win.drawFunc= {
 			var i, j, x, y, size;
 			var left, right, top, bottom;

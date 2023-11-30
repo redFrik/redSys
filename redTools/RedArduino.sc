@@ -3,7 +3,7 @@
 RedArduino {
 	var <>intel;
 	*read {|path, post= true|
-		^super.new.read(path);
+		^super.new.read(path, post);
 	}
 	read {|path, post= true|
 		intel= RedIntelHex.read(path);
@@ -56,7 +56,7 @@ RedArduino {
 			frameCnt= frameCnt+1;
 		};
 		(this.class.name++": number of pages="+array.size).postln;
-		
+
 		//--boot server and make sound
 		server= server?Server.default;
 		server.waitForBoot{

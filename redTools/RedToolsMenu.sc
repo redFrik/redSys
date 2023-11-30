@@ -4,6 +4,7 @@ RedToolsMenu {
 	classvar <>list;
 	*initClass {
 		StartUp.add({
+			var files;
 
 			//--list of tools in the format: [ [category, name], function, [category, name], function, ... ]
 			list= List[
@@ -121,7 +122,7 @@ RedToolsMenu {
 						SCDoc.documents.choose.path.help;
 					}
 					{Main.versionAtLeast(3, 5)} {
-						var files= List.new;
+						files= List.new;
 						PathName(Help.dir).filesDo{|x| if(x.extension=="html", {files.add(x)})};
 						files.choose.fileNameWithoutExtension.openHelpFile;
 					}

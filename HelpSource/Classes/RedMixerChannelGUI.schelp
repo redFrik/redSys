@@ -9,8 +9,6 @@ An embeddable GUI for link::Classes/RedMixerChannel::. If no parent given then a
 
 CLASSMETHODS::
 
-PRIVATE:: initClass
-
 METHOD:: new
 
 ARGUMENT:: redMixerChannel
