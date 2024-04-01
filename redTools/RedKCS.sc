@@ -50,10 +50,10 @@ RedKCS {
 	}
 	initArrays {
 		if(addNewlineGap, {
-			gapBits= arrayClass.with(*[zeroBits.dup(9), oneBits.dup(2)].dup(10).flat);
+			gapBits= arrayClass.newFrom([zeroBits.dup(9), oneBits.dup(2)].dup(10).flat);
 		});
-		leaderBits= arrayClass.with(*oneBits.dup(baudRate*leaderDur).flat);
-		trailerBits= arrayClass.with(*oneBits.dup(baudRate*trailerDur).flat);
+		leaderBits= arrayClass.newFrom(oneBits.dup(baudRate*leaderDur).flat);
+		trailerBits= arrayClass.newFrom(oneBits.dup(baudRate*trailerDur).flat);
 	}
 
 	//--sclang encode

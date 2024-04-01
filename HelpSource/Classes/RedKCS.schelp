@@ -198,6 +198,7 @@ a.encodeStringAsSoundFile("hej du glade!", "~/Desktop/hej.wav");
 a.decodeSoundFile("~/Desktop/hej.wav");
 
 //buffer
+s.boot;
 a= RedKCS(leaderDur:1, trailerDur: 1);
 b= a.encodeStringAsBuffer(str:"hej du glade!");
 a.decodeBuffer(b, false, action:{|a| a.postln});
